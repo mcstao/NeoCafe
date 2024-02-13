@@ -83,10 +83,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         blank=True,
     )
     email = models.EmailField(blank=True, null=True, unique=True)
-    last_name = models.CharField(max_length=255, blank=True, null=True)
     birth_date = models.DateField(blank=True, null=True)
     password = models.CharField(max_length=128)
-    username = models.CharField(max_length=255, blank=True, null=True, unique=True)
     otp = models.CharField(max_length=4, blank=True, null=True)
     branch = models.ForeignKey(
         to=Branch, on_delete=models.CASCADE, null=True, blank=True
