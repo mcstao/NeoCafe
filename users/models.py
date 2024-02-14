@@ -25,7 +25,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password):
         user = self.create_user(
             email=email,
-            first_name="Admin",
+            first_name="Super",
             last_name="User",
             password=password,
         )
@@ -72,7 +72,7 @@ class EmployeeSchedule(models.Model):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    POSITIONS = (("barista", "Barista"), ("waiter", "Waiter"), ("client", "Client"))
+    POSITIONS = (("barista", "Barista"), ("waiter", "Waiter"), ("client", "Client"), ("admin", "Admin"),)
 
     first_name = models.CharField(max_length=255, blank=True, null=True)
     schedule = models.ForeignKey(
@@ -82,9 +82,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True,
     )
+    last_name = models.CharField(max_length=255, blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True, unique=True)
     email = models.EmailField(blank=True, null=True, unique=True)
     birth_date = models.DateField(blank=True, null=True)
-    password = models.CharField(max_length=128)
+    password = models.CharField(max_length=128, null=True, blank=True)
     otp = models.CharField(max_length=4, blank=True, null=True)
     branch = models.ForeignKey(
         to=Branch, on_delete=models.CASCADE, null=True, blank=True

@@ -3,26 +3,24 @@ from rest_framework import serializers
 from users.models import CustomUser
 
 
-class CustomerRegistrationSerializer(serializers.ModelSerializer):
+class RegistrationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+
     class Meta:
         model = CustomUser
         fields = ["email"]
 
-    def create(self, validated_data):
-        validated_data["position"] = "client"
-        return CustomUser.objects.create(**validated_data)
 
-
-class CustomerLoginSerializer(serializers.ModelSerializer):
-    phone_number = serializers.CharField(required=True)
+class LoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
 
     class Meta:
         model = CustomUser
-        fields = ["phone_number"]
+        fields = ["email"]
 
 
-class CustomerOtpSerializer(serializers.ModelSerializer):
-    otp = serializers.ImageField()
+class OtpSerializer(serializers.ModelSerializer):
+    otp = serializers.IntegerField()
 
     class Meta:
         model = CustomUser
