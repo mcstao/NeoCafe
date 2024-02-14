@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'users',
     'rest_framework_simplejwt',
     'drf_spectacular'
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -150,6 +154,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(minutes=5),
@@ -192,3 +197,6 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+CORS_ALLOW_ALL_ORIGINS = True
+

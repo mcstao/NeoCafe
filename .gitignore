@@ -5,4 +5,6 @@ __pycache__/
 *.py[cod]
 *.so
 .env
-identifier.sqlite
+.venv
+db.sqlite3
+
