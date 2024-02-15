@@ -305,6 +305,7 @@ paths:
   /users/login/admin/:
     post:
       operationId: users_login_admin_create
+      description: Этот эндпоинт служит для входа админа
       tags:
       - users
       requestBody:
@@ -328,25 +329,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AdminLogin'
+                example:
+                  refresh: token
+                  access: token
           description: ''
   /users/login/barista/:
     post:
       operationId: users_login_barista_create
+      description: Этот эндпоинт предназначен для входа бармена.
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          content:
             schema:
-              $ref: '#/components/schemas/Login'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Login'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Login'
-        required: true
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -356,25 +359,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Login'
+                example:
+                  message: Введите 4-значный код, отправленный на почту example@gmail.com
+                  pre_token: your_pre_token_here
           description: ''
   /users/login/barista/confirm/:
     post:
       operationId: users_login_barista_confirm_create
+      description: Этот эндпоинт служит для подтверждении входа сотрудников по коду
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          headers:
             schema:
-              $ref: '#/components/schemas/Otp'
-          application/x-www-form-urlencoded:
+              type: object
+              properties:
+                Authorization: pre_token
+              required:
+              - Authorization
+              example:
+                Authorization: pre_token
+          content:
             schema:
-              $ref: '#/components/schemas/Otp'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Otp'
-        required: true
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+              - otp
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -384,25 +401,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Otp'
+                example:
+                  refresh: token
+                  access: token
           description: ''
   /users/login/customer/:
     post:
       operationId: users_login_customer_create
+      description: Этот эндпоинт предназначен для входа клиентов.
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          content:
             schema:
-              $ref: '#/components/schemas/Login'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Login'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Login'
-        required: true
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -412,25 +431,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Login'
+                example:
+                  message: Введите 4-значный код, отправленный на почту example@gmail.com
+                  pre_token: your_pre_token_here
           description: ''
   /users/login/customer/confirm/:
     post:
       operationId: users_login_customer_confirm_create
+      description: Этот эндпоинт служит для подтверждении входа клиентов по коду
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          headers:
             schema:
-              $ref: '#/components/schemas/Otp'
-          application/x-www-form-urlencoded:
+              type: object
+              properties:
+                Authorization: pre_token
+              required:
+              - Authorization
+              example:
+                Authorization: pre_token
+          content:
             schema:
-              $ref: '#/components/schemas/Otp'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Otp'
-        required: true
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+              - otp
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -440,11 +473,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Otp'
+                example:
+                  refresh: token
+                  access: token
           description: ''
   /users/login/waiter/:
     post:
       operationId: users_login_waiter_create
+      description: Этот эндпоинт предназначен для входа официантов.
       tags:
       - users
       requestBody:
@@ -468,25 +504,39 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WaiterLogin'
+                example:
+                  message: Введите 4-значный код, отправленный на почту example@gmail.com
+                  pre_token: your_pre_token_here
           description: ''
   /users/login/waiter/confirm/:
     post:
       operationId: users_login_waiter_confirm_create
+      description: Этот эндпоинт служит для подтверждении входа сотрудников по коду
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          headers:
             schema:
-              $ref: '#/components/schemas/Otp'
-          application/x-www-form-urlencoded:
+              type: object
+              properties:
+                Authorization: pre_token
+              required:
+              - Authorization
+              example:
+                Authorization: pre_token
+          content:
             schema:
-              $ref: '#/components/schemas/Otp'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Otp'
-        required: true
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+              - otp
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -496,25 +546,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Otp'
+                example:
+                  refresh: token
+                  access: token
           description: ''
   /users/register/customer/:
     post:
       operationId: users_register_customer_create
+      description: Этот эндпоинт предназначен для регистрации клиентов.
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          content:
             schema:
-              $ref: '#/components/schemas/Registration'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Registration'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Registration'
-        required: true
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -524,12 +576,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Registration'
+                example:
+                  message: Введите 4-значный код, отправленный на почту example@gmail.com
+                  pre_token: your_pre_token_here
           description: ''
   /users/resend-code/:
     get:
       operationId: users_resend_code_retrieve
-      description: Повторная отправка кода
+      description: Повторная отправка кода Ожидается, что клиент передаст pre_token
+        пользователя в заголовке Authorization.
       tags:
       - users
       security:
@@ -541,25 +596,38 @@ paths:
           content:
             application/json:
               schema:
-                description: Successful operation
+                example:
+                  detail: Код был отправлен заново
           description: ''
   /users/verify/email/:
     post:
       operationId: users_verify_email_create
+      description: Этот эндпоинт служит для подтверждении регистрации пользователей
       tags:
       - users
       requestBody:
         content:
-          application/json:
+          headers:
             schema:
-              $ref: '#/components/schemas/Otp'
-          application/x-www-form-urlencoded:
+              type: object
+              properties:
+                Authorization: pre_token
+              required:
+              - Authorization
+              example:
+                Authorization: pre_token
+          content:
             schema:
-              $ref: '#/components/schemas/Otp'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Otp'
-        required: true
+              type: object
+              properties:
+                otp:
+                  type: string
+                email:
+                  type: string
+                  format: email
+              required:
+              - otp
+              - email
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -569,7 +637,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Otp'
+                example:
+                  message: Поздравляем, ваш адрес электронной почты подтвержден!
           description: ''
 components:
   schemas:
@@ -615,21 +684,6 @@ components:
       - link_to_map
       - phone_number
       - schedule
-    Login:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-      required:
-      - email
-    Otp:
-      type: object
-      properties:
-        otp:
-          type: integer
-      required:
-      - otp
     PatchedBranch:
       type: object
       properties:
@@ -656,14 +710,6 @@ components:
           maxLength: 200
         counts_of_tables:
           type: integer
-    Registration:
-      type: object
-      properties:
-        email:
-          type: string
-          format: email
-      required:
-      - email
     Schedule:
       type: object
       properties:

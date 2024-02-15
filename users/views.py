@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema
-
+from django.contrib.auth.hashers import check_password
 from rest_framework import generics, status, permissions, serializers
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -14,6 +14,26 @@ from users.serializers import RegistrationSerializer, OtpSerializer, LoginSerial
 User = get_user_model()
 
 
+@extend_schema(
+    description='Этот эндпоинт предназначен для регистрации клиентов.',
+    request={
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'email': {'type': 'string', 'format': 'email'}
+                    },
+                    'required': ['email']
+        }
+    },
+    responses={
+        200: {
+                    'example': {
+                        'message': 'Введите 4-значный код, отправленный на почту example@gmail.com',
+                        'pre_token': 'your_pre_token_here'
+                    }
+            }
+    }
+)
 class CustomerRegistrationView(generics.GenericAPIView):
     serializer_class = RegistrationSerializer
 
@@ -36,9 +56,39 @@ class CustomerRegistrationView(generics.GenericAPIView):
         )
 
 
+@extend_schema(
+    description='Этот эндпоинт служит для подтверждении регистрации пользователей',
+    request={
+        'headers': {
+                    'type': 'object',
+                    'properties': {
+                        'Authorization': 'pre_token'
+                    },
+                    'required': ['Authorization'],
+                    'example':{
+                        'Authorization': 'pre_token'
+                    }
+         },
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'otp': {'type': 'string'},
+                        'email': {'type': 'string', 'format': 'email'},
+                    },
+                    'required': ['otp', 'email'],
+        }
+    },
+    responses={
+        200: {
+            'example': {
+                'message': 'Поздравляем, ваш адрес электронной почты подтвержден!'
+            }
+        }
+
+    }
+)
 class VerifyEmailView(generics.GenericAPIView):
     serializer_class = OtpSerializer
-
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -63,6 +113,27 @@ class VerifyEmailView(generics.GenericAPIView):
         else:
             return Response({"detail": "Ошибка при аутентификации пользователя"}, status=status.HTTP_401_UNAUTHORIZED)
 
+
+@extend_schema(
+    description='Этот эндпоинт предназначен для входа клиентов.',
+    request={
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'email': {'type': 'string', 'format': 'email'}
+                    },
+                    'required': ['email']
+        }
+    },
+    responses={
+        200: {
+                    'example': {
+                        'message': 'Введите 4-значный код, отправленный на почту example@gmail.com',
+                        'pre_token': 'your_pre_token_here'
+                    }
+            }
+    }
+)
 class CustomerLoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -85,6 +156,38 @@ class CustomerLoginView(generics.GenericAPIView):
             )
 
 
+@extend_schema(
+    description='Этот эндпоинт служит для подтверждении входа клиентов по коду',
+    request={
+        'headers': {
+                    'type': 'object',
+                    'properties': {
+                        'Authorization': 'pre_token'
+                    },
+                    'required': ['Authorization'],
+                    'example':{
+                        'Authorization': 'pre_token'
+                    }
+         },
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'otp': {'type': 'string'},
+                        'email': {'type': 'string', 'format': 'email'},
+                    },
+                    'required': ['otp', 'email'],
+        }
+    },
+    responses={
+        200: {
+            'example': {
+                'refresh': 'token',
+                'access': 'token'
+            }
+        }
+
+    }
+)
 class ConfirmCustomerLoginView(generics.GenericAPIView):
     serializer_class = OtpSerializer
 
@@ -107,6 +210,19 @@ class ConfirmCustomerLoginView(generics.GenericAPIView):
             return Response({"detail": "Код введен неверно, повторите еще раз"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+@extend_schema(
+    description='Этот эндпоинт служит для входа админа',
+    responses={
+        200: {
+            'example': {
+                'refresh': 'token',
+                'access': 'token'
+            }
+        }
+
+    }
+)
 class AdminLoginView(generics.GenericAPIView):
     serializer_class = AdminLoginSerializer
 
@@ -120,7 +236,7 @@ class AdminLoginView(generics.GenericAPIView):
                 {"detail": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND
             )
         if user.position == "admin":
-            if user.check_password(password):
+            if user.password == password:
                 refresh = RefreshToken.for_user(user)
 
                 return Response({
@@ -139,9 +255,20 @@ class AdminLoginView(generics.GenericAPIView):
             )
 
 
+
+@extend_schema(
+    description='Этот эндпоинт предназначен для входа официантов.',
+    responses={
+        200: {
+                    'example': {
+                        'message': 'Введите 4-значный код, отправленный на почту example@gmail.com',
+                        'pre_token': 'your_pre_token_here'
+                    }
+            }
+    }
+)
 class WaiterLoginView(generics.GenericAPIView):
     serializer_class = WaiterLoginSerializer
-
 
     def post(self, request):
         username = request.data["username"]
@@ -154,8 +281,7 @@ class WaiterLoginView(generics.GenericAPIView):
             )
 
         if user.position == "waiter":
-            if user.check_password(password):
-
+            if user.password == password:
 
                 try:
 
@@ -182,6 +308,38 @@ class WaiterLoginView(generics.GenericAPIView):
             )
 
 
+@extend_schema(
+    description='Этот эндпоинт служит для подтверждении входа сотрудников по коду',
+    request={
+        'headers': {
+                    'type': 'object',
+                    'properties': {
+                        'Authorization': 'pre_token'
+                    },
+                    'required': ['Authorization'],
+                    'example':{
+                        'Authorization': 'pre_token'
+                    }
+         },
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'otp': {'type': 'string'},
+                        'email': {'type': 'string', 'format': 'email'},
+                    },
+                    'required': ['otp', 'email'],
+        }
+    },
+    responses={
+        200: {
+            'example': {
+                'refresh': 'token',
+                'access': 'token'
+            }
+        }
+
+    }
+)
 class ConfirmBaristaWaiterLoginView(generics.GenericAPIView):
     serializer_class = OtpSerializer
 
@@ -194,14 +352,15 @@ class ConfirmBaristaWaiterLoginView(generics.GenericAPIView):
         response = OTP.validate_otp(request)
 
         if response == status.HTTP_200_OK:
-            if user.is_verified:
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'refresh': str(refresh),
                     'access': str(refresh.access_token),
                 }, status=status.HTTP_200_OK)
             else:
-                user.is_verified = True
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'refresh': str(refresh),
@@ -211,6 +370,26 @@ class ConfirmBaristaWaiterLoginView(generics.GenericAPIView):
             return Response({"detail": "Код введен неверно, повторите еще раз"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@extend_schema(
+    description='Этот эндпоинт предназначен для входа бармена.',
+    request={
+        'content': {
+                    'type': 'object',
+                    'properties': {
+                        'email': {'type': 'string', 'format': 'email'}
+                    },
+                    'required': ['email']
+        }
+    },
+    responses={
+        200: {
+                    'example': {
+                        'message': 'Введите 4-значный код, отправленный на почту example@gmail.com',
+                        'pre_token': 'your_pre_token_here'
+                    }
+            }
+    }
+)
 class BaristaLoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -244,12 +423,21 @@ class BaristaLoginView(generics.GenericAPIView):
             )
 
 
+@extend_schema(
+    description='Повторная отправка кода'
+                ' Ожидается, что клиент передаст pre_token пользователя в заголовке Authorization.',
+    responses={
+        200: {
+            'example': {
+                        "detail": "Код был отправлен заново"
+            }
+        }
+
+    }
+)
 class ResendOtpView(generics.GenericAPIView):
     serializer_class = serializers.Serializer
-    @extend_schema(
-        description="Повторная отправка кода",
-        responses={200: {"description": "Successful operation"}},
-    )
+
 
     def get(self, request):
 

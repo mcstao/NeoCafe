@@ -2,19 +2,21 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
+from django.contrib.auth.hashers import make_password
 from branches.models import Branch
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, first_name=None, last_name=None, password=None):
+    def create_user(self, email, password, first_name=None, last_name=None, **extra_fields):
         if not email:
             raise ValueError("Пользователи должны иметь электронную почту")
 
         user = self.model(
             email=self.normalize_email(email),
+            password=password,
             first_name=first_name,
             last_name=last_name,
+            **extra_fields
         )
 
         user.is_active = True
@@ -86,7 +88,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, blank=True, null=True, unique=True)
     email = models.EmailField(blank=True, null=True, unique=True)
     birth_date = models.DateField(blank=True, null=True)
-    password = models.CharField(max_length=128, null=True, blank=True)
+    password = models.CharField(max_length=128, blank=True, null=True)
     otp = models.CharField(max_length=4, blank=True, null=True)
     branch = models.ForeignKey(
         to=Branch, on_delete=models.CASCADE, null=True, blank=True
