@@ -2,16 +2,7 @@ from django.db import models
 from branches.models import Branch
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='storage/images', blank=True, null=True)
-    sluq = models.SlugField()
-
-    def __str__(self):
-        return self.name
-
-
-class Item(models.Model):
+class InventoryItem(models.Model):
     MEASUREMENT_UNIT_CHOICES = [
         ("kg", "кг"),
         ("g", "г"),
@@ -19,6 +10,11 @@ class Item(models.Model):
         ("ml", "мл"),
         ("unit", "шт"),
     ]
+    CATEGORY_CHOICES = [
+        ("ready_products", "Готовые продукты"),
+        ("raw_materials", "Сырье"),
+    ]
+
     name = models.CharField(max_length=100, verbose_name="Наименование")
     quantity = models.PositiveIntegerField(default=0, verbose_name="Количество")
     quantity_unit = models.CharField(
@@ -28,7 +24,9 @@ class Item(models.Model):
     )
     limit = models.PositiveIntegerField(default=0, verbose_name="Лимит")
     arrival_date = models.DateField(verbose_name="Дата прихода")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.CharField(
+        max_length=20, choices=CATEGORY_CHOICES, verbose_name="Категория"
+    )
     branch = models.ForeignKey(
         Branch, on_delete=models.CASCADE, verbose_name="Филиал"
     )
@@ -41,7 +39,7 @@ class Item(models.Model):
         verbose_name_plural = "Склад"
 
     def __str__(self):
-        return f"{self.name} ({self.category}) {self.branch}"
+        return f"{self.name} ({self.get_category_display()}) {self.branch}"
 
     def decrease_stock(self, amount):
         """
