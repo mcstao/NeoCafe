@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from services.users.utils import generate_and_send_otp, get_user_from_jwt, generate_jwt
-from services.users.otp_validate import OTP
+from services.users.otp_validate import OTP, logger
 from users.models import CustomUser
 from users.serializers import RegistrationSerializer, OtpSerializer, LoginSerializer, AdminLoginSerializer, \
     WaiterLoginSerializer
@@ -43,10 +43,9 @@ class CustomerRegistrationView(generics.GenericAPIView):
         user = serializer.save()
         pre_token = generate_jwt(user)
 
-        otp = generate_and_send_otp(user)
+        generate_and_send_otp(user)
 
-        user.otp = otp
-        user.save()
+
 
         return Response(
             {"message": f"Введите 4-х значный код, отправленный на почту {user.email}",
@@ -97,7 +96,8 @@ class VerifyEmailView(generics.GenericAPIView):
         pre_token = request.headers.get("Authorization")
         user = get_user_from_jwt(pre_token)
         if user:
-            response = OTP.validate_otp(request)
+
+            response = OTP.validate_otp(request, user)
             if response == status.HTTP_200_OK:
                 user.is_verified = True
                 user.save()
@@ -196,7 +196,7 @@ class ConfirmCustomerLoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         pre_token = request.headers.get("Authorization")
         user = get_user_from_jwt(pre_token)
-        response = OTP.validate_otp(request)
+        response = OTP.validate_otp(request, user)
 
         if response == status.HTTP_200_OK:
 
@@ -349,7 +349,7 @@ class ConfirmBaristaWaiterLoginView(generics.GenericAPIView):
 
         pre_token = request.headers.get("Authorization")
         user = get_user_from_jwt(pre_token)
-        response = OTP.validate_otp(request)
+        response = OTP.validate_otp(request, user)
 
         if response == status.HTTP_200_OK:
             if not user.is_verified:
