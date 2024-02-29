@@ -1,6 +1,6 @@
 from rest_framework import serializers, viewsets
-from .models import Category, Menu, ExtraItem
-from .serializers import CategorySerializer, MenuSerializer, ExtraItemSerializer
+from .models import Category, Menu, ExtraItem, Ingredient
+from .serializers import CategorySerializer, MenuSerializer, ExtraItemSerializer, IngredientSerializer
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -17,3 +17,7 @@ class ExtraItemViewSet(viewsets.ModelViewSet):
     queryset = ExtraItem.objects.all()
     serializer_class = ExtraItemSerializer
 
+
+class IngredientViewSet(viewsets.ModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
