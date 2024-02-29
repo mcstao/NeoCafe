@@ -15,14 +15,15 @@ otp_data = {}
 def generate_and_send_otp(user):
     if user.email in otp_data:
         del otp_data[user.email]
-    otp = "".join([str(secrets.randbelow(10)) for _ in range(4)])
+    user.otp = "".join([str(secrets.randbelow(10)) for _ in range(4)])
 
     expiration_time = timezone.now() + timezone.timedelta(minutes=5)
-    otp_data[user.email] = {'otp': otp, 'exp': expiration_time}
+    otp_data[user.email] = {'user.otp': user.otp, 'exp': expiration_time}
 
     subject = 'Подтверждение адреса электронной почты'
-    message = f'Ваш одноразовый код подтверждения: {otp}'
+    message = f'Ваш одноразовый код подтверждения: {user.otp}'
     send_mail(subject, message, settings.EMAIL_FROM, [user.email])
+    user.save()
 
 
 def generate_jwt(user):
