@@ -4,15 +4,15 @@ from branches.models import Branch
 
 class InventoryItem(models.Model):
     MEASUREMENT_UNIT_CHOICES = [
-        ("kg", "кг"),
-        ("g", "г"),
-        ("l", "л"),
-        ("ml", "мл"),
-        ("unit", "шт"),
+        ("кг", "кг"),
+        ("г", "г"),
+        ("л", "л"),
+        ("мл", "мл"),
+        ("шт", "шт"),
     ]
     CATEGORY_CHOICES = [
-        ("ready_products", "Готовые продукты"),
-        ("raw_materials", "Сырье"),
+        ("Готовые продукты", "Готовые продукты"),
+        ("Сырье", "Сырье"),
     ]
 
     name = models.CharField(max_length=100, verbose_name="Наименование")
@@ -23,6 +23,11 @@ class InventoryItem(models.Model):
         verbose_name="Единица измерения (Количество)",
     )
     limit = models.PositiveIntegerField(default=0, verbose_name="Лимит")
+    limit_unit = models.CharField(
+        max_length=20,
+        choices=MEASUREMENT_UNIT_CHOICES,
+        verbose_name="Единица измерения (Количество)",
+    )
     arrival_date = models.DateField(verbose_name="Дата прихода")
     category = models.CharField(
         max_length=20, choices=CATEGORY_CHOICES, verbose_name="Категория"
