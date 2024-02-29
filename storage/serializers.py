@@ -7,7 +7,7 @@ class InventoryItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InventoryItem
-        fields = ['id', 'name', 'quantity', 'quantity_unit', 'limit', 'category',
+        fields = ['id', 'name', 'quantity', 'quantity_unit', 'limit', 'limit_unit', 'category',
                   'arrival_date', 'is_running_out', 'branch']
 
     def to_internal_value(self, data):
