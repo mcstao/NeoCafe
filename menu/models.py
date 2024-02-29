@@ -1,32 +1,18 @@
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, verbose_name="Категория")
-    image = models.ImageField(upload_to='menu/images', null=True, blank=True)
-    slug = models.SlugField(max_length=20)
-    # branch = models.ForeignKey(
-    #     "branches.Branch",
-    #     on_delete=models.CASCADE,
-    #     null=True,
-    #     verbose_name="Филиал",
-    #     related_name="categories",
-    # )
-
-    class Meta:
-        ordering = ["name"]
-        indexes = [models.Index(fields=["name"])]
-        verbose_name = "Категория"
-        verbose_name_plural = "Категории"
+    name = models.CharField(max_length=100, default="Выпечка", unique=True, validators=[
+                            MinLengthValidator(3)])
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 
 class Menu(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название")
     image = models.ImageField(upload_to='menu/images', verbose_name="Фото блюда", null=True, blank=True)
-    slug = models.SlugField(max_length=200)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
                                  verbose_name='Категория', null=True
                                  )
@@ -46,7 +32,6 @@ class Menu(models.Model):
     class Meta:
         ordering = ["name"]
         indexes = [
-            models.Index(fields=["id", "slug"]),
             models.Index(fields=["name"]),
             models.Index(fields=["-created"]),
         ]
@@ -57,20 +42,58 @@ class Menu(models.Model):
 
 
 class ExtraItem(models.Model):
-    TYPE_CHOICE = (["Milk", "Молоко"], ["Syrop", "Сиропы"])
+    MILK = 'Milk'
+    SYRUP = 'Syrup'
+    TYPE_CHOICES = [
+        (MILK, 'Молоко'),
+        (SYRUP, 'Сиропы')
+    ]
+
     choice_category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name="extra_products", null=True
     )
     type_extra_product = models.CharField(
-        max_length=20, choices=TYPE_CHOICE, null=True, verbose_name="Доп. Продукт"
+        max_length=20, choices=TYPE_CHOICES, null=True, verbose_name="Доп. Продукт"
     )
-    name = models.CharField(max_length=100, verbose_name="Название доп. продукта")
+    name = models.CharField(max_length=100, unique=True, verbose_name="Название доп. продукта")
     price = models.DecimalField(max_digits=7, decimal_places=2, verbose_name="Цена")
 
     class Meta:
         ordering = ["name"]
-        indexes = [models.Index(fields=["name"])]
         verbose_name_plural = "Доп. Продукты"
 
     def __str__(self):
         return self.name
+
+
+class Ingredient(models.Model):
+    MEASUREMENT_UNIT_CHOICES = [
+        ('гр', 'гр'),
+        ('кг', 'кг'),
+        ('мл', 'мл'),
+        ('л', 'л'),
+        ('шт', 'шт')
+    ]
+
+    menu_item = models.ForeignKey(
+        Menu, on_delete=models.CASCADE, related_name='ingredients')
+    name = models.CharField(max_length=225)
+    quantity = models.PositiveIntegerField()
+    measurement_unit = models.CharField(
+        max_length=15, choices=MEASUREMENT_UNIT_CHOICES)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Состав блюда"
+
+    def __str__(self):
+        return f"{self.name} ({self.quantity}{self.measurement_unit})"
+
+
+class MenuItemIngredient(models.Model):
+    menu_item = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.menu_item.name} - {self.ingredient.name} ({self.quantity})"
