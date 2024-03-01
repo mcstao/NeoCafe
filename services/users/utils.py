@@ -25,6 +25,7 @@ def generate_and_send_otp(user):
     message = f'Ваш одноразовый код подтверждения: {user.otp}'
     send_mail(subject, message, settings.EMAIL_FROM, [user.email])
     user.save()
+    print(otp_data)
 
 
 def generate_jwt(user):
