@@ -95,6 +95,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
     bonus = models.IntegerField(default=0)
     position = models.CharField(max_length=255, choices=POSITIONS, default="client")
+    expiration_time = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
