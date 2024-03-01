@@ -22,7 +22,7 @@ class OTP:
 
             if email in otp_data:
                 if timezone.now() <= user.expiration_time:
-                    if otp == otp_data[email]['otp']:
+                    if otp == otp_data[user.email]['otp']:
                         logger.info("OTP successfully validated")
                         return status.HTTP_200_OK
                     else:
