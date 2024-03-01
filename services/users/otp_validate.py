@@ -1,12 +1,12 @@
 
 import logging
-from datetime import datetime
+
 
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.response import Response
 
-from services.users.utils import otp_data
+
+
 
 logger = logging.getLogger(__name__)
 class OTP:
@@ -20,7 +20,7 @@ class OTP:
                 logger.error("Invalid email or OTP provided")
                 return status.HTTP_400_BAD_REQUEST
             if timezone.now() <= user.expiration_time:
-                if otp == otp_data[user.email]['otp']:
+                if otp == user.otp:
                     logger.info("OTP successfully validated")
                     return status.HTTP_200_OK
                 else:
