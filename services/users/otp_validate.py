@@ -19,20 +19,15 @@ class OTP:
             if not email or not otp:
                 logger.error("Invalid email or OTP provided")
                 return status.HTTP_400_BAD_REQUEST
-
-            if email in otp_data:
-                if timezone.now() <= user.expiration_time:
-                    if otp == otp_data[user.email]['otp']:
-                        logger.info("OTP successfully validated")
-                        return status.HTTP_200_OK
-                    else:
-                        logger.error("Invalid OTP provided")
-                        return status.HTTP_400_BAD_REQUEST
+            if timezone.now() <= user.expiration_time:
+                if otp == otp_data[user.email]['otp']:
+                    logger.info("OTP successfully validated")
+                    return status.HTTP_200_OK
                 else:
-                    logger.error("OTP expired")
+                    logger.error("Invalid OTP provided")
                     return status.HTTP_400_BAD_REQUEST
             else:
-                logger.error("No OTP data found for the email")
+                logger.error("OTP expired")
                 return status.HTTP_400_BAD_REQUEST
         except Exception as e:
             logger.exception("An error occurred during OTP validation: %s", str(e))
