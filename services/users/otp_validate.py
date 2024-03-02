@@ -13,8 +13,8 @@ class OTP:
     @staticmethod
     def validate_otp(request, user):
         try:
-            email = request.POST.get('email')
-            otp = request.POST.get('otp')
+            email = request.POST.get("email")
+            otp = request.POST.get("otp")
 
             if not email or not otp:
                 logger.error("Invalid email or OTP provided")
