@@ -80,7 +80,9 @@ class CustomerRegistrationView(generics.GenericAPIView):
     responses={
         200: {
             'example': {
-                'message': 'Поздравляем, ваш адрес электронной почты подтвержден!'
+                'message': 'Поздравляем, ваш адрес электронной почты подтвержден!',
+                'refresh': 'token',
+                'access': 'token'
             }
         }
 
@@ -101,8 +103,11 @@ class VerifyEmailView(generics.GenericAPIView):
             if response == status.HTTP_200_OK:
                 user.is_verified = True
                 user.save()
+                refresh = RefreshToken.for_user(user)
                 return Response(
-                    {"detail": "Поздравляем, ваш адрес электронной почты подтвержден!"},
+                    {"detail": "Поздравляем, ваш адрес электронной почты подтвержден!",
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)},
                     status=status.HTTP_200_OK,
                 )
             else:
