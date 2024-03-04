@@ -151,6 +151,23 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
+  /barista/profile/:
+    get:
+      operationId: barista_profile_retrieve
+      tags:
+      - barista
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaristaProfile'
+          description: ''
   /branches/:
     get:
       operationId: branches_list
@@ -316,6 +333,52 @@ paths:
       responses:
         '204':
           description: No response body
+  /customers/profile/:
+    get:
+      operationId: customers_profile_retrieve
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerProfile'
+          description: ''
+  /customers/profile/edit/:
+    put:
+      operationId: customers_profile_edit_update
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerEditProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomerEditProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomerEditProfile'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerEditProfile'
+          description: ''
   /employees/staff/{id}/:
     get:
       operationId: employees_staff_retrieve
@@ -424,7 +487,7 @@ paths:
       responses:
         '204':
           description: No response body
-  /employees/staff/create:
+  /employees/staff/create/:
     post:
       operationId: employees_staff_create_create
       tags:
@@ -453,7 +516,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StaffCreate'
           description: ''
-  /employees/staff/list:
+  /employees/staff/list/:
     get:
       operationId: employees_staff_list_list
       tags:
@@ -1705,6 +1768,23 @@ paths:
                   refresh: token
                   access: token
           description: ''
+  /waiters/profile/:
+    get:
+      operationId: waiters_profile_retrieve
+      tags:
+      - waiters
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaiterProfile'
+          description: ''
 components:
   schemas:
     AdminLogin:
@@ -1717,6 +1797,28 @@ components:
       required:
       - password
       - username
+    BaristaProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/EmployeeSchedule'
+          readOnly: true
+      required:
+      - schedule
     Branch:
       type: object
       properties:
@@ -1769,6 +1871,46 @@ components:
       description: |-
         * `Готовые продукты` - Готовые продукты
         * `Сырье` - Сырье
+    CustomerEditProfile:
+      type: object
+      properties:
+        first_name:
+          type: string
+        email:
+          type: string
+          format: email
+          readOnly: true
+        birth_date:
+          type: string
+          format: date
+      required:
+      - birth_date
+      - email
+      - first_name
+    CustomerProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        bonus:
+          type: integer
+        orders:
+          allOf:
+          - $ref: '#/components/schemas/OrderHistory'
+          readOnly: true
+      required:
+      - orders
     EmployeeSchedule:
       type: object
       properties:
@@ -2479,6 +2621,28 @@ components:
       required:
       - password
       - username
+    WaiterProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        schedule:
+          allOf:
+          - $ref: '#/components/schemas/EmployeeSchedule'
+          readOnly: true
+      required:
+      - schedule
   securitySchemes:
     basicAuth:
       type: http
