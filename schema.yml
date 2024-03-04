@@ -128,6 +128,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -149,14 +151,16 @@ paths:
                 type: object
                 additionalProperties: {}
           description: ''
-  /branches/branches/:
+  /branches/:
     get:
-      operationId: branches_branches_list
+      operationId: branches_list
       tags:
       - branches
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -168,7 +172,7 @@ paths:
                   $ref: '#/components/schemas/Branch'
           description: ''
     post:
-      operationId: branches_branches_create
+      operationId: branches_create
       tags:
       - branches
       requestBody:
@@ -186,6 +190,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '201':
@@ -194,9 +200,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Branch'
           description: ''
-  /branches/branches/{id}/:
+  /branches/{id}/:
     get:
-      operationId: branches_branches_retrieve
+      operationId: branches_retrieve
       parameters:
       - in: path
         name: id
@@ -209,6 +215,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -218,7 +226,7 @@ paths:
                 $ref: '#/components/schemas/Branch'
           description: ''
     put:
-      operationId: branches_branches_update
+      operationId: branches_update
       parameters:
       - in: path
         name: id
@@ -243,6 +251,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -252,7 +262,7 @@ paths:
                 $ref: '#/components/schemas/Branch'
           description: ''
     patch:
-      operationId: branches_branches_partial_update
+      operationId: branches_partial_update
       parameters:
       - in: path
         name: id
@@ -276,6 +286,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -285,7 +297,7 @@ paths:
                 $ref: '#/components/schemas/Branch'
           description: ''
     delete:
-      operationId: branches_branches_destroy
+      operationId: branches_destroy
       parameters:
       - in: path
         name: id
@@ -298,6 +310,1037 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /employees/staff/{id}/:
+    get:
+      operationId: employees_staff_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - employees
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffCreate'
+          description: ''
+    put:
+      operationId: employees_staff_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - employees
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffCreate'
+          description: ''
+    patch:
+      operationId: employees_staff_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - employees
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStaffCreate'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffCreate'
+          description: ''
+    delete:
+      operationId: employees_staff_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - employees
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /employees/staff/create:
+    post:
+      operationId: employees_staff_create_create
+      tags:
+      - employees
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffCreate'
+          description: ''
+  /employees/staff/list:
+    get:
+      operationId: employees_staff_list_list
+      tags:
+      - employees
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StaffCreate'
+          description: ''
+  /menu/categories/:
+    get:
+      operationId: menu_categories_list
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+    post:
+      operationId: menu_categories_create
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /menu/categories/{id}/:
+    get:
+      operationId: menu_categories_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: menu_categories_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    patch:
+      operationId: menu_categories_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: menu_categories_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /menu/extra-items/:
+    get:
+      operationId: menu_extra_items_list
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExtraItem'
+          description: ''
+    post:
+      operationId: menu_extra_items_create
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraItem'
+          description: ''
+  /menu/extra-items/{id}/:
+    get:
+      operationId: menu_extra_items_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this extra item.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraItem'
+          description: ''
+    put:
+      operationId: menu_extra_items_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this extra item.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExtraItem'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraItem'
+          description: ''
+    patch:
+      operationId: menu_extra_items_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this extra item.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedExtraItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedExtraItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedExtraItem'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExtraItem'
+          description: ''
+    delete:
+      operationId: menu_extra_items_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this extra item.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /menu/ingredients/:
+    get:
+      operationId: menu_ingredients_list
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ingredient'
+          description: ''
+    post:
+      operationId: menu_ingredients_create
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+          description: ''
+  /menu/ingredients/{id}/:
+    get:
+      operationId: menu_ingredients_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ingredient.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+          description: ''
+    put:
+      operationId: menu_ingredients_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ingredient.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ingredient'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+          description: ''
+    patch:
+      operationId: menu_ingredients_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ingredient.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedIngredient'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedIngredient'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedIngredient'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ingredient'
+          description: ''
+    delete:
+      operationId: menu_ingredients_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this ingredient.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /menu/menus/:
+    get:
+      operationId: menu_menus_list
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+          description: ''
+    post:
+      operationId: menu_menus_create
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Menu'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Menu'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Menu'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+          description: ''
+  /menu/menus/{id}/:
+    get:
+      operationId: menu_menus_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this menu.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+          description: ''
+    put:
+      operationId: menu_menus_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this menu.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Menu'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Menu'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Menu'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+          description: ''
+    patch:
+      operationId: menu_menus_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this menu.
+        required: true
+      tags:
+      - menu
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMenu'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMenu'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMenu'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Menu'
+          description: ''
+    delete:
+      operationId: menu_menus_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this menu.
+        required: true
+      tags:
+      - menu
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /orders/create/:
+    post:
+      operationId: orders_create_create
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Order'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Order'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Order'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+  /orders/history/:
+    get:
+      operationId: orders_history_list
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderHistory'
+          description: ''
+  /storage/:
+    get:
+      operationId: storage_list
+      tags:
+      - storage
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    post:
+      operationId: storage_create
+      tags:
+      - storage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+  /storage/{id}/:
+    get:
+      operationId: storage_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - storage
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    put:
+      operationId: storage_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - storage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InventoryItem'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    patch:
+      operationId: storage_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - storage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItem'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItem'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedInventoryItem'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItem'
+          description: ''
+    delete:
+      operationId: storage_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this inventory item.
+        required: true
+      tags:
+      - storage
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '204':
@@ -323,6 +1366,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -353,6 +1398,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -395,6 +1442,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -425,6 +1474,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -467,6 +1518,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -498,6 +1551,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -540,6 +1595,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -570,6 +1627,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -590,6 +1649,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -631,6 +1692,8 @@ paths:
       security:
       - tokenAuth: []
       - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
       - {}
       responses:
         '200':
@@ -639,6 +1702,8 @@ paths:
               schema:
                 example:
                   message: Поздравляем, ваш адрес электронной почты подтвержден!
+                  refresh: token
+                  access: token
           description: ''
 components:
   schemas:
@@ -684,33 +1749,27 @@ components:
       - link_to_map
       - phone_number
       - schedule
-    PatchedBranch:
+    Category:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        schedule:
-          $ref: '#/components/schemas/Schedule'
-        image:
-          type: string
-          format: uri
-          nullable: true
         name:
           type: string
           maxLength: 100
-        address:
-          type: string
-        phone_number:
-          type: string
-          maxLength: 128
-        link_to_map:
-          type: string
-          format: uri
-          maxLength: 200
-        counts_of_tables:
-          type: integer
-    Schedule:
+          minLength: 3
+      required:
+      - id
+    CategoryEnum:
+      enum:
+      - Готовые продукты
+      - Сырье
+      type: string
+      description: |-
+        * `Готовые продукты` - Готовые продукты
+        * `Сырье` - Сырье
+    EmployeeSchedule:
       type: object
       properties:
         id:
@@ -795,6 +1854,621 @@ components:
       required:
       - id
       - title
+    ExtraItem:
+      type: object
+      properties:
+        name:
+          type: string
+          title: Название доп. продукта
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+        type_extra_product:
+          nullable: true
+          title: Доп. Продукт
+          oneOf:
+          - $ref: '#/components/schemas/TypeExtraProductEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        choice_category:
+          type: integer
+          nullable: true
+      required:
+      - name
+      - price
+    Ingredient:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 225
+        quantity:
+          type: integer
+        measurement_unit:
+          $ref: '#/components/schemas/MeasurementUnitEnum'
+      required:
+      - measurement_unit
+      - name
+      - quantity
+    InventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Наименование
+          maxLength: 100
+        quantity:
+          type: integer
+          title: Количество
+        quantity_unit:
+          allOf:
+          - $ref: '#/components/schemas/QuantityUnitEnum'
+          title: Единица измерения (Количество)
+        limit:
+          type: integer
+          title: Лимит
+        limit_unit:
+          allOf:
+          - $ref: '#/components/schemas/LimitUnitEnum'
+          title: Единица измерения (Количество)
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        arrival_date:
+          type: string
+          format: date
+          title: Дата прихода
+        is_running_out:
+          type: boolean
+          title: Заканчивающийся продукт
+        branch:
+          type: integer
+          title: Филиал
+      required:
+      - arrival_date
+      - branch
+      - category
+      - id
+      - limit_unit
+      - name
+      - quantity_unit
+    LimitUnitEnum:
+      enum:
+      - кг
+      - г
+      - л
+      - мл
+      - шт
+      type: string
+      description: |-
+        * `кг` - кг
+        * `г` - г
+        * `л` - л
+        * `мл` - мл
+        * `шт` - шт
+    MTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        menu_detail:
+          allOf:
+          - $ref: '#/components/schemas/OrderMenuHistory'
+          readOnly: true
+        menu:
+          type: integer
+        menu_quantity:
+          type: integer
+        extra_product:
+          type: array
+          items:
+            type: integer
+        extra_product_detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderExtraProduct'
+          readOnly: true
+        extra_product_quantity:
+          type: integer
+      required:
+      - extra_product_detail
+      - id
+      - menu
+      - menu_detail
+    MeasurementUnitEnum:
+      enum:
+      - гр
+      - кг
+      - мл
+      - л
+      - шт
+      type: string
+      description: |-
+        * `гр` - гр
+        * `кг` - кг
+        * `мл` - мл
+        * `л` - л
+        * `шт` - шт
+    Menu:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото блюда
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        description:
+          type: string
+          title: Описание
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+        available:
+          type: boolean
+          title: В наличии
+        branch:
+          type: integer
+          nullable: true
+          title: Филиал
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+      required:
+      - description
+      - id
+      - ingredients
+      - name
+      - price
+    NullEnum:
+      enum:
+      - null
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        branch:
+          type: integer
+          nullable: true
+        user:
+          type: integer
+          nullable: true
+        bonuses_used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        cashback:
+          type: string
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MTO'
+      required:
+      - cashback
+      - created
+      - id
+      - items
+    OrderBranchInHistory:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+          nullable: true
+        name:
+          type: string
+          maxLength: 100
+    OrderExtraProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          title: Название доп. продукта
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+      required:
+      - name
+      - price
+    OrderHistory:
+      type: object
+      properties:
+        branch:
+          $ref: '#/components/schemas/OrderBranchInHistory'
+        bonuses_used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MTO'
+      required:
+      - branch
+      - created
+      - items
+    OrderMenuHistory:
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото блюда
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        description:
+          type: string
+          title: Описание
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+      required:
+      - description
+      - name
+      - price
+    OrderTypeEnum:
+      enum:
+      - takeaway
+      - inplace
+      type: string
+      description: |-
+        * `takeaway` - На вынос
+        * `inplace` - В заведении
+    PatchedBranch:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        schedule:
+          $ref: '#/components/schemas/Schedule'
+        image:
+          type: string
+          format: uri
+          nullable: true
+        name:
+          type: string
+          maxLength: 100
+        address:
+          type: string
+        phone_number:
+          type: string
+          maxLength: 128
+        link_to_map:
+          type: string
+          format: uri
+          maxLength: 200
+        counts_of_tables:
+          type: integer
+    PatchedCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+          minLength: 3
+    PatchedExtraItem:
+      type: object
+      properties:
+        name:
+          type: string
+          title: Название доп. продукта
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+        type_extra_product:
+          nullable: true
+          title: Доп. Продукт
+          oneOf:
+          - $ref: '#/components/schemas/TypeExtraProductEnum'
+          - $ref: '#/components/schemas/NullEnum'
+        choice_category:
+          type: integer
+          nullable: true
+    PatchedIngredient:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 225
+        quantity:
+          type: integer
+        measurement_unit:
+          $ref: '#/components/schemas/MeasurementUnitEnum'
+    PatchedInventoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Наименование
+          maxLength: 100
+        quantity:
+          type: integer
+          title: Количество
+        quantity_unit:
+          allOf:
+          - $ref: '#/components/schemas/QuantityUnitEnum'
+          title: Единица измерения (Количество)
+        limit:
+          type: integer
+          title: Лимит
+        limit_unit:
+          allOf:
+          - $ref: '#/components/schemas/LimitUnitEnum'
+          title: Единица измерения (Количество)
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        arrival_date:
+          type: string
+          format: date
+          title: Дата прихода
+        is_running_out:
+          type: boolean
+          title: Заканчивающийся продукт
+        branch:
+          type: integer
+          title: Филиал
+    PatchedMenu:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото блюда
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+        description:
+          type: string
+          title: Описание
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+        available:
+          type: boolean
+          title: В наличии
+        branch:
+          type: integer
+          nullable: true
+          title: Филиал
+        ingredients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ingredient'
+    PatchedStaffCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        password:
+          type: string
+          nullable: true
+          maxLength: 128
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        last_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        branch:
+          type: integer
+          nullable: true
+        position:
+          $ref: '#/components/schemas/PositionEnum'
+        schedule:
+          $ref: '#/components/schemas/EmployeeSchedule'
+    PositionEnum:
+      enum:
+      - barista
+      - waiter
+      - client
+      - admin
+      type: string
+      description: |-
+        * `barista` - Barista
+        * `waiter` - Waiter
+        * `client` - Client
+        * `admin` - Admin
+    QuantityUnitEnum:
+      enum:
+      - кг
+      - г
+      - л
+      - мл
+      - шт
+      type: string
+      description: |-
+        * `кг` - кг
+        * `г` - г
+        * `л` - л
+        * `мл` - мл
+        * `шт` - шт
+    Schedule:
+      type: object
+      properties:
+        monday:
+          type: boolean
+        monday_start_time:
+          type: string
+          format: time
+          nullable: true
+        monday_end_time:
+          type: string
+          format: time
+          nullable: true
+        tuesday:
+          type: boolean
+        tuesday_start_time:
+          type: string
+          format: time
+          nullable: true
+        tuesday_end_time:
+          type: string
+          format: time
+          nullable: true
+        wednesday:
+          type: boolean
+        wednesday_start_time:
+          type: string
+          format: time
+          nullable: true
+        wednesday_end_time:
+          type: string
+          format: time
+          nullable: true
+        thursday:
+          type: boolean
+        thursday_start_time:
+          type: string
+          format: time
+          nullable: true
+        thursday_end_time:
+          type: string
+          format: time
+          nullable: true
+        friday:
+          type: boolean
+        friday_start_time:
+          type: string
+          format: time
+          nullable: true
+        friday_end_time:
+          type: string
+          format: time
+          nullable: true
+        saturday:
+          type: boolean
+        saturday_start_time:
+          type: string
+          format: time
+          nullable: true
+        saturday_end_time:
+          type: string
+          format: time
+          nullable: true
+        sunday:
+          type: boolean
+        sunday_start_time:
+          type: string
+          format: time
+          nullable: true
+        sunday_end_time:
+          type: string
+          format: time
+          nullable: true
+    StaffCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        password:
+          type: string
+          nullable: true
+          maxLength: 128
+        first_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        last_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        branch:
+          type: integer
+          nullable: true
+        position:
+          $ref: '#/components/schemas/PositionEnum'
+        schedule:
+          $ref: '#/components/schemas/EmployeeSchedule'
+      required:
+      - schedule
+    TypeExtraProductEnum:
+      enum:
+      - Milk
+      - Syrup
+      type: string
+      description: |-
+        * `Milk` - Молоко
+        * `Syrup` - Сиропы
     WaiterLogin:
       type: object
       properties:
@@ -806,6 +2480,13 @@ components:
       - password
       - username
   securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
     jwtAuth:
       type: http
       scheme: bearer
