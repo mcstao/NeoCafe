@@ -8,7 +8,7 @@ from services.users.permissions import IsCustomer, IsEmailVerified
 
 class CustomerProfileView(generics.GenericAPIView):
     serializer_class = CustomerProfileSerializer
-    permission_classes = [IsCustomer]
+    permission_classes = [IsCustomer, IsEmailVerified]
 
     def get(self, request):
         user = request.user
