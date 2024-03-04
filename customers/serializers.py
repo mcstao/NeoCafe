@@ -2,11 +2,13 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from menu.serializers import CategorySerializer
+from orders.serializers import OrderHistorySerializer
 
 User = get_user_model()
 
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
+    orders = OrderHistorySerializer(read_only=True)
     class Meta:
         model = User
         fields = (
@@ -14,6 +16,7 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "birth_date",
             "bonus",
+            "orders"
         )
 
 
