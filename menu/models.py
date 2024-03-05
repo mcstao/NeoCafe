@@ -5,12 +5,19 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=100, default="Выпечка", unique=True, validators=[
                             MinLengthValidator(3)])
+    image = models.ImageField(upload_to='menu/images', verbose_name="Фото категории", null=True, blank=True)
 
     def __str__(self):
         return f"{self.name}"
 
 
 class Menu(models.Model):
+
+    CATEGORY_CHOICES = [
+        ("Готовые продукты", "Готовые продукты"),
+        ("Сырье", "Сырье"),
+    ]
+
     name = models.CharField(max_length=100, verbose_name="Название")
     image = models.ImageField(upload_to='menu/images', verbose_name="Фото блюда", null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
@@ -21,12 +28,9 @@ class Menu(models.Model):
     available = models.BooleanField(default=True, verbose_name="В наличии")
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    branch = models.ForeignKey(
-        "branches.Branch",
-        on_delete=models.CASCADE,
-        null=True,
-        verbose_name="Филиал",
-        related_name="menus",
+    branch = models.CharField(max_length=100, blank=True, null=True)
+    meal_type = models.CharField(
+        max_length=20, choices=CATEGORY_CHOICES, verbose_name="Тип блюда"
     )
 
     class Meta:

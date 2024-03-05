@@ -42,11 +42,16 @@ class Schedule(models.Model):
 
 
 class Branch(models.Model):
-    image = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image_1 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image_2 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image_3 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image_4 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image_5 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+
     schedule = models.ForeignKey(
         Schedule, on_delete=models.CASCADE, related_name="branch"
     )
-    name = models.CharField(max_length=100, default="NeoCafe")
+    name = models.CharField(max_length=100, unique=True, default="NeoCafe")
     address = models.TextField()
     phone_number = PhoneNumberField()
     link_to_map = models.URLField()

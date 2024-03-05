@@ -8,21 +8,21 @@ from services.orders.ord_services import OrderService
 
 class Order(models.Model):
     TYPE_CHOICES = [
-        ("takeaway", "На вынос"),
-        ("inplace", "В заведении"),
+        ("На вынос", "На вынос"),
+        ("В заведении", "В заведении"),
     ]
     STATUS_CHOICES = [
-        ("new", "Новый"),
-        ("in_process", "В процессе"),
-        ("done", "Готово"),
-        ("cancelled", "Отменено"),
-        ("completed", "Завершено"),
+        ("Новый", "Новый"),
+        ("В процессе", "В процессе"),
+        ("Готово", "Готово"),
+        ("Отменено", "Отменено"),
+        ("Завершено", "Завершено"),
     ]
 
     order_type = models.CharField(
-        max_length=20, choices=TYPE_CHOICES, default="takeaway"
+        max_length=20, choices=TYPE_CHOICES, default="На вынос"
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Новый")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
