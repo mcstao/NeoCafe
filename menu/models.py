@@ -29,9 +29,7 @@ class Menu(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     branch = models.CharField(max_length=100, blank=True, null=True)
-    meal_type = models.CharField(
-        max_length=20, choices=CATEGORY_CHOICES, verbose_name="Тип блюда"
-    )
+
 
     class Meta:
         ordering = ["name"]
