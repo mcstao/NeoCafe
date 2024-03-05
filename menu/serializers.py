@@ -5,28 +5,30 @@ from menu.models import Category, Menu, ExtraItem, Ingredient
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image']
 
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
-        fields = ['name', 'quantity', 'measurement_unit']
+        fields = ['id', 'name', 'quantity', 'measurement_unit']
 
 
 class MenuSerializer(serializers.ModelSerializer):
-    ingredients = IngredientSerializer(many=True)
+    ingredients = IngredientSerializer(many=True, required=False)
 
     class Meta:
         model = Menu
-        fields = ['id', 'name', 'image', 'category', 'description', 'price', 'available', 'branch', 'ingredients']
+        fields = ['id', 'name', 'image', 'category', 'description', 'price', 'available', 'ingredients',
+                  'meal_type']
 
     def create(self, validated_data):
-        ingredients_data = validated_data.pop('ingredients')
+        ingredients_data = validated_data.pop('ingredients', None)
         menu = Menu.objects.create(**validated_data)
 
-        for ingredient_data in ingredients_data:
-            Ingredient.objects.create(menu_item=menu, **ingredient_data)
+        if ingredients_data is not None:
+            for ingredient_data in ingredients_data:
+                Ingredient.objects.create(menu_item=menu, **ingredient_data)
 
         return menu
 
@@ -34,6 +36,6 @@ class MenuSerializer(serializers.ModelSerializer):
 class ExtraItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExtraItem
-        fields = ['name', 'price', 'type_extra_product', 'choice_category']
+        fields = ['id', 'name', 'price', 'type_extra_product', 'choice_category']
 
 
