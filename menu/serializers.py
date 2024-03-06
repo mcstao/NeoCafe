@@ -20,7 +20,7 @@ class MenuSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
         fields = ['id', 'name', 'image', 'category', 'description', 'price', 'available', 'ingredients',
-                  'meal_type']
+                 ]
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients', None)
