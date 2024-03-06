@@ -42,7 +42,7 @@ class Schedule(models.Model):
 
 
 class Branch(models.Model):
-    image_1 = models.ImageField(upload_to="branches/images", blank=True, null=True)
+    image = models.ImageField(upload_to="branches/images", blank=True, null=True)
     image_2 = models.ImageField(upload_to="branches/images", blank=True, null=True)
     image_3 = models.ImageField(upload_to="branches/images", blank=True, null=True)
     image_4 = models.ImageField(upload_to="branches/images", blank=True, null=True)
