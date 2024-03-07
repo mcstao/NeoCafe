@@ -51,7 +51,7 @@ class Branch(models.Model):
     schedule = models.ForeignKey(
         Schedule, on_delete=models.CASCADE, related_name="branch"
     )
-    name = models.CharField(max_length=100, unique=True, default="NeoCafe")
+    name = models.CharField(max_length=100, unique=True)
     address = models.TextField()
     phone_number = PhoneNumberField()
     link_to_map = models.URLField()
