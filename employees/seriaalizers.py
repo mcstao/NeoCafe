@@ -18,7 +18,6 @@ class StaffCreateSerializer(serializers.ModelSerializer):
             "email",
             "password",
             "first_name",
-            "last_name",
             "birth_date",
             "branch",
             "position",
