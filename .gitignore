@@ -10,3 +10,4 @@ db.sqlite3
 myenv
 .gitignore
 static
+**__pycehe__
