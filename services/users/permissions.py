@@ -6,7 +6,7 @@ class IsAdminUser(permissions.BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and request.user.position == "admin"
+            and request.user.position == "Админ"
         )
 
 
@@ -15,7 +15,7 @@ class IsCustomer(permissions.BasePermission):
         return (
                 request.user
                 and request.user.is_authenticated
-                and request.user.position == "client"
+                and request.user.position == "Клиент"
         )
 
 
@@ -24,7 +24,7 @@ class IsBarista(permissions.BasePermission):
         return (
                 request.user
                 and request.user.is_authenticated
-                and request.user.position == "barista"
+                and request.user.position == "Бармен"
         )
 
 
@@ -33,7 +33,7 @@ class IsWaiter(permissions.BasePermission):
         return (
                 request.user
                 and request.user.is_authenticated
-                and request.user.position == "waiter"
+                and request.user.position == "Официант"
         )
 
 

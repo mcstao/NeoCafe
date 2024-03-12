@@ -31,6 +31,8 @@ DEBUG = config('DEBUG', cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
+ALGOLIA_APPLICATION_ID = 'OZICZW0QZ5'
+ALGOLIA_API_KEY = '68abe89ed10ca583956b23a53ce55734'
 
 # Application definition
 
@@ -58,6 +60,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'waiters',
     'barista',
+    'algoliasearch',
 ]
 
 MIDDLEWARE = [
