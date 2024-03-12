@@ -1,15 +1,15 @@
 from django.shortcuts import render
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import permissions, generics, status
+from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
+from rest_framework import permissions, generics, status, serializers
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from branches.models import Branch
-from customers.serializers import CustomerProfileSerializer, CustomerEditProfileSerializer, MenuSerializer, \
-    MenuItemDetailSerializer, ChangeBranchSerializer, UserOrdersSerializer
+from customers.serializers import CustomerProfileSerializer, CustomerEditProfileSerializer, CustomerMenuSerializer, \
+    MenuItemDetailSerializer, ChangeBranchSerializer, UserOrdersSerializer, CheckIfItemCanBeMadeSerializer
 from menu.models import Menu
 from orders.models import Order
 from orders.serializers import OrderSerializer
@@ -45,19 +45,14 @@ class CustomerEditProfileView(generics.GenericAPIView):
 
 
 class MenuView(APIView):
-    """
-    View for getting menu items.
-    """
 
     @extend_schema(
-        summary="Get menu",
-        description="Use this endpoint to get menu items.",
-        responses={200: MenuSerializer},
+        summary="Меню филиала",
+        description="Меню филиала",
+        responses={200: CustomerMenuSerializer},
     )
     def get(self, request, format=None):
-        """
-        Get menu items.
-        """
+
         user = request.user
         category_id = request.GET.get("category_id")
 
@@ -66,13 +61,11 @@ class MenuView(APIView):
         else:
             items = Menu.objects.filter(branch=user.branch, available=True)
 
-        serializer = MenuSerializer(items, many=True)
+        serializer = CustomerMenuSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class MenuItemDetailView(APIView):
-    """
-    View for getting menu item detail.
-    """
 
     @extend_schema(
         summary="Получить детальную информацию о пункте меню",
@@ -80,9 +73,7 @@ class MenuItemDetailView(APIView):
         responses={200: MenuItemDetailSerializer},
     )
     def get(self, request, item_id, format=None):
-        """
-        Get menu item detail.
-        """
+
         try:
             item = Menu.objects.get(id=item_id)
         except Menu.DoesNotExist:
@@ -91,58 +82,57 @@ class MenuItemDetailView(APIView):
         serializer = MenuItemDetailSerializer(item)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class PopularItemsView(APIView):
 
+class PopularItemsView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Get popular items",
-        description="Use this endpoint to get popular items.",
+        summary="Самое популярное",
+        description="Самое популярное",
         responses={200: MenuItemDetailSerializer(many=True)},
     )
     def get(self, request, format=None):
-        """
-        Get popular items.
-        """
         user = request.user
         items = get_popular_items(user.branch_id)  # Убедитесь, что функция get_popular_items ожидает id филиала
         serializer = MenuItemDetailSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class CompatibleItemsView(APIView):
-    """
-    View for getting compatible menu items.
-    """
 
+class CompatibleItemsView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Get compatible items",
-        description="Use this endpoint to get menu items that are compatible with a given menu item.",
+        summary="Рекомендации к заказу",
+        description="Рекомендация",
         responses={200: MenuItemDetailSerializer(many=True)},
     )
     def get(self, request, item_id, format=None):
-        """
-        Get compatible items.
-        """
         branch_id = request.user.branch.id
-        items = get_compatibles(item_id, False, branch_id)  # is_ready_made_product убран, так как у вас одна модель Menu
+        items = get_compatibles(item_id, False, branch_id)
         serializer = MenuItemDetailSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-
 class ItemSearchView(APIView):
-    """
-    View to search items.
-    """
-
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        summary="Поиск меню по филиалу",
+        description="...",
+        responses={
+            200: inline_serializer(
+                name='ItemSearchResponse',
+                fields={
+                    'items': serializers.ListField(
+                        child=serializers.DictField(
+                            child=serializers.CharField()
+                        )
+                    )
+                }
+            ),
+        },
+    )
     def get(self, request, format=None):
-        """
-        Search items.
-        """
         user = request.user
         query = request.GET.get("query")
         items = item_search(query, user.branch.id)
@@ -150,23 +140,22 @@ class ItemSearchView(APIView):
 
 
 class CheckIfItemCanBeMadeView(APIView):
-    """
-    View for checking if a menu item can be made.
-    """
-
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Check if menu item can be made",
-        description="Use this endpoint to check if a menu item can be made based on its availability and the stock of its ingredients.",
+        summary="Проверяет можно ли изготовить",
+        description="Проверка на возможность изготовление чего-то",
+        request=CheckIfItemCanBeMadeSerializer,
         responses={
-            200: "Item can be made",
-            400: "Item can't be made",
+            200: inline_serializer(
+                name='ItemCanBeMadeResponse',
+                fields={'message': serializers.CharField()}
+            ),
+            400: inline_serializer(
+                name='ItemCannotBeMadeResponse',
+                fields={'message': serializers.CharField()}
+            ),
         },
-        parameters=[
-            OpenApiParameter("item_id", OpenApiTypes.INT, OpenApiParameter.QUERY, description="Menu item id"),
-            OpenApiParameter("quantity", OpenApiTypes.INT, OpenApiParameter.QUERY, description="Quantity")
-        ],
     )
     def post(self, request, format=None):
         item_id = request.data.get("item_id")
@@ -182,19 +171,27 @@ class CheckIfItemCanBeMadeView(APIView):
 
         return Response({"message": "Item can't be made."}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ChangeBranchView(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = ChangeBranchSerializer
 
     @extend_schema(
         summary="Change branch",
-        description="Use this endpoint to change branch. You need to provide branch id.",
-        responses={200: "Branch changed successfully", 400: "Invalid data"},
+        description="Эндпоинт для смены филиала",
+        responses={
+            200: inline_serializer(
+                name='ChangeBranchResponse200',
+                fields={'message': serializers.CharField()}
+            ),
+            400: inline_serializer(
+                name='ChangeBranchResponse400',
+                fields={'message': serializers.CharField()}
+            ),
+        },
     )
     def post(self, request, format=None):
-        """
-        Change branch.
-        """
+
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             branch_id = serializer.validated_data.get("branch_id")
@@ -210,54 +207,48 @@ class ChangeBranchView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class MyIdView(APIView):
-    """
-    View for getting user's id.
-    """
 
+class MyIdView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Get user's ID",
-        description="Use this endpoint to get the authenticated user's ID.",
-        responses={200: "User's ID"},
+        summary="ID пользователя",
+        description="Выдает ID пользователя.",
+        responses={
+            200: inline_serializer(
+                name='UserIdResponse',
+                fields={'id': serializers.IntegerField()}
+            ),
+        },
     )
     def get(self, request, format=None):
-        """
-        Get user's ID.
-        """
         user = request.user
         return Response({"id": user.id}, status=status.HTTP_200_OK)
 
-class MyOrdersView(APIView):
-    """
-    View for getting user's orders.
-    """
 
+class MyOrdersView(APIView):
     permission_classes = [IsAuthenticated]
 
     @extend_schema(
-        summary="Get user's orders",
-        description="Use this endpoint to get the authenticated user's orders.",
+        summary="Заказы пользователя",
+        description="Заказы пользователя",
         responses={200: UserOrdersSerializer},
     )
     def get(self, request, format=None):
-        """
-        Get user's orders.
-        """
         user = request.user
         serializer = UserOrdersSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class MyOrderDetailView(RetrieveAPIView):
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
     queryset = Order.objects.all()
 
     @extend_schema(
-        summary="Get order detail",
-        description="Use this endpoint to get details of a specific order by its ID.",
+        summary="Детали заказа",
+        description="Деталь заказа",
         responses={200: OrderSerializer},
     )
-
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

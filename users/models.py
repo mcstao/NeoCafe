@@ -94,7 +94,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         to=Branch, on_delete=models.CASCADE, null=True, blank=True
     )
     bonus = models.IntegerField(default=0)
-    position = models.CharField(max_length=255, choices=POSITIONS, default="client")
+    position = models.CharField(max_length=255, choices=POSITIONS, default="Клиент")
     expiration_time = models.DateTimeField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

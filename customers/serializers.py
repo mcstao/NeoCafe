@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from menu.models import Menu
@@ -37,7 +39,7 @@ class ChangeBranchSerializer(serializers.Serializer):
 from rest_framework import serializers
 from menu.models import Menu
 
-class MenuSerializer(serializers.ModelSerializer):
+class CustomerMenuSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=7, decimal_places=2)
 
     class Meta:
@@ -52,6 +54,8 @@ class MenuItemDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Menu
         fields = ['id', 'name', 'description', 'price', 'image', 'ingredients', 'available', 'category']
+
+    @extend_schema_field(serializers.ListField(child=serializers.DictField()))
 
     def get_ingredients(self, obj):
         ingredients = obj.ingredients.all()
@@ -86,10 +90,18 @@ class UserOrdersSerializer(serializers.Serializer):
     class Meta:
         fields = ["opened_orders", "closed_orders"]
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_opened_orders(self, obj):
         orders = get_my_opened_orders_data(obj)
         return OrderHistorySerializer(orders, many=True).data
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_closed_orders(self, obj):
         orders = get_my_closed_orders_data(obj)
         return OrderHistorySerializer(orders, many=True).data
+
+
+class CheckIfItemCanBeMadeSerializer(serializers.Serializer):
+    menu_id = serializers.IntegerField(help_text="The ID of the menu item.")
+    branch_id = serializers.IntegerField(help_text="The ID of the branch.")
+    quantity = serializers.IntegerField(help_text="The quantity of the menu item.", required=False, default=1)
