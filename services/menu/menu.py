@@ -98,13 +98,20 @@ def update_ingredient_storage_on_cooking(menu_id, branch_id, quantity):
 
 
 def check_if_items_can_be_made(menu_id, branch_id, quantity):
-    ingredients = Menu.objects.get(id=menu_id).ingredients.all()
-    for ingredient in ingredients:
-        inventory_item = InventoryItem.objects.get(name=ingredient.name, branch_id=branch_id)
-        if inventory_item.quantity < ingredient.quantity * quantity:
-            return False
-    return True
+    try:
+        menu_item = Menu.objects.get(id=menu_id)
+        ingredients = menu_item.ingredients.all()
 
+        for ingredient in ingredients:
+            try:
+                inventory_item = InventoryItem.objects.get(name=ingredient.name, branch=branch_id)
+                if inventory_item.quantity < ingredient.quantity * quantity:
+                    return False
+            except InventoryItem.DoesNotExist:
+                return False
+        return True
+    except Menu.DoesNotExist:
+        return False
 
 def item_search(query, branch_id):
     items = index.search(query, {"filters": f"branch_id:{branch_id}"})["hits"]

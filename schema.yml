@@ -333,6 +333,267 @@ paths:
       responses:
         '204':
           description: No response body
+  /branches/branches/{id}/menu/:
+    get:
+      operationId: branches_branches_menu_list
+      description: Get the menu items available at this branch with enough ingredients
+        and ready-made products in stock.
+      summary: Branch Menu Items
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - branches
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+          description: ''
+  /customers/change-branch/:
+    post:
+      operationId: customers_change_branch_create
+      description: Эндпоинт для смены филиала
+      summary: Change branch
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeBranch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChangeBranch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChangeBranch'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeBranchResponse200'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeBranchResponse400'
+          description: ''
+  /customers/check-item/:
+    post:
+      operationId: customers_check_item_create
+      description: Проверка на возможность изготовление чего-то
+      summary: Проверяет можно ли изготовить
+      tags:
+      - customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckIfItemCanBeMade'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CheckIfItemCanBeMade'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CheckIfItemCanBeMade'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemCanBeMadeResponse'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemCannotBeMadeResponse'
+          description: ''
+  /customers/compatible-items/{item_id}/:
+    get:
+      operationId: customers_compatible_items_list
+      description: Рекомендация
+      summary: Рекомендации к заказу
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItemDetail'
+          description: ''
+  /customers/menu/:
+    get:
+      operationId: customers_menu_retrieve
+      description: Меню филиала
+      summary: Меню филиала
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerMenu'
+          description: ''
+  /customers/menu/{item_id}/:
+    get:
+      operationId: customers_menu_retrieve_2
+      description: Используйте этот эндпоинт для получения детальной информации о
+        пункте меню по ID.
+      summary: Получить детальную информацию о пункте меню
+      parameters:
+      - in: path
+        name: item_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MenuItemDetail'
+          description: ''
+  /customers/my-id/:
+    get:
+      operationId: customers_my_id_retrieve
+      description: Выдает ID пользователя.
+      summary: ID пользователя
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserIdResponse'
+          description: ''
+  /customers/my-orders/:
+    get:
+      operationId: customers_my_orders_retrieve
+      description: Заказы пользователя
+      summary: Заказы пользователя
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserOrders'
+          description: ''
+  /customers/orders/{id}/:
+    get:
+      operationId: customers_orders_retrieve
+      description: Деталь заказа
+      summary: Детали заказа
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+  /customers/popular-items/:
+    get:
+      operationId: customers_popular_items_list
+      description: Самое популярное
+      summary: Самое популярное
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MenuItemDetail'
+          description: ''
   /customers/profile/:
     get:
       operationId: customers_profile_retrieve
@@ -378,6 +639,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerEditProfile'
+          description: ''
+  /customers/search/:
+    get:
+      operationId: customers_search_retrieve
+      description: '...'
+      summary: Поиск меню по филиалу
+      tags:
+      - customers
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemSearchResponse'
           description: ''
   /employees/staff/{id}/:
     get:
@@ -1831,6 +2111,22 @@ components:
           type: string
           format: uri
           nullable: true
+        image_2:
+          type: string
+          format: uri
+          nullable: true
+        image_3:
+          type: string
+          format: uri
+          nullable: true
+        image_4:
+          type: string
+          format: uri
+          nullable: true
+        image_5:
+          type: string
+          format: uri
+          nullable: true
         name:
           type: string
           maxLength: 100
@@ -1849,6 +2145,7 @@ components:
       - address
       - id
       - link_to_map
+      - name
       - phone_number
       - schedule
     Category:
@@ -1861,6 +2158,11 @@ components:
           type: string
           maxLength: 100
           minLength: 3
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото категории
       required:
       - id
     CategoryEnum:
@@ -1871,6 +2173,43 @@ components:
       description: |-
         * `Готовые продукты` - Готовые продукты
         * `Сырье` - Сырье
+    ChangeBranch:
+      type: object
+      properties:
+        branch_id:
+          type: integer
+      required:
+      - branch_id
+    ChangeBranchResponse200:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    ChangeBranchResponse400:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    CheckIfItemCanBeMade:
+      type: object
+      properties:
+        menu_id:
+          type: integer
+          description: The ID of the menu item.
+        branch_id:
+          type: integer
+          description: The ID of the branch.
+        quantity:
+          type: integer
+          default: 1
+          description: The quantity of the menu item.
+      required:
+      - branch_id
+      - menu_id
     CustomerEditProfile:
       type: object
       properties:
@@ -1887,6 +2226,36 @@ components:
       - birth_date
       - email
       - first_name
+    CustomerMenu:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото блюда
+        available:
+          type: boolean
+          title: В наличии
+        category:
+          type: integer
+          nullable: true
+          title: Категория
+      required:
+      - id
+      - name
+      - price
     CustomerProfile:
       type: object
       properties:
@@ -1914,15 +2283,6 @@ components:
     EmployeeSchedule:
       type: object
       properties:
-        id:
-          type: integer
-          readOnly: true
-        title:
-          type: string
-          maxLength: 255
-        description:
-          type: string
-          nullable: true
         monday:
           type: boolean
         monday_start_time:
@@ -1993,12 +2353,12 @@ components:
           type: string
           format: time
           nullable: true
-      required:
-      - id
-      - title
     ExtraItem:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           title: Название доп. продукта
@@ -2018,11 +2378,15 @@ components:
           type: integer
           nullable: true
       required:
+      - id
       - name
       - price
     Ingredient:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           maxLength: 225
@@ -2031,6 +2395,7 @@ components:
         measurement_unit:
           $ref: '#/components/schemas/MeasurementUnitEnum'
       required:
+      - id
       - measurement_unit
       - name
       - quantity
@@ -2078,6 +2443,31 @@ components:
       - limit_unit
       - name
       - quantity_unit
+    ItemCanBeMadeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    ItemCannotBeMadeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+      - message
+    ItemSearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+      required:
+      - items
     LimitUnitEnum:
       enum:
       - кг
@@ -2166,15 +2556,51 @@ components:
         available:
           type: boolean
           title: В наличии
-        branch:
-          type: integer
-          nullable: true
-          title: Филиал
         ingredients:
           type: array
           items:
             $ref: '#/components/schemas/Ingredient'
       required:
+      - description
+      - id
+      - name
+      - price
+    MenuItemDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Название
+          maxLength: 100
+        description:
+          type: string
+          title: Описание
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
+          title: Цена
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото блюда
+        ingredients:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        available:
+          type: boolean
+          title: В наличии
+        category:
+          $ref: '#/components/schemas/Category'
+      required:
+      - category
       - description
       - id
       - ingredients
@@ -2231,6 +2657,8 @@ components:
         name:
           type: string
           maxLength: 100
+      required:
+      - name
     OrderExtraProduct:
       type: object
       properties:
@@ -2293,12 +2721,12 @@ components:
       - price
     OrderTypeEnum:
       enum:
-      - takeaway
-      - inplace
+      - На вынос
+      - В заведении
       type: string
       description: |-
-        * `takeaway` - На вынос
-        * `inplace` - В заведении
+        * `На вынос` - На вынос
+        * `В заведении` - В заведении
     PatchedBranch:
       type: object
       properties:
@@ -2308,6 +2736,22 @@ components:
         schedule:
           $ref: '#/components/schemas/Schedule'
         image:
+          type: string
+          format: uri
+          nullable: true
+        image_2:
+          type: string
+          format: uri
+          nullable: true
+        image_3:
+          type: string
+          format: uri
+          nullable: true
+        image_4:
+          type: string
+          format: uri
+          nullable: true
+        image_5:
           type: string
           format: uri
           nullable: true
@@ -2335,9 +2779,17 @@ components:
           type: string
           maxLength: 100
           minLength: 3
+        image:
+          type: string
+          format: uri
+          nullable: true
+          title: Фото категории
     PatchedExtraItem:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           title: Название доп. продукта
@@ -2359,6 +2811,9 @@ components:
     PatchedIngredient:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         name:
           type: string
           maxLength: 225
@@ -2432,10 +2887,6 @@ components:
         available:
           type: boolean
           title: В наличии
-        branch:
-          type: integer
-          nullable: true
-          title: Филиал
         ingredients:
           type: array
           items:
@@ -2443,20 +2894,25 @@ components:
     PatchedStaffCreate:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
+        position:
+          $ref: '#/components/schemas/PositionEnum'
         email:
           type: string
           format: email
           nullable: true
           maxLength: 254
+        username:
+          type: string
+          nullable: true
+          maxLength: 255
         password:
           type: string
           nullable: true
           maxLength: 128
         first_name:
-          type: string
-          nullable: true
-          maxLength: 255
-        last_name:
           type: string
           nullable: true
           maxLength: 255
@@ -2467,22 +2923,20 @@ components:
         branch:
           type: integer
           nullable: true
-        position:
-          $ref: '#/components/schemas/PositionEnum'
         schedule:
           $ref: '#/components/schemas/EmployeeSchedule'
     PositionEnum:
       enum:
-      - barista
-      - waiter
-      - client
-      - admin
+      - Бармен
+      - Официант
+      - Клиент
+      - Админ
       type: string
       description: |-
-        * `barista` - Barista
-        * `waiter` - Waiter
-        * `client` - Client
-        * `admin` - Admin
+        * `Бармен` - Бармен
+        * `Официант` - Официант
+        * `Клиент` - Клиент
+        * `Админ` - Админ
     QuantityUnitEnum:
       enum:
       - кг
@@ -2573,20 +3027,25 @@ components:
     StaffCreate:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
+        position:
+          $ref: '#/components/schemas/PositionEnum'
         email:
           type: string
           format: email
           nullable: true
           maxLength: 254
+        username:
+          type: string
+          nullable: true
+          maxLength: 255
         password:
           type: string
           nullable: true
           maxLength: 128
         first_name:
-          type: string
-          nullable: true
-          maxLength: 255
-        last_name:
           type: string
           nullable: true
           maxLength: 255
@@ -2597,11 +3056,10 @@ components:
         branch:
           type: integer
           nullable: true
-        position:
-          $ref: '#/components/schemas/PositionEnum'
         schedule:
           $ref: '#/components/schemas/EmployeeSchedule'
       required:
+      - id
       - schedule
     TypeExtraProductEnum:
       enum:
@@ -2611,6 +3069,27 @@ components:
       description: |-
         * `Milk` - Молоко
         * `Syrup` - Сиропы
+    UserIdResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+      required:
+      - id
+    UserOrders:
+      type: object
+      properties:
+        opened_orders:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        closed_orders:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - closed_orders
+      - opened_orders
     WaiterLogin:
       type: object
       properties:
