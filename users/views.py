@@ -240,7 +240,7 @@ class AdminLoginView(generics.GenericAPIView):
             return Response(
                 {"detail": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND
             )
-        if user.position == "admin":
+        if user.position == "Админ":
             if user.password == password:
                 refresh = RefreshToken.for_user(user)
 
@@ -285,7 +285,7 @@ class WaiterLoginView(generics.GenericAPIView):
                 {"detail": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND
             )
 
-        if user.position == "waiter":
+        if user.position == "Официант":
             if user.password == password:
 
                 try:
@@ -406,7 +406,7 @@ class BaristaLoginView(generics.GenericAPIView):
             return Response(
                 {"detail": "Пользователь не найден"}, status=status.HTTP_404_NOT_FOUND
             )
-        if user.position == "barista":
+        if user.position == "Бармен":
             try:
                 user = CustomUser.objects.get(email=email)
                 pre_token = generate_jwt(user)

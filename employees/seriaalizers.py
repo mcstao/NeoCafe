@@ -40,6 +40,7 @@ class StaffCreateSerializer(serializers.ModelSerializer):
             "id",
             "position",
             "email",
+            "username",
             "password",
             "first_name",
             "birth_date",

@@ -74,7 +74,7 @@ class EmployeeSchedule(models.Model):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    POSITIONS = (("barista", "Barista"), ("waiter", "Waiter"), ("client", "Client"), ("admin", "Admin"),)
+    POSITIONS = (("Бармен", "Бармен"), ("Официант", "Официант"), ("Клиент", "Клиент"), ("Админ", "Админ"),)
 
     first_name = models.CharField(max_length=255, blank=True, null=True)
     schedule = models.ForeignKey(
