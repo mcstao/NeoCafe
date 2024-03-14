@@ -6,6 +6,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = [
+            "title",
             "monday",
             "monday_start_time",
             "monday_end_time",
