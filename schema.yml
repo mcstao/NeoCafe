@@ -2283,6 +2283,9 @@ components:
     EmployeeSchedule:
       type: object
       properties:
+        title:
+          type: string
+          maxLength: 255
         monday:
           type: boolean
         monday_start_time:
@@ -2353,6 +2356,8 @@ components:
           type: string
           format: time
           nullable: true
+      required:
+      - title
     ExtraItem:
       type: object
       properties:
@@ -2954,6 +2959,9 @@ components:
     Schedule:
       type: object
       properties:
+        title:
+          type: string
+          maxLength: 255
         monday:
           type: boolean
         monday_start_time:
@@ -3024,6 +3032,8 @@ components:
           type: string
           format: time
           nullable: true
+      required:
+      - title
     StaffCreate:
       type: object
       properties:

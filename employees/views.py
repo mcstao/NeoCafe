@@ -25,13 +25,13 @@ class StaffByBranchView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        queryset = CustomUser.objects.filter(position__in=["waiter", "barista"])
+        queryset = CustomUser.objects.filter(position__in=["Бармен", "Официант"])
         return queryset
 
 
 class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StaffCreateSerializer
-    queryset = CustomUser.objects.filter(position__in=["waiter", "barista"])
+    queryset = CustomUser.objects.filter(position__in=["Бармен", "Официант"])
     lookup_field = "id"
     permission_classes = [IsAdminUser]
 
