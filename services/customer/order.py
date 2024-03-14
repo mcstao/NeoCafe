@@ -14,7 +14,7 @@ def get_my_orders_data(user, statuses):
     orders = Order.objects.filter(
         user=user,
         status__in=statuses,
-    ).only("id", "branch__name", "branch__image", "created_at")
+    ).only("id", "branch__name", "branch__image", "created")
     return orders
 
 
@@ -36,7 +36,7 @@ def get_specific_order_data(order_id):
     data = {
         "order_id": order_id,
         "branch_name": order.branch.name,
-        "order_date": order.created_at.strftime("%d.%m.%Y"),
+        "order_date": order.created.strftime("%d.%m.%Y"),
         "items": [],
         "order_total_price": order.total_price,
         "order_bonuses_used": order.bonuses_used,
