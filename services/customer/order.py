@@ -14,7 +14,7 @@ def get_my_orders_data(user, statuses):
     orders = Order.objects.filter(
         user=user,
         status__in=statuses,
-    ).only("id", "branch__name", "branch__image", "created")
+    ).only("id", "branch__name", "branch__image", "created", "is_dine_in", "table")
     return orders
 
 
@@ -40,6 +40,8 @@ def get_specific_order_data(order_id):
         "items": [],
         "order_total_price": order.total_price,
         "order_bonuses_used": order.bonuses_used,
+        "table_number": order.table,
+        "is_dine_in": order.is_dine_in,
     }
 
     for item in items:
