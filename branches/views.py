@@ -17,7 +17,7 @@ class BranchViewSet(viewsets.ModelViewSet):
         summary="Branch Menu Items",
         responses={200: MenuSerializer(many=True)}
     )
-    def get_menu_items(self, request, *args, **kwargs):
+    def menu_items(self, request, *args, **kwargs):
         branch = self.get_object()
         menu_items = self.get_menu_items_with_enough_ingredients(branch)
         ready_products = self.get_ready_products(branch)
