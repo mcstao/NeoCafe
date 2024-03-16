@@ -44,6 +44,12 @@ class Order(models.Model):
         limit_choices_to={"position": "waiter"},
     )
     created = models.DateTimeField(auto_now_add=True)
+    table = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Номер стола",
+    )
+    is_dine_in = models.BooleanField(default=False, verbose_name="Заказ в ресторане")
 
     def apply_cashback(self):
         return OrderService.apply_cashback(self)
