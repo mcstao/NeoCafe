@@ -2,7 +2,6 @@ from django.urls import path
 from .views import (
     CustomerProfileView,
     CustomerEditProfileView,
-    MenuView,
     MenuItemDetailView,
     PopularItemsView,
     CompatibleItemsView,
@@ -17,7 +16,6 @@ from .views import (
 urlpatterns = [
     path("profile/", CustomerProfileView.as_view(), name="customer-profile"),
     path("profile/edit/", CustomerEditProfileView.as_view(), name="customer-profile-edit"),
-    path("menu/", MenuView.as_view(), name='customer-menu'),
     path("menu/<int:item_id>/", MenuItemDetailView.as_view(), name="menu-item-detail"),
     path("popular-items/", PopularItemsView.as_view(), name="popular-items"),
     path("compatible-items/<int:item_id>/", CompatibleItemsView.as_view(), name="compatible-items"),

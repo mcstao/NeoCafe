@@ -96,7 +96,6 @@ def update_ingredient_storage_on_cooking(menu_id, branch_id, quantity):
     except Exception as e:
         raise e
 
-
 def check_if_items_can_be_made(menu_id, branch_id, quantity):
     try:
         menu_item = Menu.objects.get(id=menu_id)

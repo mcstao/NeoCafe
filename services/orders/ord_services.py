@@ -1,11 +1,14 @@
 import logging
 from decimal import Decimal
+
+from celery import shared_task
+from django.contrib.auth import get_user_model
 from django.db.models import Sum
 from django.db import models
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
-
+User = get_user_model()
 
 class OrderService:
     @staticmethod
@@ -72,3 +75,14 @@ class OrderService:
             order.save()
             return True
         return False
+
+
+@shared_task
+def update_user_bonus_points(user_id, total_price, spent_bonus_points):
+    """
+    Updates user bonus points.
+    """
+    user = User.objects.get(id=user_id)
+    new_bonus_points = Decimal(total_price)  # Пример расчета новых бонусных баллов
+    user.bonus += new_bonus_points - spent_bonus_points
+    user.save()
