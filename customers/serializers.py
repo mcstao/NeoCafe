@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from menu.models import Menu
 from menu.serializers import CategorySerializer
-from orders.models import OrderItem
+from orders.models import OrderItem, Order
 from orders.serializers import OrderHistorySerializer
 from services.customer.order import get_my_opened_orders_data, get_my_closed_orders_data
 
@@ -22,7 +22,6 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "birth_date",
             "bonus",
-            "orders"
         )
 
 
@@ -36,8 +35,6 @@ class ChangeBranchSerializer(serializers.Serializer):
     branch_id = serializers.IntegerField()
 
 
-from rest_framework import serializers
-from menu.models import Menu
 
 class CustomerMenuSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=7, decimal_places=2)
@@ -74,7 +71,17 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'item_name', 'item_price', 'menu_quantity', 'item_total_price', 'item_image', 'item_id', 'item_category', 'extra_product_names']
+        fields = [
+            "id",
+            "item_name",
+            "item_price",
+            "menu_quantity",
+            "item_total_price",
+            "item_image",
+            "item_id",
+            "item_category",
+            "extra_product_names",
+        ]
 
     def get_item_total_price(self, obj):
         return obj.menu.price * obj.menu_quantity
@@ -83,22 +90,59 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return [extra_item.name for extra_item in obj.extra_product.all()]
 
 
+
+class OrderSerializer(serializers.ModelSerializer):
+    branch_name = serializers.CharField(source="branch.name")
+    items = OrderItemSerializer(many=True)
+    created_at = serializers.DateTimeField(source='created', format="%d.%m.%Y %H:%M")
+    waiter = serializers.CharField(source='waiter.first_name', allow_null=True)
+    table_number = serializers.IntegerField(source='table', allow_null=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "branch_name",
+            "created_at",
+            "items",
+            "total_price",
+            "bonuses_used",
+            "table_number",
+            "is_dine_in",
+            "status",
+            "waiter",
+        ]
+
+class MyOrdersListSerializer(serializers.ModelSerializer):
+    branch_name = serializers.CharField(source="branch.name")
+    created_at = serializers.DateTimeField(source='created', format="%d.%m.%Y")
+    branch_image = serializers.ImageField(source="branch.image")
+
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "branch_name",
+            "created_at",
+            "total_price",
+            "bonuses_used",
+            "branch_image",
+        ]
+
 class UserOrdersSerializer(serializers.Serializer):
     opened_orders = serializers.SerializerMethodField()
     closed_orders = serializers.SerializerMethodField()
 
+    def get_opened_orders(self, user):
+        orders = Order.objects.filter(user=user, status__in=["Новый", "В процессе"])
+        return MyOrdersListSerializer(orders, many=True).data
+
+    def get_closed_orders(self, user):
+        orders = Order.objects.filter(user=user, status__in=["Готово", "Отменено", "Завершено"])
+        return MyOrdersListSerializer(orders, many=True).data
+
     class Meta:
         fields = ["opened_orders", "closed_orders"]
-
-    @extend_schema_field(OpenApiTypes.OBJECT)
-    def get_opened_orders(self, obj):
-        orders = get_my_opened_orders_data(obj)
-        return OrderHistorySerializer(orders, many=True).data
-
-    @extend_schema_field(OpenApiTypes.OBJECT)
-    def get_closed_orders(self, obj):
-        orders = get_my_closed_orders_data(obj)
-        return OrderHistorySerializer(orders, many=True).data
 
 
 class CheckIfItemCanBeMadeSerializer(serializers.Serializer):

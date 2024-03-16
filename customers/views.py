@@ -44,25 +44,6 @@ class CustomerEditProfileView(generics.GenericAPIView):
         )
 
 
-class MenuView(APIView):
-
-    @extend_schema(
-        summary="Меню филиала",
-        description="Меню филиала",
-        responses={200: CustomerMenuSerializer},
-    )
-    def get(self, request, format=None):
-
-        user = request.user
-        category_id = request.GET.get("category_id")
-
-        if category_id:
-            items = Menu.objects.filter(branch=user.branch, category_id=category_id, available=True)
-        else:
-            items = Menu.objects.filter(branch=user.branch, available=True)
-
-        serializer = CustomerMenuSerializer(items, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class MenuItemDetailView(APIView):

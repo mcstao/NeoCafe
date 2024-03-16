@@ -41,7 +41,7 @@ class Order(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        limit_choices_to={"position": "waiter"},
+        limit_choices_to={"position": "Официант"},
     )
     created = models.DateTimeField(auto_now_add=True)
     table = models.IntegerField(
