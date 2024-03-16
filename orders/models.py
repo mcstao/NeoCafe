@@ -6,6 +6,7 @@ from menu.models import Menu, ExtraItem
 from branches.models import Branch
 from users.models import CustomUser
 from services.orders.ord_services import OrderService
+from decimal import Decimal
 
 
 class Order(models.Model):
@@ -82,4 +83,5 @@ class OrderItem(models.Model):
             if self.extra_product
             else Decimal("0")
         )
+
         return menu_cost + extra_cost
