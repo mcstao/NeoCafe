@@ -1,9 +1,12 @@
+from decimal import Decimal
+
 from django.db import models
 from django.conf import settings
 from menu.models import Menu, ExtraItem
 from branches.models import Branch
 from users.models import CustomUser
 from services.orders.ord_services import OrderService
+from decimal import Decimal
 
 
 class Order(models.Model):
@@ -74,3 +77,17 @@ class OrderItem(models.Model):
         related_name="extra_order",
     )
     extra_product_quantity = models.PositiveIntegerField(default=0)
+
+    def get_cost(self):
+        menu_cost = (
+            max(Decimal("0"), self.menu.price) * self.menu_quantity
+            if self.menu
+            else Decimal("0")
+        )
+        extra_cost = (
+            max(Decimal("0"), self.extra_product.price) * self.extra_product_quantity
+            if self.extra_product
+            else Decimal("0")
+        )
+
+        return menu_cost + extra_cost
