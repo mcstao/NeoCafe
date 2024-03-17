@@ -333,15 +333,45 @@ paths:
       responses:
         '204':
           description: No response body
-  /branches/branches/{id}/menu/:
+  /branches/branches/{branch_id}/menu/:
     get:
       operationId: branches_branches_menu_list
-      description: Get the menu items available at this branch with enough ingredients
-        and ready-made products in stock.
-      summary: Branch Menu Items
       parameters:
       - in: path
-        name: id
+        name: branch_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - branches
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
+          description: ''
+  /branches/branches/{branch_id}/menu/category/{category_id}/:
+    get:
+      operationId: branches_branches_menu_category_list
+      description: Get a list of menu items in a branch filtered by category.
+      summary: Branch Menu Items by Category
+      parameters:
+      - in: path
+        name: branch_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: category_id
         schema:
           type: integer
         required: true
@@ -463,29 +493,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/MenuItemDetail'
           description: ''
-  /customers/menu/:
-    get:
-      operationId: customers_menu_retrieve
-      description: Меню филиала
-      summary: Меню филиала
-      tags:
-      - customers
-      security:
-      - tokenAuth: []
-      - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomerMenu'
-          description: ''
   /customers/menu/{item_id}/:
     get:
-      operationId: customers_menu_retrieve_2
+      operationId: customers_menu_retrieve
       description: Используйте этот эндпоинт для получения детальной информации о
         пункте меню по ID.
       summary: Получить детальную информацию о пункте меню
@@ -1473,22 +1483,23 @@ paths:
       responses:
         '204':
           description: No response body
-  /orders/create/:
+  /orders/add-item-to-order/:
     post:
-      operationId: orders_create_create
+      operationId: orders_add_item_to_order_create
+      description: Добавляет пункт в заказ.
       tags:
       - orders
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/AddItemToOrderRequest'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/AddItemToOrderRequest'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/AddItemToOrderRequest'
         required: true
       security:
       - tokenAuth: []
@@ -1501,11 +1512,43 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderStaff'
           description: ''
-  /orders/history/:
-    get:
-      operationId: orders_history_list
+  /orders/create-order/:
+    post:
+      operationId: orders_create_order_create
+      description: Создает заказ
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderStaff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderStaff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderStaff'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStaff'
+          description: ''
+  /orders/remove-order-item/:
+    delete:
+      operationId: orders_remove_order_item_destroy
+      description: Удаляет пункт из заказа.
       tags:
       - orders
       security:
@@ -1516,13 +1559,41 @@ paths:
       - {}
       responses:
         '200':
+          description: No response body
+  /orders/reorder/:
+    get:
+      operationId: orders_reorder_retrieve
+      description: Повторно создает заказ по его идентификатору.
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderHistory'
+                $ref: '#/components/schemas/OrderStaff'
           description: ''
+  /orders/reorder-information/:
+    get:
+      operationId: orders_reorder_information_retrieve
+      description: Предоставляет информацию для повторного заказа.
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
   /storage/:
     get:
       operationId: storage_list
@@ -2067,6 +2138,16 @@ paths:
           description: ''
 components:
   schemas:
+    AddItemToOrderRequest:
+      type: object
+      properties:
+        order_id:
+          type: integer
+        item_id:
+          type: integer
+      required:
+      - item_id
+      - order_id
     AdminLogin:
       type: object
       properties:
@@ -2226,36 +2307,6 @@ components:
       - birth_date
       - email
       - first_name
-    CustomerMenu:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        name:
-          type: string
-          title: Название
-          maxLength: 100
-        price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-        image:
-          type: string
-          format: uri
-          nullable: true
-          title: Фото блюда
-        available:
-          type: boolean
-          title: В наличии
-        category:
-          type: integer
-          nullable: true
-          title: Категория
-      required:
-      - id
-      - name
-      - price
     CustomerProfile:
       type: object
       properties:
@@ -2274,12 +2325,6 @@ components:
           nullable: true
         bonus:
           type: integer
-        orders:
-          allOf:
-          - $ref: '#/components/schemas/OrderHistory'
-          readOnly: true
-      required:
-      - orders
     EmployeeSchedule:
       type: object
       properties:
@@ -2487,36 +2532,6 @@ components:
         * `л` - л
         * `мл` - мл
         * `шт` - шт
-    MTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        menu_detail:
-          allOf:
-          - $ref: '#/components/schemas/OrderMenuHistory'
-          readOnly: true
-        menu:
-          type: integer
-        menu_quantity:
-          type: integer
-        extra_product:
-          type: array
-          items:
-            type: integer
-        extra_product_detail:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderExtraProduct'
-          readOnly: true
-        extra_product_quantity:
-          type: integer
-      required:
-      - extra_product_detail
-      - id
-      - menu
-      - menu_detail
     MeasurementUnitEnum:
       enum:
       - гр
@@ -2620,118 +2635,111 @@ components:
         id:
           type: integer
           readOnly: true
-        order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
-        branch:
-          type: integer
-          nullable: true
-        user:
-          type: integer
-          nullable: true
-        bonuses_used:
+        branch_name:
           type: string
-          format: decimal
-          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        created:
+        created_at:
           type: string
           format: date-time
-          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
         total_price:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        cashback:
-          type: string
-          readOnly: true
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/MTO'
-      required:
-      - cashback
-      - created
-      - id
-      - items
-    OrderBranchInHistory:
-      type: object
-      properties:
-        image:
-          type: string
-          format: uri
-          nullable: true
-        name:
-          type: string
-          maxLength: 100
-      required:
-      - name
-    OrderExtraProduct:
-      type: object
-      properties:
-        name:
-          type: string
-          title: Название доп. продукта
-          maxLength: 100
-        price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-          title: Цена
-      required:
-      - name
-      - price
-    OrderHistory:
-      type: object
-      properties:
-        branch:
-          $ref: '#/components/schemas/OrderBranchInHistory'
         bonuses_used:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        created:
+        table_number:
+          type: integer
+          nullable: true
+        is_dine_in:
+          type: boolean
+          title: Заказ в ресторане
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        waiter:
           type: string
-          format: date-time
-          readOnly: true
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/MTO'
+          nullable: true
       required:
-      - branch
-      - created
+      - branch_name
+      - created_at
+      - id
       - items
-    OrderMenuHistory:
+      - table_number
+      - waiter
+    OrderItem:
       type: object
       properties:
-        image:
+        id:
+          type: integer
+          readOnly: true
+        item_name:
           type: string
-          format: uri
-          nullable: true
-          title: Фото блюда
-        name:
-          type: string
-          title: Название
-          maxLength: 100
-        description:
-          type: string
-          title: Описание
-        price:
+        item_price:
           type: string
           format: decimal
           pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-          title: Цена
+        menu_quantity:
+          type: integer
+        item_image:
+          type: string
+          format: uri
+        item_id:
+          type: integer
+        item_category:
+          type: string
+        extra_product_names:
+          type: string
+          readOnly: true
       required:
-      - description
-      - name
-      - price
-    OrderTypeEnum:
-      enum:
-      - На вынос
-      - В заведении
-      type: string
-      description: |-
-        * `На вынос` - На вынос
-        * `В заведении` - В заведении
+      - extra_product_names
+      - id
+      - item_category
+      - item_id
+      - item_name
+      - item_price
+    OrderStaff:
+      type: object
+      description: Serializer for Order model.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        bonuses_used:
+          type: integer
+        is_dine_in:
+          type: boolean
+        table:
+          type: integer
+          nullable: true
+      required:
+      - bonuses_used
+      - is_dine_in
+      - total_price
+    OrderStaffItem:
+      type: object
+      description: Serializer for OrderItem model.
+      properties:
+        menu_id:
+          type: integer
+          writeOnly: true
+        menu_quantity:
+          type: integer
+        extra_product:
+          type: array
+          items:
+            type: integer
+      required:
+      - menu_id
+      - menu_quantity
     PatchedBranch:
       type: object
       properties:
@@ -3071,6 +3079,20 @@ components:
       required:
       - id
       - schedule
+    StatusEnum:
+      enum:
+      - Новый
+      - В процессе
+      - Готово
+      - Отменено
+      - Завершено
+      type: string
+      description: |-
+        * `Новый` - Новый
+        * `В процессе` - В процессе
+        * `Готово` - Готово
+        * `Отменено` - Отменено
+        * `Завершено` - Завершено
     TypeExtraProductEnum:
       enum:
       - Milk

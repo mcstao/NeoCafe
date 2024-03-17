@@ -9,10 +9,10 @@ from rest_framework.views import APIView
 
 from branches.models import Branch
 from customers.serializers import CustomerProfileSerializer, CustomerEditProfileSerializer, CustomerMenuSerializer, \
-    MenuItemDetailSerializer, ChangeBranchSerializer, UserOrdersSerializer, CheckIfItemCanBeMadeSerializer
+    MenuItemDetailSerializer, ChangeBranchSerializer, UserOrdersSerializer, CheckIfItemCanBeMadeSerializer, \
+    OrderSerializer
 from menu.models import Menu
 from orders.models import Order
-from orders.serializers import OrderSerializer
 from services.menu.menu import get_popular_items, get_compatibles, item_search, \
     check_if_items_can_be_made
 from services.users.permissions import IsCustomer, IsEmailVerified
@@ -89,7 +89,7 @@ class CompatibleItemsView(APIView):
     )
     def get(self, request, item_id, format=None):
         branch_id = request.user.branch.id
-        items = get_compatibles(item_id, False, branch_id)
+        items = get_compatibles(item_id, branch_id)
         serializer = MenuItemDetailSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
