@@ -51,11 +51,7 @@ class Order(models.Model):
     )
     is_dine_in = models.BooleanField(default=False, verbose_name="Заказ в ресторане")
 
-    def apply_cashback(self):
-        return OrderService.apply_cashback(self)
 
-    def apply_bonuses(self, bonuses_amount):
-        return OrderService.apply_bonuses(self, bonuses_amount)
 
     def set_in_process(self):
         return OrderService.set_in_process(self)

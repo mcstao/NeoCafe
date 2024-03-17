@@ -1,11 +1,11 @@
-from drf_spectacular.utils import extend_schema
-from rest_framework import generics, status
+from drf_spectacular.utils import extend_schema, inline_serializer
+from rest_framework import generics, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, add_item_to_order
-# from administrator.permissions import IsClientUser
-from .models import Order
+
+
 from .serializers import OrderStaffSerializer
 
 class CreateOrderView(APIView):
@@ -15,7 +15,7 @@ class CreateOrderView(APIView):
     @extend_schema(
         request=OrderStaffSerializer,
         responses={201: OrderStaffSerializer},
-        description="Creates an order for staff."
+        description="Создает заказ"
     )
 
     def post(self, request):
@@ -24,13 +24,10 @@ class CreateOrderView(APIView):
         """
         order = create_order(
             user_id=request.user.id,
-            total_price=request.data["total_price"],
             items=request.data["items"],
             bonuses_used=request.data["bonuses_used"],
             is_dine_in=request.data["is_dine_in"],
-            table_number=request.data["table_number"]
-            if "table_number" in request.data
-            else 0,
+            table_number=request.data.get("table_number", 0),
         )
         if order:
             return Response(
@@ -47,9 +44,10 @@ class CreateOrderView(APIView):
 
 
 class ReorderView(APIView):
-    """
-    View for reordering.
-    """
+    @extend_schema(
+        responses={201: OrderStaffSerializer},
+        description="Повторно создает заказ по его идентификатору."
+    )
 
 
     def get(self, request):
@@ -72,9 +70,10 @@ class ReorderView(APIView):
 
 
 class ReorderInformationView(APIView):
-    """
-    View for reorder information.
-    """
+    @extend_schema(
+        responses={200: None},
+        description="Предоставляет информацию для повторного заказа."
+    )
 
     @extend_schema(
         responses={201: OrderStaffSerializer},
@@ -95,10 +94,10 @@ class ReorderInformationView(APIView):
         )
 
 class RemoveOrderItemView(APIView):
-    """
-    View for removing order item.
-    """
-
+    @extend_schema(
+        responses={200: None},
+        description="Удаляет пункт из заказа."
+    )
 
     def delete(self, request):
         """
@@ -113,11 +112,17 @@ class RemoveOrderItemView(APIView):
         )
 
 class AddItemToOrderView(APIView):
-    """
-    View for adding item to order.
-    """
-
-
+    @extend_schema(
+        request=inline_serializer(
+            name='AddItemToOrderRequest',
+            fields={
+                'order_id': serializers.IntegerField(),
+                'item_id': serializers.IntegerField(),
+            }
+        ),
+        responses={201: OrderStaffSerializer},
+        description="Добавляет пункт в заказ."
+    )
     def post(self, request):
         """
         Adds item to order.

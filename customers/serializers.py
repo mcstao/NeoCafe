@@ -6,23 +6,10 @@ from rest_framework import serializers
 from menu.models import Menu
 from menu.serializers import CategorySerializer
 from orders.models import OrderItem, Order
-from orders.serializers import OrderHistorySerializer
+
 from services.customer.order import get_my_opened_orders_data, get_my_closed_orders_data
 
 User = get_user_model()
-
-
-class CustomerProfileSerializer(serializers.ModelSerializer):
-    orders = OrderHistorySerializer(read_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "email",
-            "first_name",
-            "birth_date",
-            "bonus",
-        )
 
 
 class CustomerEditProfileSerializer(serializers.Serializer):
@@ -33,7 +20,6 @@ class CustomerEditProfileSerializer(serializers.Serializer):
 
 class ChangeBranchSerializer(serializers.Serializer):
     branch_id = serializers.IntegerField()
-
 
 
 class CustomerMenuSerializer(serializers.ModelSerializer):
@@ -53,7 +39,6 @@ class MenuItemDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'description', 'price', 'image', 'ingredients', 'available', 'category']
 
     @extend_schema_field(serializers.ListField(child=serializers.DictField()))
-
     def get_ingredients(self, obj):
         ingredients = obj.ingredients.all()
         return [{'id': ingredient.id, 'name': ingredient.name, 'quantity': ingredient.quantity,
@@ -63,7 +48,6 @@ class MenuItemDetailSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     item_name = serializers.CharField(source='menu.name')
     item_price = serializers.DecimalField(source='menu.price', max_digits=7, decimal_places=2)
-    item_total_price = serializers.SerializerMethodField()
     item_image = serializers.ImageField(source='menu.image', required=False)
     item_id = serializers.IntegerField(source='menu.id')
     item_category = serializers.CharField(source='menu.category.name')
@@ -76,19 +60,15 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "item_name",
             "item_price",
             "menu_quantity",
-            "item_total_price",
             "item_image",
             "item_id",
             "item_category",
             "extra_product_names",
         ]
 
-    def get_item_total_price(self, obj):
-        return obj.menu.price * obj.menu_quantity
-
+    @extend_schema_field(OpenApiTypes.STR)
     def get_extra_product_names(self, obj):
         return [extra_item.name for extra_item in obj.extra_product.all()]
-
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -113,6 +93,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "waiter",
         ]
 
+
 class MyOrdersListSerializer(serializers.ModelSerializer):
     branch_name = serializers.CharField(source="branch.name")
     created_at = serializers.DateTimeField(source='created', format="%d.%m.%Y")
@@ -129,14 +110,17 @@ class MyOrdersListSerializer(serializers.ModelSerializer):
             "branch_image",
         ]
 
+
 class UserOrdersSerializer(serializers.Serializer):
     opened_orders = serializers.SerializerMethodField()
     closed_orders = serializers.SerializerMethodField()
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_opened_orders(self, user):
         orders = Order.objects.filter(user=user, status__in=["Новый", "В процессе"])
         return MyOrdersListSerializer(orders, many=True).data
 
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_closed_orders(self, user):
         orders = Order.objects.filter(user=user, status__in=["Готово", "Отменено", "Завершено"])
         return MyOrdersListSerializer(orders, many=True).data
@@ -149,3 +133,14 @@ class CheckIfItemCanBeMadeSerializer(serializers.Serializer):
     menu_id = serializers.IntegerField(help_text="The ID of the menu item.")
     branch_id = serializers.IntegerField(help_text="The ID of the branch.")
     quantity = serializers.IntegerField(help_text="The quantity of the menu item.", required=False, default=1)
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "first_name",
+            "birth_date",
+            "bonus",
+        )

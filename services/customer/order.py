@@ -66,40 +66,50 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, total_price, items, is_dine_in, spent_bonus_points=0, table_number=0):
+def create_order(user_id, items, is_dine_in, spent_bonus_points=0, table_number=0):
     user = CustomUser.objects.get(id=user_id)
+    total_price = 0  # Инициализация общей стоимости заказа
+
+    # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
-        total_price=total_price,
+        total_price=0,  # временное значение
         bonuses_used=spent_bonus_points,
         is_dine_in=is_dine_in,
         branch=user.branch,
         table=table_number,
     )
 
+    # Добавляем позиции заказа и считаем общую стоимость
     for item in items:
-        if check_if_items_can_be_made(item['menu_id'], order.branch.id, item['quantity']):
+        menu_item = Menu.objects.get(id=item['menu_id'])
+        if check_if_items_can_be_made(menu_item.id, order.branch.id, item['quantity']):
             OrderItem.objects.create(
                 order=order,
-                menu_id=item['menu_id'],
+                menu=menu_item,
                 menu_quantity=item['quantity'],
             )
-            update_ingredient_storage_on_cooking(item['menu_id'], order.branch.id, item['quantity'])
+            total_price += menu_item.price * item['quantity']  # Увеличиваем общую стоимость
+            update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
+
+    # Обновляем общую стоимость заказа
+    order.total_price = total_price
+    order.save()
+
     return order
 
 
-@transaction.atomic
 def reorder(order_id):
     original_order = Order.objects.get(id=order_id)
     new_order = Order.objects.create(
         user=original_order.user,
-        total_price=original_order.total_price,
         bonuses_used=original_order.bonuses_used,
         branch=original_order.branch,
         table=original_order.table,
         is_dine_in=original_order.is_dine_in
     )
 
+    total_price = 0
     for item in original_order.items.all():
         if check_if_items_can_be_made(item.menu.id, original_order.branch.id, item.menu_quantity):
             OrderItem.objects.create(
@@ -107,7 +117,11 @@ def reorder(order_id):
                 menu=item.menu,
                 menu_quantity=item.menu_quantity,
             )
+            total_price += item.menu.price * item.menu_quantity
             update_ingredient_storage_on_cooking(item.menu.id, original_order.branch.id, item.menu_quantity)
+
+    new_order.total_price = total_price
+    new_order.save()
 
     return new_order
 
@@ -123,6 +137,7 @@ def add_item_to_order(order_id, menu_id, quantity):
             menu=menu_item,
             menu_quantity=quantity,
         )
+        order.total_price += menu_item.price * quantity
         update_ingredient_storage_on_cooking(menu_id, order.branch.id, quantity)
 
 

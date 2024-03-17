@@ -15,14 +15,6 @@ client = SearchClient.create(settings.ALGOLIA_APPLICATION_ID, settings.ALGOLIA_A
 index = client.init_index("menu")
 
 
-def get_available_ready_made_products(branch_id):
-    available_ready_made_products = Menu.objects.filter(
-        branch=branch_id, available=True, category__name="Готовые продукты"
-    )
-
-    ready_made_products = [model_to_dict(product) for product in available_ready_made_products]
-    return ready_made_products
-
 
 def get_available_items(branch_id):
     all_menu_items = Menu.objects.filter(branch=branch_id, available=True)
@@ -43,18 +35,6 @@ def get_available_items(branch_id):
 
     return available_menu_items
 
-
-def combine_items_and_ready_made_products(branch_id, category_id=None):
-    available_items = get_available_items(branch_id)
-    available_ready_made_products = get_available_ready_made_products(branch_id)
-
-    if category_id:
-        available_items = [item for item in available_items if item['category_id'] == category_id]
-        available_ready_made_products = [product for product in available_ready_made_products if
-                                         product['category_id'] == category_id]
-
-    combined_list = available_items + available_ready_made_products
-    return combined_list
 
 
 def get_popular_items(branch_id):
