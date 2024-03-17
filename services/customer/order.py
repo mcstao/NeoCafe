@@ -66,7 +66,7 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, items, is_dine_in, spent_bonus_points=0, table_number=0):
+def create_order(user_id, items, is_dine_in, bonuses_used=0, table_number=0):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
 
@@ -74,7 +74,7 @@ def create_order(user_id, items, is_dine_in, spent_bonus_points=0, table_number=
     order = Order.objects.create(
         user=user,
         total_price=0,  # временное значение
-        bonuses_used=spent_bonus_points,
+        bonuses_used=bonuses_used,
         is_dine_in=is_dine_in,
         branch=user.branch,
         table=table_number,
