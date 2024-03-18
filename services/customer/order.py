@@ -87,7 +87,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_number=0):
             OrderItem.objects.create(
                 order=order,
                 menu=menu_item,
-                menu_quantity=item['quantity'],
+                quantity=item['quantity'],
             )
             total_price += menu_item.price * item['quantity']  # Увеличиваем общую стоимость
             update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
@@ -159,7 +159,7 @@ def get_order_items_names_and_quantities(order_items):
     for order_item in order_items:
         order_items_names_and_quantities.append({
             "name": order_item.menu.name,
-            "quantity": order_item.menu_quantity,
+            "quantity": order_item.quantity,
         })
     return order_items_names_and_quantities
 
@@ -210,7 +210,7 @@ def return_to_storage(order_id):
             for ingredient in order_item.menu.ingredients.all():
                 inventory_item = InventoryItem.objects.get(name=ingredient.name, branch_id=order_item.order.branch.id)
                 # Возвращаем количество использованных ингредиентов обратно на склад
-                inventory_item.quantity += ingredient.quantity * order_item.menu_quantity
+                inventory_item.quantity += ingredient.quantity * order_item.quantity
                 inventory_item.save()
         return "Returned successfully."
     except Exception as e:
