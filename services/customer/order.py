@@ -135,7 +135,7 @@ def add_item_to_order(order_id, menu_id, quantity):
         OrderItem.objects.create(
             order=order,
             menu=menu_item,
-            menu_quantity=quantity,
+            quantity=quantity,
         )
         order.total_price += menu_item.price * quantity
         update_ingredient_storage_on_cooking(menu_id, order.branch.id, quantity)
