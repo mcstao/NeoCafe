@@ -2855,7 +2855,6 @@ components:
           type: integer
           nullable: true
       required:
-      - bonuses_used
       - total_price
     OrderStaffItem:
       type: object
