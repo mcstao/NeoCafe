@@ -3,44 +3,60 @@ from rest_framework import generics, status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, add_item_to_order
+from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
+    add_item_to_order, return_to_storage
+from .models import Table, Order
 
+from .serializers import OrderStaffSerializer, OrderCustomerSerializer
 
-from .serializers import OrderStaffSerializer
 
 class CreateOrderView(APIView):
-    """
-    View for orders.
-    """
-    @extend_schema(
-        request=OrderStaffSerializer,
-        responses={201: OrderStaffSerializer},
-        description="Создает заказ"
-    )
-
+    @extend_schema(request=OrderStaffSerializer, responses={201: OrderStaffSerializer}, description="Создает заказ")
     def post(self, request):
-        """
-        Creates order.
-        """
-        order = create_order(
-            user_id=request.user.id,
-            items=request.data["items"],
-            bonuses_used=request.data["bonuses_used"],
-            order_type=request.data["order_type"],
-            table_number=request.data.get("table_number", 0),
-        )
-        if order:
-            return Response(
-                OrderStaffSerializer(order).data,
-                status=status.HTTP_201_CREATED,
-            )
-        else:
-            return Response(
-                {
-                    "message": "Not enough stock.",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        user = request.user
+        table_number = request.data.get("table_number")
+        order_type = request.data.get("order_type")
+        items = request.data.get("items", [])
+        bonuses_used = request.data.get("bonuses_used", 0)
+
+        # Проверка доступности стола
+        if order_type == "В заведении" and table_number is not None:
+            table = Table.objects.filter(table_number=table_number, branch=user.branch).first()
+            if not table or not table.is_available:
+                return Response({"message": "Table is not available."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Создание заказа
+        try:
+            order = create_order(user.id, items, order_type, bonuses_used, table_number)
+            return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class UpdateOrderView(APIView):
+    def patch(self, request, order_id):
+        try:
+            order = Order.objects.get(id=order_id)
+            serializer = OrderStaffSerializer(order, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                updated_order = serializer.save()
+
+                # Обновление статуса стола и возврат ингредиентов на склад
+                if updated_order.status in ["Отменено", "Завершено"]:
+                    if updated_order.table:
+                        updated_order.table.is_available = True
+                        updated_order.table.save()
+
+                    if updated_order.status == "Отменено":
+                        return_to_storage(updated_order.id)
+
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Order.DoesNotExist:
+            return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class ReorderView(APIView):
@@ -49,30 +65,15 @@ class ReorderView(APIView):
         description="Повторно создает заказ по его идентификатору.",
         request=inline_serializer(
             name='Reorder',
-            fields={
-                'order_id': serializers.IntegerField(),
-            }
+            fields={'order_id': serializers.IntegerField()},
         )
     )
-
-
     def get(self, request):
-        """
-        Reorders order.
-        """
         order = reorder(request.query_params["order_id"])
         if order:
-            return Response(
-                OrderStaffSerializer(order).data,
-                status=status.HTTP_201_CREATED,
-            )
+            return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         else:
-            return Response(
-                {
-                    "message": "Извините, но в данный момент невозможно сделать заказ. Не хватает ингридиентов.",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return Response({"message": "Извините, но в данный момент невозможно сделать заказ. Не хватает ингридиентов."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReorderInformationView(APIView):
@@ -138,31 +139,75 @@ class AddItemToOrderView(APIView):
             fields={
                 'order_id': serializers.IntegerField(),
                 'menu_id': serializers.IntegerField(),
+                'quantity': serializers.IntegerField(),
             }
         ),
         responses={201: OrderStaffSerializer},
         description="Добавляет пункт в заказ."
     )
     def post(self, request):
-        """
-        Adds item to order.
-        """
-        order_id = request.query_params["order_id"]
-        menu_id = request.query_params["menu_id"]
+        order_id = request.data["order_id"]
+        menu_id = request.data["menu_id"]
+        quantity = request.data["quantity"]
 
-        order = add_item_to_order(
-            order_id=order_id,
-            menu_id=menu_id,
-        )
-        if order:
-            return Response(
-                OrderStaffSerializer(order).data,
-                status=status.HTTP_201_CREATED,
-            )
-        else:
-            return Response(
-                {
-                    "message": "Not enough stock.",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        try:
+            order = add_item_to_order(order_id, menu_id, quantity)
+            if order:
+                return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"message": "Item could not be added or insufficient stock."}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CreateCustomerOrderView(APIView):
+    @extend_schema(
+        request=OrderCustomerSerializer,
+        responses={201: OrderCustomerSerializer},
+        description="Создает заказ клиента"
+    )
+    def post(self, request):
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"message": "Authentication is required."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        table_number = request.data.get("table_number")
+        order_type = request.data.get("order_type")
+        items = request.data.get("items", [])
+        bonuses_used = min(request.data.get("bonuses_used", 0), user.bonus)
+
+        # Создание заказа
+        try:
+            # Обеспечиваем, что клиент не может использовать больше бонусов, чем у него есть
+            if bonuses_used > user.bonus:
+                return Response({"message": "Not enough bonuses."}, status=status.HTTP_400_BAD_REQUEST)
+
+            order = create_order(user.id, items, order_type, bonuses_used, table_number)
+
+            # Вычитаем использованные бонусы и обновляем бонусы пользователя
+            user.bonus -= bonuses_used
+            user.save(update_fields=['bonus'])
+
+            return Response(OrderCustomerSerializer(order).data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class UpdateCustomerOrderView(APIView):
+    def patch(self, request, order_id):
+        order = Order.objects.get(id=order_id)
+
+        if order.user != request.user:
+            return Response({"message": "You can only update your orders."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = OrderCustomerSerializer(order, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            updated_order = serializer.save()
+
+            # Начисляем бонусы при завершении заказа
+            if updated_order.status == "Завершено" and order.status != "Завершено":
+                updated_order.user.bonus += updated_order.total_price  # 1 к 1 по итоговой цене
+                updated_order.user.save()
+
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
