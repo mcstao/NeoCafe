@@ -1531,6 +1531,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/OrderCustomer'
+        required: true
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -2790,7 +2791,9 @@ components:
           minimum: 0
           nullable: true
         order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
+          allOf:
+          - $ref: '#/components/schemas/OrderTypeEnum'
+          writeOnly: true
         table:
           type: integer
           nullable: true
@@ -2798,8 +2801,12 @@ components:
           type: integer
           nullable: true
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          writeOnly: true
       required:
+      - order_type
+      - status
       - total_price
     OrderItem:
       type: object
@@ -2844,17 +2851,23 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        bonuses_used:
-          type: integer
         order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
+          allOf:
+          - $ref: '#/components/schemas/OrderTypeEnum'
+          writeOnly: true
         table:
           type: integer
           nullable: true
         waiter:
           type: integer
           nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          writeOnly: true
       required:
+      - order_type
+      - status
       - total_price
     OrderStaffItem:
       type: object
@@ -3062,7 +3075,9 @@ components:
           minimum: 0
           nullable: true
         order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
+          allOf:
+          - $ref: '#/components/schemas/OrderTypeEnum'
+          writeOnly: true
         table:
           type: integer
           nullable: true
@@ -3070,7 +3085,9 @@ components:
           type: integer
           nullable: true
         status:
-          $ref: '#/components/schemas/StatusEnum'
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          writeOnly: true
     PatchedOrderStaff:
       type: object
       description: Serializer for Order model.
@@ -3083,16 +3100,20 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        bonuses_used:
-          type: integer
         order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
+          allOf:
+          - $ref: '#/components/schemas/OrderTypeEnum'
+          writeOnly: true
         table:
           type: integer
           nullable: true
         waiter:
           type: integer
           nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          writeOnly: true
     PatchedStaffCreate:
       type: object
       properties:

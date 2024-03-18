@@ -31,16 +31,16 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     """
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
-    bonuses_used = serializers.IntegerField(required=False)
     table = serializers.IntegerField(required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
+    order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
 
     class Meta:
         model = Order
-        fields = ['items', 'total_price', 'bonuses_used', 'order_type', 'table', 'waiter']
+        fields = ['items', 'total_price', 'order_type', 'table', 'waiter', 'status']
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
         validated_data['Официант'] = self.context['request'].user
-        validated_data['bonuses_used'] = 0  # Официанты не используют бонусы
 
         order = Order.objects.create(**validated_data)
 
@@ -54,7 +54,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         # Обновляем поля заказа
         instance.total_price = validated_data.get('total_price', instance.total_price)
-        instance.bonuses_used = validated_data.get('bonuses_used', instance.bonuses_used)
         instance.order_type = validated_data.get('order_type', instance.order_type)
         instance.table = validated_data.get('table', instance.table)
         instance.waiter = validated_data.get('waiter', instance.waiter)
@@ -89,7 +88,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         # Пересчитываем общую стоимость заказа
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
-        instance.total_price = total_price - instance.bonuses_used
+        instance.total_price = total_price
 
         instance.save()
         return instance
@@ -102,6 +101,8 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     table = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), required=False, allow_null=True)
+    status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
+    order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
 
     class Meta:
         model = Order
