@@ -2143,10 +2143,10 @@ components:
       properties:
         order_id:
           type: integer
-        item_id:
+        menu_id:
           type: integer
       required:
-      - item_id
+      - menu_id
       - order_id
     AdminLogin:
       type: object
@@ -2655,9 +2655,8 @@ components:
         table_number:
           type: integer
           nullable: true
-        is_dine_in:
-          type: boolean
-          title: Заказ в ресторане
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
         status:
           $ref: '#/components/schemas/StatusEnum'
         waiter:
@@ -2715,14 +2714,13 @@ components:
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
         bonuses_used:
           type: integer
-        is_dine_in:
-          type: boolean
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
         table:
           type: integer
           nullable: true
       required:
       - bonuses_used
-      - is_dine_in
       - total_price
     OrderStaffItem:
       type: object
@@ -2740,6 +2738,14 @@ components:
       required:
       - menu_id
       - menu_quantity
+    OrderTypeEnum:
+      enum:
+      - На вынос
+      - В заведении
+      type: string
+      description: |-
+        * `На вынос` - На вынос
+        * `В заведении` - В заведении
     PatchedBranch:
       type: object
       properties:

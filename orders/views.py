@@ -26,7 +26,7 @@ class CreateOrderView(APIView):
             user_id=request.user.id,
             items=request.data["items"],
             bonuses_used=request.data["bonuses_used"],
-            is_dine_in=request.data["is_dine_in"],
+            order_type=request.data["order_type"],
             table_number=request.data.get("table_number", 0),
         )
         if order:
@@ -46,7 +46,13 @@ class CreateOrderView(APIView):
 class ReorderView(APIView):
     @extend_schema(
         responses={201: OrderStaffSerializer},
-        description="Повторно создает заказ по его идентификатору."
+        description="Повторно создает заказ по его идентификатору.",
+        request=inline_serializer(
+            name='Reorder',
+            fields={
+                'order_id': serializers.IntegerField(),
+            }
+        )
     )
 
 
@@ -79,6 +85,13 @@ class ReorderInformationView(APIView):
         responses={201: OrderStaffSerializer},
         methods=['GET'],
         description="Reorders an existing order.",
+        request=inline_serializer(
+            name='Reorderinfo',
+            fields={
+
+                'order_id': serializers.IntegerField(),
+            }
+        )
     )
     def get(self, request):
         """
@@ -96,7 +109,14 @@ class ReorderInformationView(APIView):
 class RemoveOrderItemView(APIView):
     @extend_schema(
         responses={200: None},
-        description="Удаляет пункт из заказа."
+        description="Удаляет пункт из заказа.",
+        request=inline_serializer(
+            name='Removeorderitem',
+            fields={
+                'order_item_id': serializers.IntegerField(),
+            }
+        ),
+
     )
 
     def delete(self, request):
@@ -117,7 +137,7 @@ class AddItemToOrderView(APIView):
             name='AddItemToOrderRequest',
             fields={
                 'order_id': serializers.IntegerField(),
-                'item_id': serializers.IntegerField(),
+                'menu_id': serializers.IntegerField(),
             }
         ),
         responses={201: OrderStaffSerializer},
@@ -128,11 +148,11 @@ class AddItemToOrderView(APIView):
         Adds item to order.
         """
         order_id = request.query_params["order_id"]
-        item_id = request.query_params["item_id"]
+        menu_id = request.query_params["menu_id"]
 
         order = add_item_to_order(
             order_id=order_id,
-            item_id=item_id,
+            menu_id=menu_id,
         )
         if order:
             return Response(
