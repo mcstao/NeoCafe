@@ -49,6 +49,31 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         return order
 
+    def update(self, instance, validated_data):
+        items_data = validated_data.pop('items', [])
+
+        # Обновляем поля заказа
+        instance.total_price = validated_data.get('total_price', instance.total_price)
+        instance.bonuses_used = validated_data.get('bonuses_used', instance.bonuses_used)
+        instance.order_type = validated_data.get('order_type', instance.order_type)
+        instance.table = validated_data.get('table', instance.table)
+        instance.waiter = validated_data.get('waiter', instance.waiter)
+        instance.save()
+
+        # Обновляем или создаем пункты заказа (items)
+        for item_data in items_data:
+            item_id = item_data.get('id', None)
+            if item_id:
+                # Обновляем существующий пункт заказа
+                item = OrderItem.objects.get(id=item_id, order=instance)
+                item.menu = item_data.get('menu', item.menu)
+                item.quantity = item_data.get('quantity', item.quantity)
+                item.save()
+            else:
+                # Создаем новый пункт заказа
+                OrderItem.objects.create(order=instance, **item_data)
+
+        return instance
 
 class OrderCustomerSerializer(serializers.ModelSerializer):
     """
@@ -75,26 +100,37 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         order = Order.objects.create(**validated_data)
 
-        total_price = 0
         for item_data in items_data:
-            item = OrderItem.objects.create(order=order, **item_data)
-            total_price += item.menu.price * item.quantity
+            OrderItem.objects.create(order=order, **item_data)
 
-        total_price = max(total_price - bonuses_used, 0)
-        user.bonus -= bonuses_used
-        user.save()
-
-        order.total_price = total_price
         order.save()
 
         return order
 
     def update(self, instance, validated_data):
-        # Проверяем изменение статуса заказа
-        status = validated_data.get('status', instance.status)
-        if status == "Завершено" and instance.status != "Завершено":
-            # Начисляем бонусы пользователю 1 к 1 от итоговой стоимости заказа
-            instance.user.bonus += instance.total_price
+        items_data = validated_data.pop('items', [])
+
+        # Обновляем основные данные заказа
+        instance.order_type = validated_data.get('order_type', instance.order_type)
+        instance.table = validated_data.get('table', instance.table)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+
+        # Обрабатываем изменения в пунктах заказа
+        for item_data in items_data:
+            item_id = item_data.get('id', None)
+            if item_id:
+                item = OrderItem.objects.get(id=item_id, order=instance)
+                item.menu = item_data.get('menu', item.menu)
+                item.quantity = item_data.get('quantity', item.quantity)
+                item.save()
+            else:
+                OrderItem.objects.create(order=instance, **item_data)
+
+        # Логика начисления бонусов при изменении статуса заказа, если необходимо
+        if instance.status == "Завершено" and not instance.bonuses_applied:
+            instance.user.bonus += instance.total_price  # Начисляем бонусы
+            instance.bonuses_applied = True  # Флаг, предотвращающий повторное начисление
             instance.user.save()
 
-        return super().update(instance, validated_data)
+        return instance
