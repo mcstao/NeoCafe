@@ -1514,6 +1514,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderStaff'
           description: ''
+  /orders/create-customer-order/:
+    post:
+      operationId: orders_create_customer_order_create
+      description: Создает заказ клиента
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCustomer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OrderCustomer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OrderCustomer'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCustomer'
+          description: ''
   /orders/create-order/:
     post:
       operationId: orders_create_order_create
@@ -1579,9 +1609,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderStaff'
           description: ''
-  /orders/reorder-information/:
+  /orders/reorder-info/:
     get:
-      operationId: orders_reorder_information_retrieve
+      operationId: orders_reorder_info_retrieve
       description: Предоставляет информацию для повторного заказа.
       tags:
       - orders
@@ -1594,6 +1624,76 @@ paths:
       responses:
         '200':
           description: No response body
+  /orders/update-customer-order/{order_id}/:
+    patch:
+      operationId: orders_update_customer_order_partial_update
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStaff'
+          description: ''
+  /orders/update-order/{order_id}/:
+    patch:
+      operationId: orders_update_order_partial_update
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderStaff'
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderStaff'
+          description: ''
   /storage/:
     get:
       operationId: storage_list
@@ -2672,6 +2772,35 @@ components:
       - items
       - table_number
       - waiter
+    OrderCustomer:
+      type: object
+      description: Serializer for customer orders.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        bonuses_used:
+          type: integer
+          minimum: 0
+          nullable: true
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        table:
+          type: integer
+          nullable: true
+        user:
+          type: integer
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+      required:
+      - total_price
     OrderItem:
       type: object
       properties:
@@ -2916,6 +3045,28 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Ingredient'
+    PatchedOrderStaff:
+      type: object
+      description: Serializer for Order model.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        bonuses_used:
+          type: integer
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        table:
+          type: integer
+          nullable: true
+        waiter:
+          type: integer
+          nullable: true
     PatchedStaffCreate:
       type: object
       properties:

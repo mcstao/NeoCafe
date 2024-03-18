@@ -35,6 +35,7 @@ class CreateOrderView(APIView):
 
 
 class UpdateOrderView(APIView):
+    serializer_class = OrderStaffSerializer
     def patch(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id)
@@ -193,6 +194,7 @@ class CreateCustomerOrderView(APIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateCustomerOrderView(APIView):
+    serializer_class = OrderStaffSerializer
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
 
