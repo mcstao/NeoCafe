@@ -1639,13 +1639,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchedOrderStaff'
+              $ref: '#/components/schemas/PatchedOrderCustomer'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PatchedOrderStaff'
+              $ref: '#/components/schemas/PatchedOrderCustomer'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PatchedOrderStaff'
+              $ref: '#/components/schemas/PatchedOrderCustomer'
       security:
       - tokenAuth: []
       - jwtAuth: []
@@ -1657,7 +1657,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderStaff'
+                $ref: '#/components/schemas/OrderCustomer'
           description: ''
   /orders/update-order/{order_id}/:
     patch:
@@ -3045,6 +3045,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Ingredient'
+    PatchedOrderCustomer:
+      type: object
+      description: Serializer for customer orders.
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        bonuses_used:
+          type: integer
+          minimum: 0
+          nullable: true
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        table:
+          type: integer
+          nullable: true
+        user:
+          type: integer
+          nullable: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
     PatchedOrderStaff:
       type: object
       description: Serializer for Order model.

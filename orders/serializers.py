@@ -78,7 +78,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         total_price = 0
         for item_data in items_data:
             item = OrderItem.objects.create(order=order, **item_data)
-            total_price += item.menu.price * item.menu_quantity
+            total_price += item.menu.price * item.quantity
 
         total_price = max(total_price - bonuses_used, 0)
         user.bonus -= bonuses_used

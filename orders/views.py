@@ -177,39 +177,37 @@ class CreateCustomerOrderView(APIView):
         items = request.data.get("items", [])
         bonuses_used = min(request.data.get("bonuses_used", 0), user.bonus)
 
-        # Создание заказа
-        try:
-            # Обеспечиваем, что клиент не может использовать больше бонусов, чем у него есть
-            if bonuses_used > user.bonus:
-                return Response({"message": "Not enough bonuses."}, status=status.HTTP_400_BAD_REQUEST)
+        if bonuses_used > user.bonus:
+            return Response({"message": "Not enough bonuses."}, status=status.HTTP_400_BAD_REQUEST)
 
-            order = create_order(user.id, items, order_type, bonuses_used, table_number)
+        order = create_order(user.id, items, order_type, bonuses_used, table_number)
 
+        if order:
             # Вычитаем использованные бонусы и обновляем бонусы пользователя
             user.bonus -= bonuses_used
             user.save(update_fields=['bonus'])
-
             return Response(OrderCustomerSerializer(order).data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"message": "Order could not be created."}, status=status.HTTP_400_BAD_REQUEST)
 
 class UpdateCustomerOrderView(APIView):
-    serializer_class = OrderStaffSerializer
+    serializer_class = OrderCustomerSerializer
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
-
         if order.user != request.user:
             return Response({"message": "You can only update your orders."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = OrderCustomerSerializer(order, data=request.data, partial=True)
-
         if serializer.is_valid():
             updated_order = serializer.save()
 
-            # Начисляем бонусы при завершении заказа
             if updated_order.status == "Завершено" and order.status != "Завершено":
-                updated_order.user.bonus += updated_order.total_price  # 1 к 1 по итоговой цене
+                updated_order.user.bonus += updated_order.total_price  # Начисление бонусов
                 updated_order.user.save()
+
+            if updated_order.status == "Отменено" and order.table:
+                return_to_storage(updated_order.id)  # Возврат ингредиентов на склад
 
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
