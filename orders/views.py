@@ -115,6 +115,7 @@ class RemoveOrderItemView(APIView):
         request=inline_serializer(
             name='Removeorderitem',
             fields={
+                'order_id': serializers.IntegerField(),
                 'order_item_id': serializers.IntegerField(),
             }
         ),
@@ -125,13 +126,16 @@ class RemoveOrderItemView(APIView):
         """
         Removes order item.
         """
-        remove_order_item(request.query_params["order_item_id"])
+        order_id = request.data.get("order_id")
+        order_item_id = request.data.get("order_item_id")
+        remove_order_item(order_id, order_item_id)
         return Response(
             {
                 "message": "Order item removed.",
             },
             status=status.HTTP_200_OK,
         )
+
 
 class AddItemToOrderView(APIView):
     @extend_schema(
@@ -177,8 +181,6 @@ class CreateCustomerOrderView(APIView):
         items = request.data.get("items", [])
         bonuses_used = min(request.data.get("bonuses_used", 0), user.bonus)
 
-        if bonuses_used > user.bonus:
-            return Response({"message": "Not enough bonuses."}, status=status.HTTP_400_BAD_REQUEST)
 
         order = create_order(user.id, items, order_type, bonuses_used, table_number)
 

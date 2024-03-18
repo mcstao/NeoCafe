@@ -147,7 +147,7 @@ def remove_order_item(order_item_id):
     order = order_item.order
 
     if order.status == "Новый":
-        order.total_price -= order_item.menu.price * order_item.menu_quantity
+        order.total_price -= order_item.menu.price * order_item.quantity
         order.save()
         order_item.delete()
 

@@ -31,7 +31,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     """
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
-    bonuses_used = serializers.IntegerField(required=True)
+    bonuses_used = serializers.IntegerField(required=False)
     table = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
@@ -60,19 +60,38 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         instance.waiter = validated_data.get('waiter', instance.waiter)
         instance.save()
 
-        # Обновляем или создаем пункты заказа (items)
+        existing_items = {item.id: item for item in instance.items.all()}
+        updated_items = {}
+
+        # Обновляем или добавляем новые пункты заказа
         for item_data in items_data:
-            item_id = item_data.get('id', None)
-            if item_id:
-                # Обновляем существующий пункт заказа
-                item = OrderItem.objects.get(id=item_id, order=instance)
-                item.menu = item_data.get('menu', item.menu)
+            item_id = item_data.get('id')
+            menu_id = item_data.get('menu').id
+
+            if item_id in existing_items:
+                # Если ID предоставлен и элемент существует, обновляем количество
+                item = existing_items[item_id]
                 item.quantity = item_data.get('quantity', item.quantity)
                 item.save()
+                updated_items[item_id] = item
             else:
-                # Создаем новый пункт заказа
-                OrderItem.objects.create(order=instance, **item_data)
+                # Проверяем, существует ли уже пункт заказа с таким же меню
+                item = instance.items.filter(menu_id=menu_id).first()
+                if item:
+                    # Увеличиваем количество существующего пункта
+                    item.quantity += item_data.get('quantity', 0)
+                    item.save()
+                else:
+                    # Создаем новый пункт заказа
+                    item = OrderItem.objects.create(order=instance, **item_data)
+                updated_items[item.id] = item
 
+
+        # Пересчитываем общую стоимость заказа
+        total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
+        instance.total_price = total_price - instance.bonuses_used
+
+        instance.save()
         return instance
 
 class OrderCustomerSerializer(serializers.ModelSerializer):
@@ -114,23 +133,45 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         instance.order_type = validated_data.get('order_type', instance.order_type)
         instance.table = validated_data.get('table', instance.table)
         instance.status = validated_data.get('status', instance.status)
+        instance.bonuses_used = validated_data.data.get('bonuses_used', instance.bonuses_used)
         instance.save()
 
         # Обрабатываем изменения в пунктах заказа
+        existing_items = {item.id: item for item in instance.items.all()}
+        updated_items = {}
+
+        # Обновляем или добавляем новые пункты заказа
         for item_data in items_data:
-            item_id = item_data.get('id', None)
-            if item_id:
-                item = OrderItem.objects.get(id=item_id, order=instance)
-                item.menu = item_data.get('menu', item.menu)
+            item_id = item_data.get('id')
+            menu_id = item_data.get('menu').id
+
+            if item_id in existing_items:
+                # Если ID предоставлен и элемент существует, обновляем количество
+                item = existing_items[item_id]
                 item.quantity = item_data.get('quantity', item.quantity)
                 item.save()
+                updated_items[item_id] = item
             else:
-                OrderItem.objects.create(order=instance, **item_data)
+                # Проверяем, существует ли уже пункт заказа с таким же меню
+                item = instance.items.filter(menu_id=menu_id).first()
+                if item:
+                    # Увеличиваем количество существующего пункта
+                    item.quantity += item_data.get('quantity', 0)
+                    item.save()
+                else:
+                    # Создаем новый пункт заказа
+                    item = OrderItem.objects.create(order=instance, **item_data)
+                updated_items[item.id] = item
 
+        instance.bonuses_used = validated_data.get('bonuses_used', 0)
+        if instance.bonuses_used > instance.user.bonus:
+            raise serializers.ValidationError("Недостаточно бонусов.")
         # Логика начисления бонусов при изменении статуса заказа, если необходимо
         if instance.status == "Завершено" and not instance.bonuses_applied:
             instance.user.bonus += instance.total_price  # Начисляем бонусы
             instance.bonuses_applied = True  # Флаг, предотвращающий повторное начисление
+            total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
+            instance.total_price = total_price - instance.bonuses_used
             instance.user.save()
 
         return instance
