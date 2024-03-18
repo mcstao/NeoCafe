@@ -2,7 +2,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin, Group, Permission
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.hashers import make_password
+
 from branches.models import Branch
 
 

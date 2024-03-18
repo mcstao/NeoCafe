@@ -7,7 +7,6 @@ from menu.models import Menu
 from menu.serializers import CategorySerializer
 from orders.models import OrderItem, Order
 
-from services.customer.order import get_my_opened_orders_data, get_my_closed_orders_data
 
 User = get_user_model()
 
@@ -88,7 +87,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "total_price",
             "bonuses_used",
             "table_number",
-            "is_dine_in",
+            "order_type",
             "status",
             "waiter",
         ]

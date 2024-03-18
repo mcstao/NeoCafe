@@ -5,8 +5,7 @@ from django.conf import settings
 from menu.models import Menu, ExtraItem
 from branches.models import Branch
 from users.models import CustomUser
-from services.orders.ord_services import OrderService
-from decimal import Decimal
+
 
 
 class Order(models.Model):
@@ -49,18 +48,9 @@ class Order(models.Model):
         blank=True,
         verbose_name="Номер стола",
     )
-    is_dine_in = models.BooleanField(default=False, verbose_name="Заказ в ресторане")
 
 
 
-    def set_in_process(self):
-        return OrderService.set_in_process(self)
-
-    def set_completed(self):
-        return OrderService.set_completed(self)
-
-    def set_cancelled(self):
-        return OrderService.set_cancelled(self)
 
 
 class OrderItem(models.Model):
@@ -74,16 +64,3 @@ class OrderItem(models.Model):
     )
     extra_product_quantity = models.PositiveIntegerField(default=0)
 
-    def get_cost(self):
-        menu_cost = (
-            max(Decimal("0"), self.menu.price) * self.menu_quantity
-            if self.menu
-            else Decimal("0")
-        )
-        extra_cost = (
-            max(Decimal("0"), self.extra_product.price) * self.extra_product_quantity
-            if self.extra_product
-            else Decimal("0")
-        )
-
-        return menu_cost + extra_cost

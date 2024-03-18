@@ -27,12 +27,11 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=True)
     bonuses_used = serializers.IntegerField(required=True)
-    is_dine_in = serializers.BooleanField(required=True)
     table = serializers.IntegerField(required=False, allow_null=True)
 
     class Meta:
         model = Order
-        fields = ['items', 'total_price', 'bonuses_used', 'is_dine_in', 'table']
+        fields = ['items', 'total_price', 'bonuses_used', 'order_type', 'table']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
