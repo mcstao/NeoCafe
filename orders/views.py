@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
-    add_item_to_order, return_to_storage
-from .models import Table, Order
+    add_item_to_order, return_to_storage, return_item_ingredients_to_storage
+from .models import Table, Order, OrderItem
 
 from .serializers import OrderStaffSerializer, OrderCustomerSerializer
 
@@ -108,6 +108,7 @@ class ReorderInformationView(APIView):
             status=reorder_information["status"],
         )
 
+
 class RemoveOrderItemView(APIView):
     @extend_schema(
         responses={200: None},
@@ -115,20 +116,28 @@ class RemoveOrderItemView(APIView):
         request=inline_serializer(
             name='Removeorderitem',
             fields={
-                'order_id': serializers.IntegerField(),
                 'order_item_id': serializers.IntegerField(),
+                'quantity': serializers.IntegerField(required=False),
             }
         ),
-
     )
-
     def delete(self, request):
-        """
-        Removes order item.
-        """
-        order_id = request.data.get("order_id")
         order_item_id = request.data.get("order_item_id")
-        remove_order_item(order_id, order_item_id)
+        quantity = request.data.get("quantity", None)
+
+        # Получаем order_item и проверяем его существование
+        order_item = OrderItem.objects.filter(id=order_item_id).first()
+        if not order_item:
+            return Response({"error": "Order item not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        if quantity is not None:
+            quantity = int(quantity)
+        else:
+            quantity = order_item.quantity  # Если количество не указано, берем все количество товара в пункте заказа
+
+        remove_order_item(order_item_id, quantity)
+        return_item_ingredients_to_storage(order_item.menu_id, order_item.order.branch_id, quantity)
+
         return Response(
             {
                 "message": "Order item removed.",
