@@ -142,14 +142,25 @@ def add_item_to_order(order_id, menu_id, quantity):
 
 
 @transaction.atomic
-def remove_order_item(order_item_id):
+def remove_order_item(order_item_id, quantity=None):
     order_item = OrderItem.objects.get(id=order_item_id)
     order = order_item.order
 
-    if order.status == "Новый":
-        order.total_price -= order_item.menu.price * order_item.quantity
-        order.save()
-        order_item.delete()
+    # Проверяем, что статус заказа позволяет удаление или изменение
+    if order.status in ["Новый", "В процессе"]:
+        if quantity is None or quantity >= order_item.quantity:
+            # Удаляем весь пункт заказа, если количество не указано или больше текущего
+            order.total_price -= order_item.menu.price * order_item.quantity
+            order.save()
+            order_item.delete()
+        else:
+            # Уменьшаем количество товара в пункте заказа
+            order_item.quantity -= quantity
+            order_item.save()
+            # Обновляем общую стоимость заказа
+            order.total_price -= order_item.menu.price * quantity
+            order.save()
+
 
 
 """get"""
