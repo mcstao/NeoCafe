@@ -6,7 +6,14 @@ from menu.models import Menu, ExtraItem
 from branches.models import Branch
 from users.models import CustomUser
 
+class Table(models.Model):
+    table_number = models.PositiveIntegerField()
+    is_available = models.BooleanField(default=False)
+    branch = models.ForeignKey(
+        Branch, on_delete=models.CASCADE, null=True)
 
+    def __str__(self):
+        return f'Стол{self.table_number}-Филиал{self.branch.name}'
 
 class Order(models.Model):
     TYPE_CHOICES = [
@@ -43,20 +50,18 @@ class Order(models.Model):
         limit_choices_to={"position": "Официант"},
     )
     created = models.DateTimeField(auto_now_add=True)
-    table = models.IntegerField(
-        null=True,
-        blank=True,
-        verbose_name="Номер стола",
+    table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True
     )
 
 
-
+    def __str__(self):
+        return f"Order #{self.pk} - {self.order_type} - {self.status}"
 
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     menu = models.ForeignKey(Menu, on_delete=models.CASCADE, related_name="order_items")
-    menu_quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1)
     extra_product = models.ManyToManyField(
         ExtraItem,
         blank=True,

@@ -2145,9 +2145,12 @@ components:
           type: integer
         menu_id:
           type: integer
+        quantity:
+          type: integer
       required:
       - menu_id
       - order_id
+      - quantity
     AdminLogin:
       type: object
       properties:
@@ -2681,7 +2684,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-        menu_quantity:
+        quantity:
           type: integer
         item_image:
           type: string
@@ -2719,6 +2722,9 @@ components:
         table:
           type: integer
           nullable: true
+        waiter:
+          type: integer
+          nullable: true
       required:
       - bonuses_used
       - total_price
@@ -2729,7 +2735,7 @@ components:
         menu_id:
           type: integer
           writeOnly: true
-        menu_quantity:
+        quantity:
           type: integer
         extra_product:
           type: array
@@ -2737,7 +2743,7 @@ components:
             type: integer
       required:
       - menu_id
-      - menu_quantity
+      - quantity
     OrderTypeEnum:
       enum:
       - На вынос

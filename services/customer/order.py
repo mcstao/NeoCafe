@@ -56,7 +56,7 @@ def get_specific_order_data(order_id):
             "item_name": item.menu.name,
             "item_price": item.menu.price,
             "item_quantity": item.menu_quantity,
-            "item_total_price": item.menu.price * item.menu_quantity,
+            "item_total_price": item.menu.price * item.quantity,
             "item_image": item.menu.image.url if item.menu.image else None,
             "item_id": item.menu.id,
             "item_category": item.menu.category.name,
@@ -111,14 +111,14 @@ def reorder(order_id):
 
     total_price = 0
     for item in original_order.items.all():
-        if check_if_items_can_be_made(item.menu.id, original_order.branch.id, item.menu_quantity):
+        if check_if_items_can_be_made(item.menu.id, original_order.branch.id, item.quantity):
             OrderItem.objects.create(
                 order=new_order,
                 menu=item.menu,
-                menu_quantity=item.menu_quantity,
+                mquantity=item.quantity,
             )
             total_price += item.menu.price * item.menu_quantity
-            update_ingredient_storage_on_cooking(item.menu.id, original_order.branch.id, item.menu_quantity)
+            update_ingredient_storage_on_cooking(item.menu.id, original_order.branch.id, item.quantity)
 
     new_order.total_price = total_price
     new_order.save()
