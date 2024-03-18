@@ -57,6 +57,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         instance.order_type = validated_data.get('order_type', instance.order_type)
         instance.table = validated_data.get('table', instance.table)
         instance.waiter = validated_data.get('waiter', instance.waiter)
+        instance.status = validated_data.get('status', instance.status)
         instance.save()
 
         existing_items = {item.id: item for item in instance.items.all()}
