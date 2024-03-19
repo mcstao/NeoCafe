@@ -156,36 +156,27 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обновляем или добавляем новые пункты заказа
         for item_data in items_data:
-            item_id = item_data.get('id')
-            menu_id = item_data.get('menu_id', None)
+            menu_id = item_data.get('menu_id')
             new_quantity = item_data.get('quantity', 0)
 
-            if item_id and item_id in existing_items:
-                # Если ID предоставлен и элемент существует, обновляем количество
-                item = existing_items[item_id]
-                additional_quantity = new_quantity - item.quantity
-                item.quantity = new_quantity
+            # Ищем пункт заказа по menu_id, а не по item_id
+            item = instance.items.filter(menu_id=menu_id).first()
+
+            if item:
+                # Если пункт заказа найден, обновляем его количество
+                additional_quantity = new_quantity
+                item.quantity += additional_quantity
                 item.save()
-                updated_items[item_id] = item
                 # Обновляем ингредиенты на складе для дополнительного количества
                 if additional_quantity > 0:
                     update_ingredient_storage_on_cooking(menu_id, instance.branch.id, additional_quantity)
             else:
-                # Проверяем, существует ли уже пункт заказа с таким же меню
-                item = instance.items.filter(menu_id=menu_id).first()
-                if item:
-                    # Увеличиваем количество существующего пункта
-                    additional_quantity = new_quantity
-                    item.quantity += additional_quantity
-                    item.save()
-                else:
-                    # Создаем новый пункт заказа
-                    item = OrderItem.objects.create(order=instance, menu_id=menu_id, quantity=new_quantity)
-                    additional_quantity = new_quantity
-                updated_items[item.id] = item
-                # Обновляем ингредиенты на складе для нового или увеличенного количества
-                if additional_quantity > 0:
-                    update_ingredient_storage_on_cooking(menu_id, instance.branch.id, additional_quantity)
+                # Если пункт заказа не найден, создаем новый
+                if not menu_id:
+                    raise serializers.ValidationError({"menu_id": "This field is required."})
+                item = OrderItem.objects.create(order=instance, menu_id=menu_id, quantity=new_quantity)
+                # Обновляем ингредиенты на складе для нового количества
+                update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
         instance.bonuses_used = validated_data.get('bonuses_used', 0)
         if instance.bonuses_used > instance.user.bonus:
