@@ -194,9 +194,7 @@ class CreateCustomerOrderView(APIView):
         order = create_order(user.id, items, order_type, bonuses_used, table_number)
 
         if order:
-            # Вычитаем использованные бонусы и обновляем бонусы пользователя
-            user.bonus -= bonuses_used
-            user.save(update_fields=['bonus'])
+
             return Response(OrderCustomerSerializer(order).data, status=status.HTTP_201_CREATED)
         else:
             return Response({"message": "Order could not be created."}, status=status.HTTP_400_BAD_REQUEST)

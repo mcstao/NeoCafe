@@ -13,7 +13,7 @@ class Table(models.Model):
         Branch, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
-        return f'Стол{self.table_number}-Филиал{self.branch.name}'
+        return f'Стол:{self.table_number}-Филиал:{self.branch.name}'
 
 class Order(models.Model):
     TYPE_CHOICES = [
