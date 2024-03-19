@@ -155,6 +155,12 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             menu_id = item_data.get('menu_id')
             new_quantity = item_data.get('quantity')
 
+            if not menu_id:
+                raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
+
+            if not isinstance(menu_id, int):
+                raise serializers.ValidationError({'menu_id': 'Menu ID must be an integer.'})
+
             try:
                 menu_item = Menu.objects.get(id=menu_id)
             except Menu.DoesNotExist:
@@ -169,7 +175,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
                 item.save()
             else:
                 # Если пункта заказа нет, создаем новый с указанным количеством
-                OrderItem.objects.create(order=instance, menu_id=menu_id, quantity=new_quantity)
+                OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
             # Обновляем ингредиенты на складе для добавленного количества
             if new_quantity > 0:
