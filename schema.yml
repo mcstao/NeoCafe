@@ -1576,26 +1576,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderStaff'
           description: ''
-  /orders/orders/:
-    get:
-      operationId: orders_orders_list
-      tags:
-      - orders
-      security:
-      - tokenAuth: []
-      - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderList'
-          description: ''
   /orders/remove-order-item/:
     delete:
       operationId: orders_remove_order_item_destroy
@@ -2859,48 +2839,6 @@ components:
       - item_id
       - item_name
       - item_price
-    OrderList:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        order_type:
-          $ref: '#/components/schemas/OrderTypeEnum'
-        status:
-          $ref: '#/components/schemas/StatusEnum'
-        user:
-          type: integer
-          nullable: true
-        total_price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        branch:
-          type: integer
-          nullable: true
-        bonuses_used:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        waiter:
-          type: integer
-          nullable: true
-        created:
-          type: string
-          format: date-time
-          readOnly: true
-        table:
-          type: integer
-          nullable: true
-        items:
-          allOf:
-          - $ref: '#/components/schemas/OrderStaffItem'
-          readOnly: true
-      required:
-      - created
-      - id
-      - items
     OrderStaff:
       type: object
       description: Serializer for Order model.
@@ -2933,11 +2871,12 @@ components:
       - total_price
     OrderStaffItem:
       type: object
-      description: Serializer for OrderItem model.
       properties:
         menu_id:
           type: integer
-          writeOnly: true
+        menu_detail:
+          type: string
+          readOnly: true
         quantity:
           type: integer
         extra_product:
@@ -2945,8 +2884,8 @@ components:
           items:
             type: integer
       required:
+      - menu_detail
       - menu_id
-      - quantity
     OrderTypeEnum:
       enum:
       - На вынос

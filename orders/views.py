@@ -7,12 +7,8 @@ from services.customer.order import create_order, reorder, get_reorder_informati
     add_item_to_order, return_to_storage, return_item_ingredients_to_storage
 from .models import Table, Order, OrderItem
 
-from .serializers import OrderStaffSerializer, OrderCustomerSerializer, OrderListSerializer
+from .serializers import OrderStaffSerializer, OrderCustomerSerializer
 
-
-class OrderListView(generics.ListAPIView):
-    queryset = Order.objects.all()
-    serializer_class = OrderListSerializer
 
 class CreateOrderView(APIView):
     @extend_schema(request=OrderStaffSerializer, responses={201: OrderStaffSerializer}, description="Создает заказ")

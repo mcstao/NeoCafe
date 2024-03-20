@@ -1,8 +1,10 @@
 import logging
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from branches.models import Branch
 from menu.models import Menu, ExtraItem
+from menu.serializers import MenuSerializer
 from services.menu.menu import update_ingredient_storage_on_cooking
 from .models import Order, OrderItem, Table
 from django.db import transaction
@@ -11,16 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 class OrderStaffItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for OrderItem model.
-    """
-    menu_id = serializers.PrimaryKeyRelatedField(queryset=Menu.objects.all(), source='menu', write_only=True)
-    quantity = serializers.IntegerField(required=True)
-    extra_product = serializers.PrimaryKeyRelatedField(queryset=ExtraItem.objects.all(), many=True, required=False)
+    menu_detail = serializers.SerializerMethodField(read_only=True)
+    menu_id = serializers.PrimaryKeyRelatedField(queryset=Menu.objects.all(), source='menu')
 
     class Meta:
         model = OrderItem
-        fields = ['menu_id', 'quantity', 'extra_product']
+        fields = ['menu_id', 'menu_detail', 'quantity', 'extra_product']
+
+    @extend_schema_field(serializers.CharField())
+    def get_menu_detail(self, obj):
+        return MenuSerializer(obj.menu).data
 
 class TableSerializer(serializers.ModelSerializer):
 
@@ -145,7 +147,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
 
-
+        logger.debug(f"Updating order: {instance.id}")
+        logger.debug(f"Items data: {items_data}")
+        logger.debug(f"Validated data: {validated_data}")
 
         # Обновляем основные данные заказа
         instance.order_type = validated_data.get('order_type', instance.order_type)
@@ -156,9 +160,14 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обрабатываем изменения в пунктах заказа
         for item_data in items_data:
-            item_id = item_data.get('id')
+            logger.debug(f"Processing item: {item_data}")
+            menu_id = item_data.get('menu_id')
             new_quantity = item_data.get('quantity')
 
+            logger.debug(f"menu_id: {menu_id}, quantity: {new_quantity}")
+
+            if not menu_id:
+                raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
 
             try:
                 menu_item = Menu.objects.get(id=menu_id)
@@ -169,12 +178,10 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             item = instance.items.filter(menu=menu_item).first()
 
             if item:
-                logger.debug(f"Found existing item: {item.id}, updating quantity.")
                 # Если пункт заказа уже существует, прибавляем новое количество к существующему
                 item.quantity += new_quantity
                 item.save()
             else:
-                logger.debug(f"Creating new OrderItem with menu_id: {menu_id} and quantity: {new_quantity}")
                 # Если пункта заказа нет, создаем новый с указанным количеством
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
@@ -194,14 +201,3 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             instance.user.save()
 
         return instance
-
-
-class OrderListSerializer(serializers.ModelSerializer):
-    items = OrderStaffItemSerializer(read_only=True)
-
-    class Meta:
-        model = Order
-        fields = [
-            'id', 'order_type', 'status', 'user', 'total_price',
-            'branch', 'bonuses_used', 'waiter', 'created', 'table', 'items'
-        ]
