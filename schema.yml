@@ -2859,19 +2859,6 @@ components:
       - item_id
       - item_name
       - item_price
-    OrderItemList:
-      type: object
-      properties:
-        menu:
-          type: integer
-        quantity:
-          type: integer
-        extra_product:
-          type: array
-          items:
-            type: integer
-      required:
-      - menu
     OrderList:
       type: object
       properties:
@@ -2908,7 +2895,7 @@ components:
           nullable: true
         items:
           allOf:
-          - $ref: '#/components/schemas/OrderItemList'
+          - $ref: '#/components/schemas/OrderStaffItem'
           readOnly: true
       required:
       - created
