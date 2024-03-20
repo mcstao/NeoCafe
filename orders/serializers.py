@@ -78,8 +78,8 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             if item:
                 # Если пункт заказа уже существует, обновляем количество и пересчитываем его стоимость
-                difference = new_quantity - item.quantity
-                item.quantity = new_quantity
+
+                item.quantity += new_quantity
                 item.save()
 
             else:
@@ -155,8 +155,8 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
             if item:
                 # Если пункт заказа уже существует, обновляем количество и пересчитываем его стоимость
-                difference = new_quantity - item.quantity
-                item.quantity = new_quantity
+
+                item.quantity += new_quantity
                 item.save()
                 # Обновляем общую стоимость, учитывая разницу в количестве
 
