@@ -7,7 +7,7 @@ from .views import (
     RemoveOrderItemView,
     AddItemToOrderView,
     CreateCustomerOrderView,
-    UpdateCustomerOrderView,
+    UpdateCustomerOrderView, OrderListView,
 )
 
 urlpatterns = [
@@ -19,4 +19,5 @@ urlpatterns = [
     path('add-item-to-order/', AddItemToOrderView.as_view(), name='add-item-to-order'),
     path('create-customer-order/', CreateCustomerOrderView.as_view(), name='create-customer-order'),
     path('update-customer-order/<int:order_id>/', UpdateCustomerOrderView.as_view(), name='update-customer-order'),
+    path('orders/', OrderListView.as_view(), name='order-list'),
 ]
