@@ -210,10 +210,6 @@ class UpdateCustomerOrderView(APIView):
         if serializer.is_valid():
             updated_order = serializer.save()
 
-            if updated_order.status == "Завершено" and order.status != "Завершено":
-                updated_order.user.bonus -= updated_order.bonuses_used
-                updated_order.user.bonus += updated_order.total_price  # Начисление бонусов
-                updated_order.user.save()
 
             if updated_order.status == "Отменено" and order.table:
                 return_to_storage(updated_order.id)  # Возврат ингредиентов на склад
