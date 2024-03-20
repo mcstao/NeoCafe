@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
-    menu_id = serializers.PrimaryKeyRelatedField(queryset=Menu.objects.all(), source='menu')
+    menu_id = serializers.IntegerField()
 
     class Meta:
         model = OrderItem
