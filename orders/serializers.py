@@ -157,22 +157,29 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обрабатываем изменения в пунктах заказа
         for item_data in items_data:
+            if 'menu_id' not in item_data:
+                raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
+
             menu_id = item_data['menu_id']
-            new_quantity = item_data['quantity']
+            new_quantity = item_data.get('quantity')
 
             try:
                 menu_item = Menu.objects.get(id=menu_id)
             except Menu.DoesNotExist:
                 raise serializers.ValidationError({'menu_id': 'Menu item does not exist.'})
 
+            # Поиск существующего OrderItem
             item = instance.items.filter(menu=menu_item).first()
 
             if item:
+                # Если пункт заказа уже существует, прибавляем новое количество к существующему
                 item.quantity += new_quantity
                 item.save()
             else:
+                # Если пункта заказа нет, создаем новый с указанным количеством
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
+            # Обновляем ингредиенты на складе для добавленного количества
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
