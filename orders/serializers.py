@@ -146,6 +146,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
+        print("Validated data:", validated_data)
 
 
         # Обновляем основные данные заказа
@@ -157,14 +158,18 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обрабатываем изменения в пунктах заказа
         for item_data in items_data:
+            print("Current item data:", item_data)
             if 'menu_id' not in item_data:
                 raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
 
             menu_id = item_data.get['menu_id']
+            print("Menu ID:", menu_id)
             new_quantity = item_data.get('quantity')
+            print("Quantity:", new_quantity)
 
             try:
                 menu_item = Menu.objects.get(id=menu_id)
+
             except Menu.DoesNotExist:
                 raise serializers.ValidationError({'menu_id': 'Menu item does not exist.'})
 
