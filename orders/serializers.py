@@ -164,7 +164,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
             menu_id = item_data['menu_id']
             print("Menu ID:", menu_id)
-            new_quantity = item_data('quantity')
+            new_quantity = item_data['quantity']
             print("Quantity:", new_quantity)
 
             try:
