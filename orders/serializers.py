@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
-    menu_id = serializers.PrimaryKeyRelatedField(queryset=Menu.objects.all(), source='menu')
+    menu_id = serializers.PrimaryKeyRelatedField(queryset=Menu.objects.all())
 
     class Meta:
         model = OrderItem
@@ -147,9 +147,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
 
-        logger.debug(f"Updating order: {instance.id}")
-        logger.debug(f"Items data: {items_data}")
-        logger.debug(f"Validated data: {validated_data}")
 
         # Обновляем основные данные заказа
         instance.order_type = validated_data.get('order_type', instance.order_type)
@@ -160,11 +157,11 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обрабатываем изменения в пунктах заказа
         for item_data in items_data:
-            logger.debug(f"Processing item: {item_data}")
+
             menu_id = item_data.get('menu_id')
             new_quantity = item_data.get('quantity')
 
-            logger.debug(f"menu_id: {menu_id}, quantity: {new_quantity}")
+
 
             if not menu_id:
                 raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
