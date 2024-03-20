@@ -195,12 +195,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         return instance
 
-class OrderItemListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItem
-        fields = ['menu', 'quantity', 'extra_product']
+
 class OrderListSerializer(serializers.ModelSerializer):
-    items = OrderItemListSerializer(read_only=True)
+    items = OrderStaffItemSerializer(read_only=True)
 
     class Meta:
         model = Order
