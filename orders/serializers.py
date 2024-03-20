@@ -162,9 +162,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             if 'menu_id' not in item_data:
                 raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
 
-            menu_id = item_data.get['menu_id']
+            menu_id = item_data['menu_id']
             print("Menu ID:", menu_id)
-            new_quantity = item_data.get('quantity')
+            new_quantity = item_data('quantity')
             print("Quantity:", new_quantity)
 
             try:
