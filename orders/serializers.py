@@ -66,8 +66,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         instance.status = validated_data.get('status', instance.status)
         instance.save()
 
-        # Обрабатываем изменения в пунктах заказа
-        total_price = Decimal(0)
 
         for item_data in items_data:
             menu_id = item_data['menu_id']
@@ -83,18 +81,18 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                 difference = new_quantity - item.quantity
                 item.quantity = new_quantity
                 item.save()
-                # Обновляем общую стоимость, учитывая разницу в количестве
-                total_price += difference * menu_item.price
+
             else:
                 # Если пункта заказа нет, создаем новый и добавляем его стоимость к общей
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-                total_price += new_quantity * menu_item.price
+
 
             # Обновляем ингредиенты на складе для добавленного количества
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
-        # Обновляем общую стоимость заказа, учитывая использованные бонусы
+        # Расчет общей стоимости заказа
+        total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price, Decimal(0))
         instance.save()
 
@@ -145,7 +143,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Недостаточно бонусов у пользователя.")
 
         # Пересчет общей стоимости заказа
-        total_price = Decimal(0)
 
         for item_data in items_data:
             menu_id = item_data['menu_id']
@@ -162,17 +159,18 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
                 item.quantity = new_quantity
                 item.save()
                 # Обновляем общую стоимость, учитывая разницу в количестве
-                total_price += difference * menu_item.price
+
             else:
                 # Если пункта заказа нет, создаем новый и добавляем его стоимость к общей
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-                total_price += new_quantity * menu_item.price
+
 
             # Обновляем ингредиенты на складе для добавленного количества
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
-        # Обновляем общую стоимость заказа, учитывая использованные бонусы
+        # Расчет общей стоимости заказа
+        total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
         instance.save()
 
