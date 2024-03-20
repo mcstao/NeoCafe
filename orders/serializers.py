@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework import serializers
 from branches.models import Branch
 from menu.models import Menu, ExtraItem
@@ -5,7 +7,7 @@ from services.menu.menu import update_ingredient_storage_on_cooking
 from .models import Order, OrderItem, Table
 from django.db import transaction
 
-
+logger = logging.getLogger(__name__)
 
 
 class OrderStaffItemSerializer(serializers.ModelSerializer):
@@ -143,6 +145,10 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
 
+        logger.debug(f"Updating order: {instance.id}")
+        logger.debug(f"Items data: {items_data}")
+        logger.debug(f"Validated data: {validated_data}")
+
         # Обновляем основные данные заказа
         instance.order_type = validated_data.get('order_type', instance.order_type)
         instance.table = validated_data.get('table', instance.table)
@@ -152,8 +158,11 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         # Обрабатываем изменения в пунктах заказа
         for item_data in items_data:
+            logger.debug(f"Processing item: {item_data}")
             menu_id = item_data.get('menu_id')
             new_quantity = item_data.get('quantity')
+
+            logger.debug(f"menu_id: {menu_id}, quantity: {new_quantity}")
 
             if not menu_id:
                 raise serializers.ValidationError({'menu_id': 'Menu ID is required.'})
@@ -167,10 +176,12 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             item = instance.items.filter(menu=menu_item).first()
 
             if item:
+                logger.debug(f"Found existing item: {item.id}, updating quantity.")
                 # Если пункт заказа уже существует, прибавляем новое количество к существующему
                 item.quantity += new_quantity
                 item.save()
             else:
+                logger.debug(f"Creating new OrderItem with menu_id: {menu_id} and quantity: {new_quantity}")
                 # Если пункта заказа нет, создаем новый с указанным количеством
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
