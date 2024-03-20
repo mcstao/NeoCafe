@@ -2859,6 +2859,19 @@ components:
       - item_id
       - item_name
       - item_price
+    OrderItemList:
+      type: object
+      properties:
+        menu:
+          type: integer
+        quantity:
+          type: integer
+        extra_product:
+          type: array
+          items:
+            type: integer
+      required:
+      - menu
     OrderList:
       type: object
       properties:
@@ -2869,33 +2882,38 @@ components:
           $ref: '#/components/schemas/OrderTypeEnum'
         status:
           $ref: '#/components/schemas/StatusEnum'
+        user:
+          type: integer
+          nullable: true
         total_price:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        branch:
+          type: integer
+          nullable: true
         bonuses_used:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        waiter:
+          type: integer
+          nullable: true
         created:
           type: string
           format: date-time
           readOnly: true
-        user:
-          type: integer
-          nullable: true
-        branch:
-          type: integer
-          nullable: true
-        waiter:
-          type: integer
-          nullable: true
         table:
           type: integer
           nullable: true
+        items:
+          allOf:
+          - $ref: '#/components/schemas/OrderItemList'
+          readOnly: true
       required:
       - created
       - id
+      - items
     OrderStaff:
       type: object
       description: Serializer for Order model.

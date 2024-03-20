@@ -195,8 +195,16 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         return instance
 
+class OrderItemListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = ['menu', 'quantity', 'extra_product']
 class OrderListSerializer(serializers.ModelSerializer):
+    items = OrderItemListSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = "__all__"
+        fields = [
+            'id', 'order_type', 'status', 'user', 'total_price',
+            'branch', 'bonuses_used', 'waiter', 'created', 'table', 'items'
+        ]
