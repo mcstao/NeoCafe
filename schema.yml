@@ -493,33 +493,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/MenuItemDetail'
           description: ''
-  /customers/menu/{item_id}/:
-    get:
-      operationId: customers_menu_retrieve
-      description: Используйте этот эндпоинт для получения детальной информации о
-        пункте меню по ID.
-      summary: Получить детальную информацию о пункте меню
-      parameters:
-      - in: path
-        name: item_id
-        schema:
-          type: integer
-        required: true
-      tags:
-      - customers
-      security:
-      - tokenAuth: []
-      - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MenuItemDetail'
-          description: ''
   /customers/my-id/:
     get:
       operationId: customers_my_id_retrieve
@@ -539,9 +512,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserIdResponse'
           description: ''
-  /customers/my-orders/:
+  /customers/orders/:
     get:
-      operationId: customers_my_orders_retrieve
+      operationId: customers_orders_retrieve
       description: Заказы пользователя
       summary: Заказы пользователя
       tags:
@@ -558,14 +531,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserOrders'
           description: ''
-  /customers/orders/{id}/:
+  /customers/orders/{order_id}/:
     get:
-      operationId: customers_orders_retrieve
+      operationId: unique_operation_id_for_my_order_detail_view
       description: Деталь заказа
       summary: Детали заказа
       parameters:
       - in: path
-        name: id
+        name: order_id
         schema:
           type: integer
         required: true
@@ -1483,37 +1456,6 @@ paths:
       responses:
         '204':
           description: No response body
-  /orders/add-item-to-order/:
-    post:
-      operationId: orders_add_item_to_order_create
-      description: Добавляет пункт в заказ.
-      tags:
-      - orders
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddItemToOrderRequest'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/AddItemToOrderRequest'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/AddItemToOrderRequest'
-        required: true
-      security:
-      - tokenAuth: []
-      - jwtAuth: []
-      - basicAuth: []
-      - cookieAuth: []
-      - {}
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderStaff'
-          description: ''
   /orders/create-customer-order/:
     post:
       operationId: orders_create_customer_order_create
@@ -1576,6 +1518,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderStaff'
           description: ''
+  /orders/order-list/:
+    get:
+      operationId: orders_order_list_list
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDetailedList'
+          description: ''
   /orders/remove-order-item/:
     delete:
       operationId: orders_remove_order_item_destroy
@@ -1625,6 +1587,105 @@ paths:
       responses:
         '200':
           description: No response body
+  /orders/tables/:
+    get:
+      operationId: orders_tables_list
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Table'
+          description: ''
+    post:
+      operationId: orders_tables_create
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Table'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Table'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Table'
+        required: true
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Table'
+          description: ''
+  /orders/tables/{id}/:
+    get:
+      operationId: orders_tables_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableDetail'
+          description: ''
+  /orders/tables/branch/{branch_id}/:
+    get:
+      operationId: orders_tables_branch_list
+      parameters:
+      - in: path
+        name: branch_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Table'
+          description: ''
   /orders/update-customer-order/{order_id}/:
     patch:
       operationId: orders_update_customer_order_partial_update
@@ -2239,19 +2300,6 @@ paths:
           description: ''
 components:
   schemas:
-    AddItemToOrderRequest:
-      type: object
-      properties:
-        order_id:
-          type: integer
-        menu_id:
-          type: integer
-        quantity:
-          type: integer
-      required:
-      - menu_id
-      - order_id
-      - quantity
     AdminLogin:
       type: object
       properties:
@@ -2741,9 +2789,6 @@ components:
           readOnly: true
         branch_name:
           type: string
-        created_at:
-          type: string
-          format: date-time
         items:
           type: array
           items:
@@ -2766,9 +2811,16 @@ components:
         waiter:
           type: string
           nullable: true
+        created:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
       required:
       - branch_name
-      - created_at
+      - completed_at
+      - created
       - id
       - items
       - table_number
@@ -2777,6 +2829,9 @@ components:
       type: object
       description: Serializer for customer orders.
       properties:
+        id:
+          type: integer
+          readOnly: true
         items:
           type: array
           items:
@@ -2804,10 +2859,74 @@ components:
           allOf:
           - $ref: '#/components/schemas/StatusEnum'
           writeOnly: true
+        branch:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
       required:
+      - created
+      - id
       - order_type
       - status
       - total_price
+      - updated_at
+    OrderDetailedList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        user:
+          type: integer
+          nullable: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        branch:
+          type: integer
+          nullable: true
+        bonuses_used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        waiter:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        table:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+          readOnly: true
+        table_detail:
+          allOf:
+          - $ref: '#/components/schemas/Table'
+          readOnly: true
+      required:
+      - created
+      - id
+      - items
+      - table_detail
     OrderItem:
       type: object
       properties:
@@ -2843,6 +2962,9 @@ components:
       type: object
       description: Serializer for Order model.
       properties:
+        id:
+          type: integer
+          readOnly: true
         items:
           type: array
           items:
@@ -2851,6 +2973,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
         order_type:
           allOf:
           - $ref: '#/components/schemas/OrderTypeEnum'
@@ -2865,13 +2988,32 @@ components:
           allOf:
           - $ref: '#/components/schemas/StatusEnum'
           writeOnly: true
+        branch:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
       required:
+      - created
+      - id
       - order_type
       - status
       - total_price
+      - updated_at
     OrderStaffItem:
       type: object
       properties:
+        id:
+          type: integer
+          readOnly: true
         menu_id:
           type: integer
         menu_detail:
@@ -2884,6 +3026,7 @@ components:
           items:
             type: integer
       required:
+      - id
       - menu_detail
       - menu_id
     OrderTypeEnum:
@@ -3062,6 +3205,9 @@ components:
       type: object
       description: Serializer for customer orders.
       properties:
+        id:
+          type: integer
+          readOnly: true
         items:
           type: array
           items:
@@ -3089,10 +3235,26 @@ components:
           allOf:
           - $ref: '#/components/schemas/StatusEnum'
           writeOnly: true
+        branch:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
     PatchedOrderStaff:
       type: object
       description: Serializer for Order model.
       properties:
+        id:
+          type: integer
+          readOnly: true
         items:
           type: array
           items:
@@ -3101,6 +3263,7 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
         order_type:
           allOf:
           - $ref: '#/components/schemas/OrderTypeEnum'
@@ -3115,6 +3278,19 @@ components:
           allOf:
           - $ref: '#/components/schemas/StatusEnum'
           writeOnly: true
+        branch:
+          type: integer
+          nullable: true
+        created:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
     PatchedStaffCreate:
       type: object
       properties:
@@ -3304,6 +3480,42 @@ components:
         * `Готово` - Готово
         * `Отменено` - Отменено
         * `Завершено` - Завершено
+    Table:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        table_number:
+          type: integer
+        is_available:
+          type: boolean
+        branch:
+          type: integer
+          nullable: true
+      required:
+      - id
+      - table_number
+    TableDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        table_number:
+          type: integer
+        is_available:
+          type: boolean
+        orders:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+      required:
+      - id
+      - orders
+      - table_number
     TypeExtraProductEnum:
       enum:
       - Milk

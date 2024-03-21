@@ -73,16 +73,16 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     branch_name = serializers.CharField(source="branch.name")
     items = OrderItemSerializer(many=True)
-    created_at = serializers.DateTimeField(source='created', format="%d.%m.%Y %H:%M")
+    created = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
     waiter = serializers.CharField(source='waiter.first_name', allow_null=True)
     table_number = serializers.IntegerField(source='table', allow_null=True)
+    completed_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Order
         fields = [
             "id",
             "branch_name",
-            "created_at",
             "items",
             "total_price",
             "bonuses_used",
@@ -90,23 +90,27 @@ class OrderSerializer(serializers.ModelSerializer):
             "order_type",
             "status",
             "waiter",
+            "created",
+            'completed_at'
         ]
 
 
 class MyOrdersListSerializer(serializers.ModelSerializer):
     branch_name = serializers.CharField(source="branch.name")
-    created_at = serializers.DateTimeField(source='created', format="%d.%m.%Y")
+    created = serializers.DateTimeField(source='created', format="%d.%m.%Y %H:%M")
     branch_image = serializers.ImageField(source="branch.image")
+    completed_at = serializers.DateTimeField(source='completed_at', format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Order
         fields = [
             "id",
             "branch_name",
-            "created_at",
             "total_price",
             "bonuses_used",
             "branch_image",
+            "created",
+            'completed_at'
         ]
 
 

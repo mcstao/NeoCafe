@@ -50,8 +50,9 @@ class Order(models.Model):
         limit_choices_to={"position": "Официант"},
     )
     created = models.DateTimeField(auto_now_add=True)
-    table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True
-    )
+    updated_at = models.DateTimeField(auto_now=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True)
 
 
     def __str__(self):
