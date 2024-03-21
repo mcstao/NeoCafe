@@ -43,3 +43,18 @@ class BranchSerializer(serializers.ModelSerializer):
         schedule = Schedule.objects.create(**schedule_data)
         branch = Branch.objects.create(schedule=schedule, **validated_data)
         return branch
+
+    def update(self, instance, validated_data):
+        schedule_data = validated_data.pop('schedule', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if schedule_data is not None:
+            for attr, value in schedule_data.items():
+                setattr(instance.schedule, attr, value)
+            instance.schedule.save()
+
+        return instance
+

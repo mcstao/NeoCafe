@@ -56,3 +56,20 @@ class StaffCreateSerializer(serializers.ModelSerializer):
         user.schedule = schedule
         user.save()
         return user
+
+    def update(self, instance, validated_data):
+        schedule_data = validated_data.pop('schedule', None)
+
+        for attr, value in validated_data.items():
+            if attr == 'password':
+                instance.set_password(value)
+            else:
+                setattr(instance, attr, value)
+        instance.save()
+
+        if schedule_data is not None:
+            for attr, value in schedule_data.items():
+                setattr(instance.schedule, attr, value)
+            instance.schedule.save()
+
+        return instance
