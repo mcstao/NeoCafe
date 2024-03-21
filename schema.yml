@@ -531,14 +531,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserOrders'
           description: ''
-  /customers/orders/{order_id}/:
+  /customers/orders/{id}/:
     get:
       operationId: unique_operation_id_for_my_order_detail_view
       description: Деталь заказа
       summary: Детали заказа
       parameters:
       - in: path
-        name: order_id
+        name: id
         schema:
           type: integer
         required: true
