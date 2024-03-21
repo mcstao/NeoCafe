@@ -24,6 +24,6 @@ urlpatterns = [
     path("change-branch/", ChangeBranchView.as_view(), name="change-branch"),
     path("my-id/", MyIdView.as_view(), name="my-id"),
     path("orders/", MyOrdersView.as_view(), name="my-orders"),
-    path("orders/<int:order_id>/", MyOrderDetailView.as_view(), name="order-detail"),
+    path("orders/<int:pk>/", MyOrderDetailView.as_view(), name="order-detail"),
 ]
 
