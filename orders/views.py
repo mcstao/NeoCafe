@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
-    add_item_to_order, return_to_storage, return_item_ingredients_to_storage
+    return_to_storage, return_item_ingredients_to_storage
 from .models import Table, Order, OrderItem
 
-from .serializers import OrderStaffSerializer, OrderCustomerSerializer
+from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDetailSerializer, TableSerializer, \
+    OrderDetailedListSerializer
 
 
 class CreateOrderView(APIView):
@@ -33,9 +34,9 @@ class CreateOrderView(APIView):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class UpdateOrderView(APIView):
     serializer_class = OrderStaffSerializer
+
     def patch(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id)
@@ -59,7 +60,6 @@ class UpdateOrderView(APIView):
             return Response({"message": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
-
 class ReorderView(APIView):
     @extend_schema(
         responses={201: OrderStaffSerializer},
@@ -74,7 +74,9 @@ class ReorderView(APIView):
         if order:
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         else:
-            return Response({"message": "Извините, но в данный момент невозможно сделать заказ. Не хватает ингридиентов."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Извините, но в данный момент невозможно сделать заказ. Не хватает ингридиентов."},
+                status=status.HTTP_400_BAD_REQUEST)
 
 
 class ReorderInformationView(APIView):
@@ -82,7 +84,6 @@ class ReorderInformationView(APIView):
         responses={200: None},
         description="Предоставляет информацию для повторного заказа."
     )
-
     @extend_schema(
         responses={201: OrderStaffSerializer},
         methods=['GET'],
@@ -146,34 +147,6 @@ class RemoveOrderItemView(APIView):
         )
 
 
-class AddItemToOrderView(APIView):
-    @extend_schema(
-        request=inline_serializer(
-            name='AddItemToOrderRequest',
-            fields={
-                'order_id': serializers.IntegerField(),
-                'menu_id': serializers.IntegerField(),
-                'quantity': serializers.IntegerField(),
-            }
-        ),
-        responses={201: OrderStaffSerializer},
-        description="Добавляет пункт в заказ."
-    )
-    def post(self, request):
-        order_id = request.data["order_id"]
-        menu_id = request.data["menu_id"]
-        quantity = request.data["quantity"]
-
-        try:
-            order = add_item_to_order(order_id, menu_id, quantity)
-            if order:
-                return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"message": "Item could not be added or insufficient stock."}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-
 class CreateCustomerOrderView(APIView):
     @extend_schema(
         request=OrderCustomerSerializer,
@@ -190,7 +163,6 @@ class CreateCustomerOrderView(APIView):
         items = request.data.get("items", [])
         bonuses_used = min(request.data.get("bonuses_used", 0), user.bonus)
 
-
         order = create_order(user.id, items, order_type, bonuses_used, table_number)
 
         if order:
@@ -199,8 +171,10 @@ class CreateCustomerOrderView(APIView):
         else:
             return Response({"message": "Order could not be created."}, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UpdateCustomerOrderView(APIView):
     serializer_class = OrderCustomerSerializer
+
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
         if order.user != request.user:
@@ -210,10 +184,42 @@ class UpdateCustomerOrderView(APIView):
         if serializer.is_valid():
             updated_order = serializer.save()
 
-
             if updated_order.status == "Отменено" and order.table:
                 return_to_storage(updated_order.id)  # Возврат ингредиентов на склад
 
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class TableDetailView(generics.RetrieveAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableDetailSerializer
+
+    def get_object(self):
+        return super().get_object()
+
+class TableListCreateView(generics.ListCreateAPIView):
+    queryset = Table.objects.all()
+    serializer_class = TableSerializer
+
+
+class TableListByBranchView(generics.ListAPIView):
+    serializer_class = TableSerializer
+
+    def get_queryset(self):
+        branch_id = self.kwargs['branch_id']
+        return Table.objects.filter(branch__id=branch_id)
+
+
+class OrderDetailedListView(generics.ListAPIView):
+    serializer_class = OrderDetailedListSerializer
+    queryset = Order.objects.all().order_by('-created')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        branch_id = self.request.query_params.get('branch_id')
+
+        if branch_id is not None:
+            queryset = queryset.filter(branch__id=branch_id)
+
+        return queryset

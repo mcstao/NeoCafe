@@ -139,15 +139,15 @@ class CheckIfItemCanBeMadeView(APIView):
         },
     )
     def post(self, request, format=None):
-        item_id = request.data.get("item_id")
+        menu_id = request.data.get("menu_id")
         quantity = request.data.get("quantity", 1)  # Assume default quantity is 1 if not provided
 
         try:
-            item = Menu.objects.get(id=item_id)
+            menu_id = Menu.objects.get(id=menu_id)
         except Menu.DoesNotExist:
             return Response({"message": "Menu item does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        if check_if_items_can_be_made(item_id, request.user.branch.id, quantity):
+        if check_if_items_can_be_made(menu_id, request.user.branch.id, quantity):
             return Response({"message": "Item can be made."}, status=status.HTTP_200_OK)
 
         return Response({"message": "Item can't be made."}, status=status.HTTP_400_BAD_REQUEST)
@@ -230,6 +230,7 @@ class MyOrderDetailView(RetrieveAPIView):
         summary="Детали заказа",
         description="Деталь заказа",
         responses={200: OrderSerializer},
+        operation_id="unique_operation_id_for_my_order_detail_view",
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

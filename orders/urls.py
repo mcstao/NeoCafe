@@ -5,9 +5,8 @@ from .views import (
     ReorderView,
     ReorderInformationView,
     RemoveOrderItemView,
-    AddItemToOrderView,
     CreateCustomerOrderView,
-    UpdateCustomerOrderView,
+    UpdateCustomerOrderView, TableDetailView, TableListByBranchView, TableListCreateView, OrderDetailedListView,
 )
 
 urlpatterns = [
@@ -16,7 +15,10 @@ urlpatterns = [
     path('reorder/', ReorderView.as_view(), name='reorder'),
     path('reorder-info/', ReorderInformationView.as_view(), name='reorder-info'),
     path('remove-order-item/', RemoveOrderItemView.as_view(), name='remove-order-item'),
-    path('add-item-to-order/', AddItemToOrderView.as_view(), name='add-item-to-order'),
+    path('tables/<int:pk>/', TableDetailView.as_view(), name='table-detail'),
     path('create-customer-order/', CreateCustomerOrderView.as_view(), name='create-customer-order'),
     path('update-customer-order/<int:order_id>/', UpdateCustomerOrderView.as_view(), name='update-customer-order'),
+    path('tables/branch/<int:branch_id>/', TableListByBranchView.as_view(), name='table-list-by-branch'),
+    path('tables/', TableListCreateView.as_view(), name='table-list-create'),
+    path('order-list/', OrderDetailedListView.as_view(), name='order-list'),
 ]
