@@ -97,9 +97,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class MyOrdersListSerializer(serializers.ModelSerializer):
     branch_name = serializers.CharField(source="branch.name")
-    created = serializers.DateTimeField(source='created', format="%d.%m.%Y %H:%M")
+    created = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
     branch_image = serializers.ImageField(source="branch.image")
-    completed_at = serializers.DateTimeField(source='completed_at', format="%d.%m.%Y %H:%M")
+    completed_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Order
