@@ -57,7 +57,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         table = validated_data.get('table', None)
         user = self.context['request'].user
 
-        order = Order.objects.create(**validated_data, waiter=user, table_id=table.id)
+        order = Order.objects.create(**validated_data, waiter=user, table=table)
 
 
         for item_data in items_data:

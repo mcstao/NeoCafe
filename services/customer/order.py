@@ -66,13 +66,13 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
+def create_order(user_id, items, order_type, bonuses_used=0, table=None):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
     table_instance = None
-    if table_id:
+    if table:
         try:
-            table_instance = Table.objects.get(id=table_id)
+            table_instance = Table.objects.get(id=table.id)
             if order_type == "В заведении" and not table_instance.is_available:
                 raise ValueError("Стол не доступен.")
             if order_type == "В заведении":
