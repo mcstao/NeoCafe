@@ -41,7 +41,7 @@ def get_popular_items(branch_id):
     item_sales = (OrderItem.objects
                   .filter(order__branch_id=branch_id)
                   .values('menu_id')
-                  .annotate(total_quantity=Sum('menu_quantity'))
+                  .annotate(total_quantity=Sum('quantity'))
                   .order_by('-total_quantity'))
 
     popular_items = [{'menu_id': item['menu_id'], 'total_quantity': item['total_quantity']} for item in item_sales][:10]
