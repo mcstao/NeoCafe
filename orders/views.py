@@ -27,7 +27,7 @@ class CreateOrderView(APIView):
                 return Response({"message": "Table is not available."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            order = create_order(user.id, items, order_type, bonuses_used, table)
+            order = create_order(user.id, items, order_type, bonuses_used, table.id if table else None)
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

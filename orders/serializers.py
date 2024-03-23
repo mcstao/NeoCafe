@@ -54,12 +54,16 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
-        table = validated_data.pop('table', None)
+        table_id = validated_data.pop('table', None)  # Используйте table_id
         user = self.context['request'].user
+
+        # Получаем объект Table или None
+        table = Table.objects.get(id=table_id) if table_id else None
 
         if table and not table.is_available:
             raise serializers.ValidationError({"table": "Стол не доступен."})
 
+        # Обновляем доступность стола, если заказ "в заведении"
         if table and validated_data.get('order_type') == 'В заведении':
             table.is_available = False
             table.save()
@@ -71,7 +75,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         order.save()
         return order
-
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
 
