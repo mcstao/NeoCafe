@@ -2962,7 +2962,8 @@ components:
           - $ref: '#/components/schemas/OrderTypeEnum'
           writeOnly: true
         table:
-          $ref: '#/components/schemas/Table'
+          type: integer
+          nullable: true
         waiter:
           type: integer
           nullable: true
@@ -2987,7 +2988,6 @@ components:
       - id
       - order_type
       - status
-      - table
       - total_price
     OrderStaffItem:
       type: object
@@ -3246,7 +3246,8 @@ components:
           - $ref: '#/components/schemas/OrderTypeEnum'
           writeOnly: true
         table:
-          $ref: '#/components/schemas/Table'
+          type: integer
+          nullable: true
         waiter:
           type: integer
           nullable: true

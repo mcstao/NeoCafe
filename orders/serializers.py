@@ -40,7 +40,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     """
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-    table = TableSerializer()
+    table = serializers.IntegerField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
     created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
@@ -61,8 +61,11 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         if table_id is not None:
             table = Table.objects.get(id=table_id)
+
             order.table = table
+            order.table.is_available = False
             order.save()
+
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
