@@ -66,10 +66,10 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, items, order_type, bonuses_used=0, table=0):
+def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
-    table_instance = Table.objects.get(id=table) if table else None
+    table_instance = Table.objects.get(id=table_id) if table_id else None
     # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
