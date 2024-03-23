@@ -40,7 +40,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     """
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
-    table = serializers.IntegerField(required=False, allow_null=True)
+    table = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
     created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
@@ -57,12 +57,15 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         table_id = validated_data.pop('table', None)
         user = self.context['request'].user
 
-        order = Order.objects.create(**validated_data, waiter=user)
+        if table_id:
+            table = Table.objects.get(id=table_id.id)
+            if not table.is_available:
+                raise serializers.ValidationError({"table": "Стол не доступен."})
+            table.is_available = False
+            table.save()
+            validated_data['table'] = table
 
-        if table_id is not None:
-            table = Table.objects.get(id=table_id)
-            order.table = table
-            order.save()
+        order = Order.objects.create(**validated_data, waiter=user)
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
