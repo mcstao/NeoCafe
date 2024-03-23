@@ -20,14 +20,16 @@ class CreateOrderView(APIView):
         items = request.data.get("items", [])
         bonuses_used = request.data.get("bonuses_used", 0)
 
-        # Проверка доступности стола
-        if order_type == "В заведении" and table is not None:
+        table_id = None
+        if table is not None:
             table = Table.objects.filter(table_number=table, branch=user.branch).first()
-            if not table or not table.is_available:
-                return Response({"message": "Table is not available."}, status=status.HTTP_400_BAD_REQUEST)
+            if order_type == "В заведении" and (not table or not table.is_available):
+                return Response({"message": "Table is not available or does not exist."},
+                                status=status.HTTP_400_BAD_REQUEST)
+            table_id = table.id if table else None
 
         try:
-            order = create_order(user.id, items, order_type, bonuses_used, table.id if table else None)
+            order = create_order(user.id, items, order_type, bonuses_used, table_id)
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
