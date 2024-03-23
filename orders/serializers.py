@@ -54,17 +54,10 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
-        table_id = validated_data.pop('table', None)
+        table = validated_data.get('table', None)
         user = self.context['request'].user
 
-        order = Order.objects.create(**validated_data, waiter=user)
-
-        if table_id is not None:
-            table = Table.objects.get(id=table_id)
-
-            order.table = table
-            order.table.is_available = False
-            order.save()
+        order = Order.objects.create(**validated_data, waiter=user, table_id=table.id)
 
 
         for item_data in items_data:

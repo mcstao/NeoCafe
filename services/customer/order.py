@@ -69,7 +69,17 @@ def get_specific_order_data(order_id):
 def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
-    table_instance = Table.objects.get(id=table_id) if table_id else None
+    table_instance = None
+    if table_id:
+        try:
+            table_instance = Table.objects.get(id=table_id)
+            if order_type == "В заведении" and not table_instance.is_available:
+                raise ValueError("Стол не доступен.")
+            if order_type == "В заведении":
+                table_instance.is_available = False
+                table_instance.save()
+        except Table.DoesNotExist:
+            raise ValueError("Стол с таким ID не существует.")
     # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
