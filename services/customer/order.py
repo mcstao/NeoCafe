@@ -3,7 +3,7 @@ from rest_framework import status
 
 from branches.models import Branch
 from menu.models import Menu
-from orders.models import Order, OrderItem
+from orders.models import Order, OrderItem, Table
 from services.menu.menu import update_ingredient_storage_on_cooking, check_if_items_can_be_made
 from storage.models import InventoryItem
 from users.models import CustomUser
@@ -66,10 +66,10 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, items, order_type, bonuses_used=0, table_number=0):
+def create_order(user_id, items, order_type, bonuses_used=0, table=0):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
-
+    table_instance = Table.objects.get(id=table) if table else None
     # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
@@ -77,7 +77,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_number=0):
         bonuses_used=bonuses_used,
         order_type=order_type,
         branch=user.branch,
-        table=table_number,
+        table=table_instance,
     )
 
     # Добавляем позиции заказа и считаем общую стоимость
