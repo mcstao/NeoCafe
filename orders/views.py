@@ -22,7 +22,7 @@ class CreateOrderView(APIView):
 
         # Проверка доступности стола
         if order_type == "В заведении" and table is not None:
-            table = Table.objects.filter(table=table, branch=user.branch).first()
+            table = Table.objects.filter(table_number=table, branch=user.branch).first()
             if not table or not table.is_available:
                 return Response({"message": "Table is not available."}, status=status.HTTP_400_BAD_REQUEST)
 

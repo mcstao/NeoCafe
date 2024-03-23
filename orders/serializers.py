@@ -61,7 +61,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         if table_id is not None:
             table = Table.objects.get(id=table_id)
             order.table = table
-            order.table.is_available = False
             order.save()
 
 
