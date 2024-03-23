@@ -36,16 +36,24 @@ def get_available_items(branch_id):
     return available_menu_items
 
 
-
 def get_popular_items(branch_id):
     item_sales = (OrderItem.objects
                   .filter(order__branch_id=branch_id)
-                  .values('menu_id')
+                  .values('menu')
                   .annotate(total_quantity=Sum('quantity'))
                   .order_by('-total_quantity'))
 
-    popular_items = [{'menu_id': item['menu_id'], 'total_quantity': item['total_quantity']} for item in item_sales][:10]
-    return popular_items
+    menu_ids = [item['menu'] for item in item_sales[:10]]
+    menus = Menu.objects.filter(id__in=menu_ids)
+
+    # Создаем словарь, где ключ - ID блюда, а значение - его количество
+    menu_quantities = {item['menu']: item['total_quantity'] for item in item_sales[:10]}
+
+    # Добавляем информацию о количестве в объекты меню
+    for menu in menus:
+        menu.total_quantity = menu_quantities[menu.id]
+
+    return menus
 
 
 def get_complementary_objects(order_item_id):

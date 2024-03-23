@@ -2759,6 +2759,9 @@ components:
           title: В наличии
         category:
           $ref: '#/components/schemas/Category'
+        total_quantity:
+          type: integer
+          readOnly: true
       required:
       - category
       - description
@@ -2766,6 +2769,7 @@ components:
       - ingredients
       - name
       - price
+      - total_quantity
     NullEnum:
       enum:
       - null
