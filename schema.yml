@@ -333,15 +333,9 @@ paths:
       responses:
         '204':
           description: No response body
-  /branches/branches/{branch_id}/menu/:
+  /branches/branches/menu/:
     get:
       operationId: branches_branches_menu_list
-      parameters:
-      - in: path
-        name: branch_id
-        schema:
-          type: integer
-        required: true
       tags:
       - branches
       security:
@@ -359,17 +353,12 @@ paths:
                 items:
                   $ref: '#/components/schemas/Menu'
           description: ''
-  /branches/branches/{branch_id}/menu/category/{category_id}/:
+  /branches/branches/menu/category/{category_id}/:
     get:
       operationId: branches_branches_menu_category_list
       description: Get a list of menu items in a branch filtered by category.
       summary: Branch Menu Items by Category
       parameters:
-      - in: path
-        name: branch_id
-        schema:
-          type: integer
-        required: true
       - in: path
         name: category_id
         schema:

@@ -7,7 +7,7 @@ router.register(r'', BranchViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('branches/<int:branch_id>/menu/', BranchMenuView.as_view(), name='branch-menu'),
-    path('branches/<int:branch_id>/menu/category/<int:category_id>/',
+    path('branches/menu/', BranchMenuView.as_view(), name='branch-menu'),
+    path('branches/menu/category/<int:category_id>/',
          BranchMenuByCategoryView.as_view(), name='branch-menu-by-category'),
 ]
