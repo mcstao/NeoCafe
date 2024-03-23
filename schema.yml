@@ -2630,7 +2630,6 @@ components:
         arrival_date:
           type: string
           format: date
-          title: Дата прихода
         is_running_out:
           type: boolean
           title: Заканчивающийся продукт
@@ -2849,9 +2848,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/OrderTypeEnum'
           writeOnly: true
-        table:
-          type: integer
-          nullable: true
         user:
           type: integer
           nullable: true
@@ -2873,12 +2869,10 @@ components:
           format: date-time
           nullable: true
       required:
-      - created
       - id
       - order_type
       - status
       - total_price
-      - updated_at
     OrderDetailedList:
       type: object
       properties:
@@ -3002,12 +2996,10 @@ components:
           format: date-time
           nullable: true
       required:
-      - created
       - id
       - order_type
       - status
       - total_price
-      - updated_at
     OrderStaffItem:
       type: object
       properties:
@@ -3160,7 +3152,6 @@ components:
         arrival_date:
           type: string
           format: date
-          title: Дата прихода
         is_running_out:
           type: boolean
           title: Заканчивающийся продукт
@@ -3225,9 +3216,6 @@ components:
           allOf:
           - $ref: '#/components/schemas/OrderTypeEnum'
           writeOnly: true
-        table:
-          type: integer
-          nullable: true
         user:
           type: integer
           nullable: true

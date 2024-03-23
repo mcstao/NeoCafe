@@ -143,11 +143,11 @@ class CheckIfItemCanBeMadeView(APIView):
         quantity = request.data.get("quantity", 1)  # Assume default quantity is 1 if not provided
 
         try:
-            menu_id = Menu.objects.get(id=menu_id)
+            menu_item = Menu.objects.get(id=menu_id)
         except Menu.DoesNotExist:
             return Response({"message": "Menu item does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
-        if check_if_items_can_be_made(menu_id, request.user.branch.id, quantity):
+        if check_if_items_can_be_made(menu_item.id, request.user.branch.id, quantity):
             return Response({"message": "Item can be made."}, status=status.HTTP_200_OK)
 
         return Response({"message": "Item can't be made."}, status=status.HTTP_400_BAD_REQUEST)

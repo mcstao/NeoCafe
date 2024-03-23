@@ -43,9 +43,9 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     table = serializers.IntegerField(required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
-    created = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
-    completed_at = serializers.DateTimeField(allow_null=True, required=False)
+    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
+    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
+    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Order
@@ -54,9 +54,15 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
-        validated_data['Официант'] = self.context['request'].user
+        table_id = validated_data.pop('table', None)
+        user = self.context['request'].user
 
-        order = Order.objects.create(**validated_data)
+        order = Order.objects.create(**validated_data, waiter=user)
+
+        if table_id is not None:
+            table = Table.objects.get(id=table_id)
+            order.table = table
+            order.save()
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
@@ -115,16 +121,15 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     items = OrderStaffItemSerializer(many=True, required=False)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
     bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    table = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False, write_only=True)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False, write_only=True)
-    created = serializers.DateTimeField()
-    updated_at = serializers.DateTimeField()
-    completed_at = serializers.DateTimeField(allow_null=True, required=False)
+    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
+    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
+    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M")
 
     class Meta:
         model = Order
-        fields = ['id', 'items', 'total_price', 'bonuses_used', 'order_type', 'table', 'user', 'status', 'branch',
+        fields = ['id', 'items', 'total_price', 'bonuses_used', 'order_type', 'user', 'status', 'branch',
                   'created',
                   'updated_at', 'completed_at']
 

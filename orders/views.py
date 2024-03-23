@@ -15,20 +15,20 @@ class CreateOrderView(APIView):
     @extend_schema(request=OrderStaffSerializer, responses={201: OrderStaffSerializer}, description="Создает заказ")
     def post(self, request):
         user = request.user
-        table_number = request.data.get("table_number")
+        table = request.data.get("table")
         order_type = request.data.get("order_type")
         items = request.data.get("items", [])
         bonuses_used = request.data.get("bonuses_used", 0)
 
         # Проверка доступности стола
-        if order_type == "В заведении" and table_number is not None:
-            table = Table.objects.filter(table_number=table_number, branch=user.branch).first()
+        if order_type == "В заведении" and table is not None:
+            table = Table.objects.filter(table_number=table, branch=user.branch).first()
             if not table or not table.is_available:
                 return Response({"message": "Table is not available."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Создание заказа
         try:
-            order = create_order(user.id, items, order_type, bonuses_used, table_number)
+            order = create_order(user.id, items, order_type, bonuses_used, table)
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

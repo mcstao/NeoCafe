@@ -46,13 +46,10 @@ class BranchMenuByCategoryView(generics.ListAPIView):
     serializer_class = MenuSerializer
 
     def get_queryset(self):
-        branch_id = self.kwargs.get('branch_id')
+        user = self.request.user
+        branch = user.branch
         category_id = self.kwargs.get('category_id')
 
-        try:
-            branch = Branch.objects.get(id=branch_id)
-        except Branch.DoesNotExist:
-            return []
 
         menu_items = Menu.objects.filter(category__id=category_id)
         available_menu_items = [
