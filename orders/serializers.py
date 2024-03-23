@@ -58,6 +58,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
 
         order = Order.objects.create(**validated_data, waiter=user)
+
         if table_id is not None:
             table = Table.objects.get(id=table_id)
             order.table = table
