@@ -57,15 +57,15 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         table_id = validated_data.pop('table', None)
         user = self.context['request'].user
 
-        order = Order.objects.create(**validated_data, waiter=user)
-
         if table_id is not None:
             table = Table.objects.get(id=table_id)
             if not table.is_available:
                 raise serializers.ValidationError("Стол не доступен.")
             table.is_available = False
-            order.table = table
-            order.save()
+            table.save()
+            validated_data['table'] = table  # Assign the table instance to the validated data
+
+        order = Order.objects.create(**validated_data, waiter=user)  # Create the order with the table instance
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
