@@ -79,9 +79,6 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
         table_instance.is_available = False
         table_instance.save()
 
-    # Проверяем, доступен ли стол
-    if table_instance and not table_instance.is_available:
-        raise ValueError("Стол не доступен.")
     # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
