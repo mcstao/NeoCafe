@@ -66,20 +66,10 @@ def get_specific_order_data(order_id):
 
 
 @transaction.atomic
-def create_order(user_id, items, order_type, bonuses_used=0, table=None):
+def create_order(user_id, items, order_type, bonuses_used=0, table=0):
     user = CustomUser.objects.get(id=user_id)
     total_price = 0  # Инициализация общей стоимости заказа
-    table_instance = None
-    if table:
-        try:
-            table_instance = Table.objects.get(id=table.id)
-            if order_type == "В заведении" and not table_instance.is_available:
-                raise ValueError("Стол не доступен.")
-            if order_type == "В заведении":
-                table_instance.is_available = False
-                table_instance.save()
-        except Table.DoesNotExist:
-            raise ValueError("Стол с таким ID не существует.")
+    table_instance = Table.objects.get(id=table) if table else None
     # Создаем заказ с временной общей стоимостью, которую потом обновим
     order = Order.objects.create(
         user=user,
@@ -87,7 +77,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table=None):
         bonuses_used=bonuses_used,
         order_type=order_type,
         branch=user.branch,
-        table=table_instance,
+        table=table,
     )
 
     # Добавляем позиции заказа и считаем общую стоимость
@@ -107,7 +97,6 @@ def create_order(user_id, items, order_type, bonuses_used=0, table=None):
     order.save()
 
     return order
-
 
 def reorder(order_id):
     original_order = Order.objects.get(id=order_id)
