@@ -271,8 +271,8 @@ class MenuSearchView(APIView):
 
         print(f"Available menu items: {len(available_menu_items)}")  # Для отладки
 
-        serializer = self.serializer_class(available_menu_items, many=True)
-        return Response(serializer.data)
+
+        return available_menu_items
 
     def menu_item_has_enough_ingredients(self, menu_item, branch):
         for ingredient in menu_item.ingredients.all():
