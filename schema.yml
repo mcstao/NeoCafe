@@ -614,7 +614,7 @@ paths:
           description: ''
   /customers/search/:
     get:
-      operationId: customers_search_retrieve
+      operationId: customers_search_list
       tags:
       - customers
       security:
@@ -627,7 +627,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Menu'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Menu'
           description: ''
   /employees/staff/{id}/:
     get:

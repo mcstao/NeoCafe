@@ -239,13 +239,13 @@ class MyOrderDetailView(RetrieveAPIView):
         return super().get(request, *args, **kwargs)
 
 
-class MenuSearchView(APIView):
+class MenuSearchView(generics.ListAPIView):
     serializer_class = MenuSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        search_query = request.query_params.get('search', None)
-        user = request.user
+    def get_queryset(self):
+        search_query = self.request.query_params.get('search', None)
+        user = self.request.user
         branch = user.branch
 
         print(f"Search query: {search_query}")  # Добавьте это для отладки
