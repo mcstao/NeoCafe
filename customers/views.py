@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.shortcuts import render
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
@@ -11,11 +12,13 @@ from branches.models import Branch
 from customers.serializers import CustomerProfileSerializer, CustomerEditProfileSerializer, CustomerMenuSerializer, \
     MenuItemDetailSerializer, ChangeBranchSerializer, UserOrdersSerializer, CheckIfItemCanBeMadeSerializer, \
     OrderSerializer
-from menu.models import Menu
+from menu.models import Menu, Category
+from menu.serializers import MenuSerializer
 from orders.models import Order
 from services.menu.menu import get_popular_items, get_compatibles, item_search, \
     check_if_items_can_be_made
 from services.users.permissions import IsCustomer, IsEmailVerified
+from storage.models import InventoryItem
 
 
 class CustomerProfileView(generics.GenericAPIView):
@@ -234,3 +237,44 @@ class MyOrderDetailView(RetrieveAPIView):
     )
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+
+class MenuSearchView(APIView):
+    serializer_class = MenuSerializer
+
+    def get(self, request):
+        search_query = request.query_params.get('search', None)
+        user = request.user
+        branch = user.branch
+
+        if search_query:
+
+            category = Category.objects.filter(name__iexact=search_query).first()
+
+            if category:
+                menu_items = Menu.objects.filter(branch=branch, category=category)
+            else:
+                menu_items = Menu.objects.filter(branch=branch).filter(
+                    Q(name__icontains=search_query) |
+                    Q(description__icontains=search_query)
+                )
+        else:
+
+            menu_items = Menu.objects.filter(branch=branch)
+
+        available_menu_items = [
+            menu_item for menu_item in menu_items if self.menu_item_has_enough_ingredients(menu_item, branch)
+        ]
+
+        serializer = self.serializer_class(available_menu_items, many=True)
+        return Response(serializer.data)
+
+    def menu_item_has_enough_ingredients(self, menu_item, branch):
+        for ingredient in menu_item.ingredients.all():
+            try:
+                inventory_item = InventoryItem.objects.get(branch=branch, name=ingredient.name)
+            except InventoryItem.DoesNotExist:
+                return False
+            if inventory_item.quantity < ingredient.quantity:
+                return False
+        return True

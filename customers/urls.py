@@ -5,7 +5,7 @@ from .views import (
     MenuItemDetailView,
     PopularItemsView,
     CompatibleItemsView,
-    ItemSearchView,
+    MenuSearchView,
     CheckIfItemCanBeMadeView,
     ChangeBranchView,
     MyIdView,
@@ -19,7 +19,7 @@ urlpatterns = [
 
     path("popular-items/", PopularItemsView.as_view(), name="popular-items"),
     path("compatible-items/<int:item_id>/", CompatibleItemsView.as_view(), name="compatible-items"),
-    path("search/", ItemSearchView.as_view(), name="item-search"),
+    path("search/", MenuSearchView.as_view(), name="item-search"),
     path("check-item/", CheckIfItemCanBeMadeView.as_view(), name="check-item"),
     path("change-branch/", ChangeBranchView.as_view(), name="change-branch"),
     path("my-id/", MyIdView.as_view(), name="my-id"),

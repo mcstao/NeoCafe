@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.forms.models import model_to_dict
 from algoliasearch.search_client import SearchClient
 from django.conf import settings
+from rest_framework import request
 
 from menu.models import Menu, Category, Ingredient
 from storage.models import (
@@ -48,10 +49,10 @@ def get_popular_items(branch_id):
     menu_ids = [item['menu'] for item in item_sales[:10]]
     menus = Menu.objects.filter(id__in=menu_ids)
 
-    # Создаем словарь, где ключ - ID блюда, а значение - его количество
+
     menu_quantities = {item['menu']: item['total_quantity'] for item in item_sales[:10]}
 
-    # Добавляем информацию о количестве в объекты меню
+
     for menu in menus:
         menu.total_quantity = menu_quantities[menu.id]
 
@@ -107,28 +108,3 @@ def item_search(query, branch_id):
 
     return items
 
-@receiver(post_save, sender=Menu)
-@receiver(post_delete, sender=Menu)
-def update_menu_on_menu_change(sender, instance, **kwargs):
-    update_menu_availability(instance)
-
-@receiver(post_save, sender=Ingredient)
-@receiver(post_delete, sender=Ingredient)
-def update_menu_on_ingredient_change(sender, instance, **kwargs):
-    # Можно оптимизировать, проверяя только меню, связанные с измененным ингредиентом
-    for menu_item in Menu.objects.filter(ingredients=instance):
-        update_menu_availability(menu_item)
-
-@receiver(post_save, sender=Category)
-@receiver(post_delete, sender=Category)
-def update_menu_on_category_change(sender, instance, **kwargs):
-    # Можно оптимизировать, проверяя только меню в измененной категории
-    for menu_item in Menu.objects.filter(category=instance):
-        update_menu_availability(menu_item)
-
-def update_menu_availability(menu_item):
-    if check_if_items_can_be_made(menu_item.id, menu_item.branch.id):
-        menu_item.is_available = True
-    else:
-        menu_item.is_available = False
-    menu_item.save()

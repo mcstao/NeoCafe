@@ -615,8 +615,6 @@ paths:
   /customers/search/:
     get:
       operationId: customers_search_retrieve
-      description: '...'
-      summary: Поиск меню по филиалу
       tags:
       - customers
       security:
@@ -624,12 +622,13 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ItemSearchResponse'
+                $ref: '#/components/schemas/Menu'
           description: ''
   /employees/staff/{id}/:
     get:
@@ -2647,17 +2646,6 @@ components:
           type: string
       required:
       - message
-    ItemSearchResponse:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-            additionalProperties:
-              type: string
-      required:
-      - items
     LimitUnitEnum:
       enum:
       - кг
