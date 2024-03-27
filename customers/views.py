@@ -241,14 +241,16 @@ class MyOrderDetailView(RetrieveAPIView):
 
 class MenuSearchView(APIView):
     serializer_class = MenuSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         search_query = request.query_params.get('search', None)
         user = request.user
         branch = user.branch
 
-        if search_query:
+        print(f"Search query: {search_query}")  # Добавьте это для отладки
 
+        if search_query:
             category = Category.objects.filter(name__iexact=search_query).first()
 
             if category:
@@ -259,12 +261,15 @@ class MenuSearchView(APIView):
                     Q(description__icontains=search_query)
                 )
         else:
-
             menu_items = Menu.objects.filter(branch=branch)
+
+        print(f"Menu items found: {menu_items.count()}")  # Для отладки
 
         available_menu_items = [
             menu_item for menu_item in menu_items if self.menu_item_has_enough_ingredients(menu_item, branch)
         ]
+
+        print(f"Available menu items: {len(available_menu_items)}")  # Для отладки
 
         serializer = self.serializer_class(available_menu_items, many=True)
         return Response(serializer.data)

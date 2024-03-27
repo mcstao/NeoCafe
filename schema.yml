@@ -622,7 +622,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
