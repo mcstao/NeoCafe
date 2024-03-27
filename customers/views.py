@@ -244,36 +244,37 @@ class MenuSearchView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        search_query = self.request.query_params.get('search', None)
+        search = self.request.query_params.get('search', None)
         user = self.request.user
         branch = user.branch
 
-        print(f"Search query: {search_query}")  # Добавьте это для отладки
+        print(f"Search query: {search}")  # Для отладки
 
-        if search_query:
-            category = Category.objects.filter(name__iexact=search_query).first()
-
+        if search:
+            category = Category.objects.filter(name__iexact=search).first()
             if category:
-                menu_items = Menu.objects.filter(branch=branch, category=category)
+                # Фильтрация пунктов меню по категории
+                menu_items = Menu.objects.filter(category=category)
             else:
-                menu_items = Menu.objects.filter(branch=branch).filter(
-                    Q(name__icontains=search_query) |
-                    Q(description__icontains=search_query)
+                # Фильтрация пунктов меню по имени или описанию
+                menu_items = Menu.objects.filter(
+                    Q(name__icontains=search) |
+                    Q(description__icontains=search)
                 )
         else:
-            menu_items = Menu.objects.filter(branch=branch)
+            # Получение всех пунктов меню, если поисковый запрос не указан
+            menu_items = Menu.objects.all()
 
         print(f"Menu items found: {menu_items.count()}")  # Для отладки
 
+        # Отбор доступных пунктов меню на основе проверки ингредиентов в филиале пользователя
         available_menu_items = [
             menu_item for menu_item in menu_items if self.menu_item_has_enough_ingredients(menu_item, branch)
         ]
 
         print(f"Available menu items: {len(available_menu_items)}")  # Для отладки
 
-
         return available_menu_items
-
     def menu_item_has_enough_ingredients(self, menu_item, branch):
         for ingredient in menu_item.ingredients.all():
             try:
