@@ -1,11 +1,13 @@
 from django.db import transaction
 from django.db.models import Prefetch, Sum, Count
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 
 from django.forms.models import model_to_dict
 from algoliasearch.search_client import SearchClient
 from django.conf import settings
 
-from menu.models import Menu
+from menu.models import Menu, Category, Ingredient
 from storage.models import (
 
     InventoryItem)
@@ -105,4 +107,28 @@ def item_search(query, branch_id):
 
     return items
 
+@receiver(post_save, sender=Menu)
+@receiver(post_delete, sender=Menu)
+def update_menu_on_menu_change(sender, instance, **kwargs):
+    update_menu_availability(instance)
 
+@receiver(post_save, sender=Ingredient)
+@receiver(post_delete, sender=Ingredient)
+def update_menu_on_ingredient_change(sender, instance, **kwargs):
+    # Можно оптимизировать, проверяя только меню, связанные с измененным ингредиентом
+    for menu_item in Menu.objects.filter(ingredients=instance):
+        update_menu_availability(menu_item)
+
+@receiver(post_save, sender=Category)
+@receiver(post_delete, sender=Category)
+def update_menu_on_category_change(sender, instance, **kwargs):
+    # Можно оптимизировать, проверяя только меню в измененной категории
+    for menu_item in Menu.objects.filter(category=instance):
+        update_menu_availability(menu_item)
+
+def update_menu_availability(menu_item):
+    if check_if_items_can_be_made(menu_item.id, menu_item.branch.id):
+        menu_item.is_available = True
+    else:
+        menu_item.is_available = False
+    menu_item.save()
