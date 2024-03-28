@@ -112,10 +112,9 @@ def update_extra_product_storage(extra_product_id, branch_id, extra_product_quan
     try:
         with transaction.atomic():
             extra_product = ExtraItem.objects.get(id=extra_product_id)
-            for product in extra_product:
-                inventory_item = InventoryItem.objects.get(name=product.name, branch_id=branch_id)
-                inventory_item.quantity -= 50 * extra_product_quantity
-                inventory_item.save()
+            inventory_item = InventoryItem.objects.get(name=extra_product.name, branch_id=branch_id)
+            inventory_item.quantity -= 50 * extra_product_quantity
+            inventory_item.save()
             return "Updated successfully."
     except Exception as e:
         raise e
