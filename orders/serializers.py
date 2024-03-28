@@ -27,12 +27,13 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = ExtraProductSerializer(many=True, required=False)
+    extra_product = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
         fields = ['id', 'menu_id', 'menu_detail', 'quantity', 'extra_product']
 
+    @extend_schema_field(ExtraProductSerializer(many=True))
     def get_extra_product(self, order_item):
         extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
         if not extra_products:
