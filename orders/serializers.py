@@ -30,8 +30,9 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         extra_products_data = validated_data.pop('extra_product', [])
-        order_item = OrderItem.objects.create(**validated_data)
+        order_item = super().create(validated_data)
         order_item.extra_product.set(extra_products_data)
+        order_item.save()
         return order_item
 
     def update(self, instance, validated_data):
