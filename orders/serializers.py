@@ -74,16 +74,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data, waiter=user, table=table)
 
         for item_data in items_data:
-            extra_products_data = item_data.pop('extra_product', [])
-            order_item = OrderItem.objects.create(order=order, **item_data)
-            if extra_products_data:
-                for extra_product_data in extra_products_data:
-                    extra_product_id = extra_product_data['id']
-                    extra_product_quantity = extra_product_data.get('quantity',
-                                                                    1)
-                    extra_product = ExtraItem.objects.get(id=extra_product_id)
-                    order_item.extra_product.add(extra_product)
-                    update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
+            OrderItem.objects.create(order=order, **item_data)
 
 
         order.save()
@@ -161,17 +152,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
 
         for item_data in items_data:
-            extra_products_data = item_data.pop('extra_product', [])
-            order_item = OrderItem.objects.create(order=order, **item_data)
-            if extra_products_data:
-                if extra_products_data:
-                    for extra_product_data in extra_products_data:
-                        extra_product_id = extra_product_data['id']
-                        extra_product_quantity = extra_product_data.get('quantity',
-                                                                        1)
-                        extra_product = ExtraItem.objects.get(id=extra_product_id)
-                        order_item.extra_product.add(extra_product)
-                        update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
+            OrderItem.objects.create(order=order, **item_data)
 
         order.save()
 

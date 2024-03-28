@@ -4,7 +4,8 @@ from rest_framework import status
 from branches.models import Branch
 from menu.models import Menu, ExtraItem
 from orders.models import Order, OrderItem, Table
-from services.menu.menu import update_ingredient_storage_on_cooking, check_if_items_can_be_made
+from services.menu.menu import update_ingredient_storage_on_cooking, check_if_items_can_be_made, \
+    update_extra_product_storage
 from storage.models import InventoryItem
 from users.models import CustomUser
 
@@ -99,10 +100,12 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
                 quantity=item['quantity'],
             )
             total_price += menu_item.price * item['quantity']  # Увеличиваем общую стоимость
-            if 'extra_product' in item:
-                # Устанавливаем связь с дополнительными продуктами
-                extra_products = ExtraItem.objects.filter(id__in=item['extra_product'])
-                order_item.extra_product.set(extra_products)
+            for extra_product_data in item.get('extra_product', []):
+                extra_product_id = extra_product_data['id']
+                extra_product_quantity = extra_product_data.get('quantity', 1)
+                extra_product = ExtraItem.objects.get(id=extra_product_id)
+                order_item.extra_product.add(extra_product)
+                update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
 
             update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
 
