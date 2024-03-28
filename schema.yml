@@ -2571,11 +2571,8 @@ components:
       properties:
         id:
           type: integer
-        quantity:
-          type: integer
       required:
       - id
-      - quantity
     Ingredient:
       type: object
       properties:
