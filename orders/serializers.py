@@ -124,11 +124,12 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-
             extra_products_data = item_data.get('extra_product', [])
+
             for extra_product_data in extra_products_data:
+
                 extra_product_id = extra_product_data['id']
-                extra_product_quantity = extra_product_data.get('quantity', 0)
+                extra_product_quantity = extra_product_data['quantity']
 
                 # Попытка получить существующий OrderItemExtraProduct
                 extra_product = OrderItemExtraProduct.objects.filter(
@@ -152,7 +153,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
-
 
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price, Decimal(0))
@@ -232,7 +232,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             extra_products_data = item_data.get('extra_product', [])
             for extra_product_data in extra_products_data:
                 extra_product_id = extra_product_data['id']
-                extra_product_quantity = extra_product_data.get('quantity', 0)
+                extra_product_quantity = extra_product_data['quantity']
 
                 # Попытка получить существующий OrderItemExtraProduct
                 extra_product = OrderItemExtraProduct.objects.filter(
