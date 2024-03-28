@@ -146,11 +146,20 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                     # Если объекта не существует, создаем новый с указанным количеством
                     OrderItemExtraProduct.objects.create(
                         order_item=item,
-                        extra_product_id=extra_product_id,
+                        extra_product_id=extra,
                         quantity=extra_product_quantity
                     )
                 if extra_product_quantity > 0:
                     update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
+
+                logger.debug(f"Processing extra product {extra_product_id} with quantity {extra_product_quantity}")
+
+                if extra_product:
+                    logger.debug(
+                        f"Found existing extra product with ID {extra_product.id}, updating quantity from {extra_product.quantity} to {extra_product.quantity + extra_product_quantity}")
+                else:
+                    logger.debug(
+                        f"Creating new extra product with ID {extra_product_id} and quantity {extra_product_quantity}")
 
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
