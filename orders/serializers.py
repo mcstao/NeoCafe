@@ -14,6 +14,7 @@ from .models import Order, OrderItem, Table, OrderItemExtraProduct
 
 logger = logging.getLogger(__name__)
 
+
 class ExtraProductSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='extra_product.id')
     quantity = serializers.IntegerField()
@@ -32,15 +33,15 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'menu_id', 'menu_detail', 'quantity', 'extra_product']
 
+    def get_extra_product(self, order_item):
+        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
+        logger.debug(f"Extra products for order item {order_item.id}: {list(extra_products)}")
+        serializer = ExtraProductSerializer(extra_products, many=True)
+        return serializer.data
+
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
         return MenuSerializer(obj.menu).data
-
-    def get_extra_product(self, order_item):
-
-        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
-        serializer = ExtraProductSerializer(extra_products, many=True)
-        return serializer.data
 
 
 class TableSerializer(serializers.ModelSerializer):
@@ -87,9 +88,9 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
 
-
         order.save()
         return order
+
     def update(self, instance, validated_data):
         items_data = validated_data.pop('items', [])
 
@@ -115,7 +116,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-
 
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
@@ -178,7 +178,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         if instance.bonuses_used > instance.user.bonus:
             raise serializers.ValidationError("Недостаточно бонусов у пользователя.")
-
 
         for item_data in items_data:
             menu_id = item_data['menu_id']
