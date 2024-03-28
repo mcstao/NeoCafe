@@ -83,7 +83,11 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data, waiter=user, table=table)
 
         for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
+            order_item_serializer = OrderStaffItemSerializer(data=item_data)
+            if order_item_serializer.is_valid():
+                order_item_serializer.save(order=order)
+            else:
+                raise serializers.ValidationError(order_item_serializer.errors)
 
         order.save()
         return order
@@ -164,7 +168,11 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
 
         for item_data in items_data:
-            OrderItem.objects.create(order=order, **item_data)
+            order_item_serializer = OrderStaffItemSerializer(data=item_data)
+            if order_item_serializer.is_valid():
+                order_item_serializer.save(order=order)
+            else:
+                raise serializers.ValidationError(order_item_serializer.errors)
 
         order.save()
 
