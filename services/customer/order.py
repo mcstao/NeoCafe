@@ -2,7 +2,7 @@ from django.db import transaction
 from rest_framework import status
 
 from branches.models import Branch
-from menu.models import Menu
+from menu.models import Menu, ExtraItem
 from orders.models import Order, OrderItem, Table
 from services.menu.menu import update_ingredient_storage_on_cooking, check_if_items_can_be_made
 from storage.models import InventoryItem
@@ -93,12 +93,17 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
     for item in items:
         menu_item = Menu.objects.get(id=item['menu_id'])
         if check_if_items_can_be_made(menu_item.id, order.branch.id, item['quantity']):
-            OrderItem.objects.create(
+            order_item =OrderItem.objects.create(
                 order=order,
                 menu=menu_item,
                 quantity=item['quantity'],
             )
             total_price += menu_item.price * item['quantity']  # Увеличиваем общую стоимость
+            if 'extra_product' in item:
+                # Устанавливаем связь с дополнительными продуктами
+                extra_products = ExtraItem.objects.filter(id__in=item['extra_product'])
+                order_item.extra_product.set(extra_products)
+
             update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
 
     # Обновляем общую стоимость заказа
