@@ -74,7 +74,10 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             extra_products_data = item_data.pop('extra_product', [])
             order_item = OrderItem.objects.create(order=order, **item_data)
-            order_item.extra_product.set(extra_products_data)
+            if extra_products_data:
+                print('extra_products_data')
+                order_item.extra_product.set(extra_products_data)
+                order_item.save()
 
         order.save()
         return order
