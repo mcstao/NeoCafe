@@ -2573,7 +2573,6 @@ components:
           type: integer
         quantity:
           type: integer
-          readOnly: true
       required:
       - id
       - quantity

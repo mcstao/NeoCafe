@@ -10,19 +10,18 @@ from branches.models import Branch
 from menu.models import Menu, ExtraItem
 from menu.serializers import MenuSerializer
 from services.menu.menu import update_ingredient_storage_on_cooking, update_extra_product_storage
-from .models import Order, OrderItem, Table
+from .models import Order, OrderItem, Table, OrderItemExtraProduct
 
 logger = logging.getLogger(__name__)
 
+class ExtraProductSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source='extra_product.id')
+    quantity = serializers.IntegerField()
 
-class ExtraProductSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    quantity = serializers.SerializerMethodField()
+    class Meta:
+        model = OrderItemExtraProduct
+        fields = ['id', 'quantity']
 
-    @extend_schema_field(serializers.IntegerField())
-    def get_quantity(self, instance):
-        quantity_mapping = self.context.get('quantities', {})
-        return quantity_mapping.get(instance.id, 1)
 
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
@@ -38,10 +37,9 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
         return MenuSerializer(obj.menu).data
 
     def get_extra_product(self, order_item):
-        extra_products = order_item.extra_product.all()
-        quantities = {extra_product.id: 'Количество для extra_product' for extra_product in extra_products}
 
-        serializer = ExtraProductSerializer(extra_products, many=True, context={'quantities': quantities})
+        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
+        serializer = ExtraProductSerializer(extra_products, many=True)
         return serializer.data
 
 
