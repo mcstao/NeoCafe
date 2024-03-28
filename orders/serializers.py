@@ -125,8 +125,34 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
+            extra_products_data = item_data.get('extra_product', [])
+            for extra_product_data in extra_products_data:
+                extra_product_id = extra_product_data['id']
+                extra_product_quantity = extra_product_data.get('quantity', 0)
+
+                # Попытка получить существующий OrderItemExtraProduct
+                extra_product = OrderItemExtraProduct.objects.filter(
+                    order_item=item,
+                    extra_product_id=extra_product_id
+                ).first()
+
+                # Если такой объект существует, увеличиваем количество
+                if extra_product:
+                    extra_product.quantity += extra_product_quantity
+                    extra_product.save()
+                else:
+                    # Если объекта не существует, создаем новый с указанным количеством
+                    OrderItemExtraProduct.objects.create(
+                        order_item=item,
+                        extra_product_id=extra_product_id,
+                        quantity=extra_product_quantity
+                    )
+                if extra_product_quantity > 0:
+                    update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
+
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
+
 
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price, Decimal(0))
@@ -202,6 +228,31 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
+
+            extra_products_data = item_data.get('extra_product', [])
+            for extra_product_data in extra_products_data:
+                extra_product_id = extra_product_data['id']
+                extra_product_quantity = extra_product_data.get('quantity', 0)
+
+                # Попытка получить существующий OrderItemExtraProduct
+                extra_product = OrderItemExtraProduct.objects.filter(
+                    order_item=item,
+                    extra_product_id=extra_product_id
+                ).first()
+
+                # Если такой объект существует, увеличиваем количество
+                if extra_product:
+                    extra_product.quantity += extra_product_quantity
+                    extra_product.save()
+                else:
+                    # Если объекта не существует, создаем новый с указанным количеством
+                    OrderItemExtraProduct.objects.create(
+                        order_item=item,
+                        extra_product_id=extra_product_id,
+                        quantity=extra_product_quantity
+                    )
+                if extra_product_quantity > 0:
+                    update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
 
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
