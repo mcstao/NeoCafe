@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class ExtraProductSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()

@@ -58,6 +58,7 @@ class ExtraItem(models.Model):
         max_length=20, choices=TYPE_CHOICES, null=True, verbose_name="Доп. Продукт"
     )
     name = models.CharField(max_length=100, unique=True, verbose_name="Название доп. продукта")
+    quantity = models.PositiveIntegerField(default=0, verbose_name="Количество")
 
     class Meta:
         ordering = ["name"]
