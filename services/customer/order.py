@@ -69,18 +69,18 @@ def get_specific_order_data(order_id):
 @transaction.atomic
 def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
     user = CustomUser.objects.get(id=user_id)
-    total_price = 0  # Инициализация общей стоимости заказа
+    total_price = 0
 
     table_instance = None
     if order_type == "В заведении" and table_id:
         table_instance = Table.objects.get(id=table_id)
         if not table_instance.is_available:
             raise ValueError("Стол не доступен.")
-        # Меняем доступность стола только для заказов "В заведении"
+
         table_instance.is_available = False
         table_instance.save()
 
-    # Создаем заказ с временной общей стоимостью, которую потом обновим
+
     order = Order.objects.create(
         user=user,
         total_price=0,  # временное значение
@@ -90,7 +90,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
         table=table_instance,
     )
 
-    # Добавляем позиции заказа и считаем общую стоимость
+
     for item in items:
         menu_item = Menu.objects.get(id=item['menu_id'])
         if check_if_items_can_be_made(menu_item.id, order.branch.id, item['quantity']):
@@ -99,7 +99,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
                 menu=menu_item,
                 quantity=item['quantity'],
             )
-            total_price += menu_item.price * item['quantity']  # Увеличиваем общую стоимость
+            total_price += menu_item.price * item['quantity']
             for extra_product_data in item.get('extra_product', []):
                 extra_product_id = extra_product_data['id']
                 extra_product_quantity = extra_product_data.get('quantity', 1)
@@ -109,7 +109,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
 
             update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
 
-    # Обновляем общую стоимость заказа
+
     order.total_price = total_price
     order.save()
 
