@@ -35,9 +35,16 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     def get_extra_product(self, order_item):
         extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
-        logger.debug(f"Extra products for order item {order_item.id}: {list(extra_products)}")
+        if not extra_products:
+            logger.debug(f"No extra products found for order item {order_item.id}")
+        else:
+            for prod in extra_products:
+                logger.debug(
+                    f"OrderItemExtraProduct {prod.id}: OrderItem {prod.order_item.id}, ExtraItem {prod.extra_product.id}, Quantity {prod.quantity}")
         serializer = ExtraProductSerializer(extra_products, many=True)
-        return serializer.data
+        serialized_data = serializer.data
+        logger.debug(f"Serialized data: {serialized_data}")
+        return serialized_data
 
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
