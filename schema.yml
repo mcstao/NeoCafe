@@ -2566,6 +2566,16 @@ components:
       required:
       - id
       - name
+    ExtraProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+        quantity:
+          type: integer
+      required:
+      - id
+      - quantity
     Ingredient:
       type: object
       properties:
@@ -2644,14 +2654,14 @@ components:
     LimitUnitEnum:
       enum:
       - кг
-      - г
+      - гр
       - л
       - мл
       - шт
       type: string
       description: |-
         * `кг` - кг
-        * `г` - г
+        * `гр` - гр
         * `л` - л
         * `мл` - мл
         * `шт` - шт
@@ -2992,7 +3002,7 @@ components:
         extra_product:
           type: array
           items:
-            type: integer
+            $ref: '#/components/schemas/ExtraProduct'
       required:
       - id
       - menu_detail
@@ -3299,14 +3309,14 @@ components:
     QuantityUnitEnum:
       enum:
       - кг
-      - г
+      - гр
       - л
       - мл
       - шт
       type: string
       description: |-
         * `кг` - кг
-        * `г` - г
+        * `гр` - гр
         * `л` - л
         * `мл` - мл
         * `шт` - шт
@@ -3477,12 +3487,12 @@ components:
       - table_number
     TypeExtraProductEnum:
       enum:
-      - Milk
-      - Syrup
+      - Молоко
+      - Сироп
       type: string
       description: |-
-        * `Milk` - Молоко
-        * `Syrup` - Сиропы
+        * `Молоко` - Молоко
+        * `Сироп` - Сиропы
     UserIdResponse:
       type: object
       properties:
