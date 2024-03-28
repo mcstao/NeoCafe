@@ -124,8 +124,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-            extra_products_data = item_data.get('extra_product', [])
-
+            extra_products_data = item_data.pop('extra_product', [])
             for extra_product_data in extra_products_data:
 
                 extra_product_id = extra_product_data['id']
@@ -229,7 +228,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
-            extra_products_data = item_data.get('extra_product', [])
+            extra_products_data = item_data.pop('extra_product', [])
             for extra_product_data in extra_products_data:
                 extra_product_id = extra_product_data['id']
                 extra_product_quantity = extra_product_data['quantity']
