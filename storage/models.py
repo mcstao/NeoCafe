@@ -5,7 +5,7 @@ from branches.models import Branch
 class InventoryItem(models.Model):
     MEASUREMENT_UNIT_CHOICES = [
         ("кг", "кг"),
-        ("г", "г"),
+        ("гр", "гр"),
         ("л", "л"),
         ("мл", "мл"),
         ("шт", "шт"),

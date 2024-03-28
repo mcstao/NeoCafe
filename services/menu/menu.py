@@ -8,7 +8,7 @@ from algoliasearch.search_client import SearchClient
 from django.conf import settings
 from rest_framework import request
 
-from menu.models import Menu, Category, Ingredient
+from menu.models import Menu, Category, Ingredient, ExtraItem
 from storage.models import (
 
     InventoryItem)
@@ -108,3 +108,14 @@ def item_search(query, branch_id):
 
     return items
 
+def update_extra_product_storage(extra_product_id, branch_id, extra_product_quantity):
+    try:
+        with transaction.atomic():
+            extra_product = ExtraItem.objects.get(id=extra_product_id)
+            for product in extra_product:
+                inventory_item = InventoryItem.objects.get(name=product.name, branch_id=branch_id)
+                inventory_item.quantity -= 50 * extra_product_quantity
+                inventory_item.save()
+            return "Updated successfully."
+    except Exception as e:
+        raise e

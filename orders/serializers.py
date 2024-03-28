@@ -9,16 +9,19 @@ from rest_framework import serializers
 from branches.models import Branch
 from menu.models import Menu, ExtraItem
 from menu.serializers import MenuSerializer
-from services.menu.menu import update_ingredient_storage_on_cooking
+from services.menu.menu import update_ingredient_storage_on_cooking, update_extra_product_storage
 from .models import Order, OrderItem, Table
 
 logger = logging.getLogger(__name__)
 
 
+class ExtraProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    quantity = serializers.IntegerField()
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = serializers.PrimaryKeyRelatedField(queryset=ExtraItem.objects.all(), many=True, required=False)
+    extra_product = ExtraProductSerializer(many=True, required=False)
 
     class Meta:
         model = OrderItem
@@ -74,8 +77,14 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             extra_products_data = item_data.pop('extra_product', [])
             order_item = OrderItem.objects.create(order=order, **item_data)
             if extra_products_data:
-                order_item.extra_product.set(extra_products_data)
-                order_item.save()
+                for extra_product_data in extra_products_data:
+                    extra_product_id = extra_product_data['id']
+                    extra_product_quantity = extra_product_data.get('quantity',
+                                                                    1)
+                    extra_product = ExtraItem.objects.get(id=extra_product_id)
+                    order_item.extra_product.add(extra_product)
+                    update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
+
 
         order.save()
         return order
@@ -155,8 +164,14 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             extra_products_data = item_data.pop('extra_product', [])
             order_item = OrderItem.objects.create(order=order, **item_data)
             if extra_products_data:
-                order_item.extra_product.set(extra_products_data)
-                order_item.save()
+                if extra_products_data:
+                    for extra_product_data in extra_products_data:
+                        extra_product_id = extra_product_data['id']
+                        extra_product_quantity = extra_product_data.get('quantity',
+                                                                        1)
+                        extra_product = ExtraItem.objects.get(id=extra_product_id)
+                        order_item.extra_product.add(extra_product)
+                        update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
 
         order.save()
 
