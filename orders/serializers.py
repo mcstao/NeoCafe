@@ -28,20 +28,6 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
     def get_menu_detail(self, obj):
         return MenuSerializer(obj.menu).data
 
-    def create(self, validated_data):
-        extra_products_data = validated_data.pop('extra_product', [])
-        print("Extra products data:", extra_products_data)  # Для отладки
-        order_item = super().create(validated_data)
-        if extra_products_data:
-            order_item.extra_product.set(extra_products_data)
-            order_item.save()
-        return order_item
-
-    def update(self, instance, validated_data):
-        extra_products_data = validated_data.pop('extra_product', None)
-        if extra_products_data is not None:
-            instance.extra_product.set(extra_products_data)
-        return super().update(instance, validated_data)
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
@@ -86,11 +72,9 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data, waiter=user, table=table)
 
         for item_data in items_data:
-            order_item_serializer = OrderStaffItemSerializer(data=item_data)
-            if order_item_serializer.is_valid():
-                order_item_serializer.save(order=order)
-            else:
-                raise serializers.ValidationError(order_item_serializer.errors)
+            extra_products_data = item_data.pop('extra_product', [])
+            order_item = OrderItem.objects.create(order=order, **item_data)
+            order_item.extra_product.set(extra_products_data)
 
         order.save()
         return order
@@ -171,11 +155,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         order = Order.objects.create(**validated_data)
 
         for item_data in items_data:
-            order_item_serializer = OrderStaffItemSerializer(data=item_data)
-            if order_item_serializer.is_valid():
-                order_item_serializer.save(order=order)
-            else:
-                raise serializers.ValidationError(order_item_serializer.errors)
+            extra_products_data = item_data.pop('extra_product', [])
+            order_item = OrderItem.objects.create(order=order, **item_data)
+            order_item.extra_product.set(extra_products_data)
 
         order.save()
 
