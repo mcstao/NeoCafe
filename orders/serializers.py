@@ -130,10 +130,12 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                 extra_product_id = extra_product_data['id']
                 extra_product_quantity = extra_product_data['quantity']
 
+                extra = ExtraItem.objects.get(id=extra_product_id)
+
                 # Попытка получить существующий OrderItemExtraProduct
-                extra_product = OrderItemExtraProduct.objects.filter(
+                extra_product= OrderItemExtraProduct.objects.filter(
                     order_item=item,
-                    extra_product_id=extra_product_id
+                    extra_product=extra
                 ).first()
 
                 # Если такой объект существует, увеличиваем количество
