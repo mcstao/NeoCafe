@@ -2554,11 +2554,6 @@ components:
           type: string
           title: Название доп. продукта
           maxLength: 100
-        price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-          title: Цена
         type_extra_product:
           nullable: true
           title: Доп. Продукт
@@ -2571,7 +2566,6 @@ components:
       required:
       - id
       - name
-      - price
     Ingredient:
       type: object
       properties:
@@ -3078,11 +3072,6 @@ components:
           type: string
           title: Название доп. продукта
           maxLength: 100
-        price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,5}(?:\.\d{0,2})?$
-          title: Цена
         type_extra_product:
           nullable: true
           title: Доп. Продукт

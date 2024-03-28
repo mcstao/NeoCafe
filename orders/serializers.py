@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
+    extra_product = serializers.PrimaryKeyRelatedField(queryset=ExtraItem.objects.all(), many=True, required=False)
 
     class Meta:
         model = OrderItem
@@ -27,6 +28,17 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
     def get_menu_detail(self, obj):
         return MenuSerializer(obj.menu).data
 
+    def create(self, validated_data):
+        extra_products_data = validated_data.pop('extra_product', [])
+        order_item = OrderItem.objects.create(**validated_data)
+        order_item.extra_product.set(extra_products_data)
+        return order_item
+
+    def update(self, instance, validated_data):
+        extra_products_data = validated_data.pop('extra_product', None)
+        if extra_products_data is not None:
+            instance.extra_product.set(extra_products_data)
+        return super().update(instance, validated_data)
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:

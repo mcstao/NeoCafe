@@ -36,6 +36,6 @@ class MenuSerializer(serializers.ModelSerializer):
 class ExtraItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExtraItem
-        fields = ['id', 'name', 'price', 'type_extra_product', 'choice_category']
+        fields = ['id', 'name', 'type_extra_product', 'choice_category']
 
 

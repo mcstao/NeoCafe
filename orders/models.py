@@ -68,5 +68,4 @@ class OrderItem(models.Model):
         blank=True,
         related_name="extra_order",
     )
-    extra_product_quantity = models.PositiveIntegerField(default=0)
 

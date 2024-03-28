@@ -58,7 +58,6 @@ class ExtraItem(models.Model):
         max_length=20, choices=TYPE_CHOICES, null=True, verbose_name="Доп. Продукт"
     )
     name = models.CharField(max_length=100, unique=True, verbose_name="Название доп. продукта")
-    price = models.DecimalField(max_digits=7, decimal_places=2, verbose_name="Цена")
 
     class Meta:
         ordering = ["name"]
