@@ -39,6 +39,12 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
         return MenuSerializer(obj.menu).data
 
 
+    @extend_schema_field(ExtraProductSerializer(many=True))
+    def get_extra_product(self, obj):
+        # Получаем связанные объекты OrderItemExtraProduct и сериализуем их
+        extra_products = OrderItemExtraProduct.objects.filter(order_item=obj)
+        return ExtraProductSerializer(extra_products, many=True).data
+
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
         model = Table
