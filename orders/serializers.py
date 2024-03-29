@@ -27,7 +27,7 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = ExtraProductSerializer(source='extraitem_set', many=True, read_only=True)
+    extra_product = ExtraProductSerializer(source='orderitemextraproduct_set', many=True, read_only=True)
 
     class Meta:
         model = OrderItem
