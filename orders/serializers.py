@@ -27,7 +27,7 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = ExtraProductSerializer(source='extra_product_set', many=True)
+    extra_product = ExtraProductSerializer(many=True, required=False)
 
     class Meta:
         model = OrderItem
@@ -35,7 +35,7 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(ExtraProductSerializer(many=True))
     def get_extra_product(self, order_item):
-        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item).all()
+        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
         serializer = ExtraProductSerializer(extra_products, many=True)
         serialized_data = serializer.data
         return serialized_data

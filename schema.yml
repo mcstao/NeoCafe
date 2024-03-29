@@ -3004,7 +3004,6 @@ components:
           items:
             $ref: '#/components/schemas/ExtraProduct'
       required:
-      - extra_product
       - id
       - menu_detail
       - menu_id
