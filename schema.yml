@@ -3003,9 +3003,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExtraProduct'
-          readOnly: true
       required:
-      - extra_product
       - id
       - menu_detail
       - menu_id
