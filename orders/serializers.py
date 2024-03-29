@@ -38,7 +38,7 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(ExtraProductSerializer(many=True))
     def get_extra_product(self, order_item):
-        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
+        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item).all()
         serializer = ExtraProductSerializer(extra_products, many=True)
         serialized_data = serializer.data
         return serialized_data
