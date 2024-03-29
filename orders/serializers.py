@@ -38,9 +38,8 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(ExtraProductSerializer(many=True))
     def get_extra_product(self, order_item):
-        # Используем related_name из модели OrderItem для extra_product
         extra_products = order_item.extra_product.all()
-        return ExtraProductSerializer(extra_products, many=True).data
+        return [{'id': extra_product.id, 'quantity': 1} for extra_product in extra_products]
 
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
