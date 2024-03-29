@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExtraProductSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source='extra_product.id')
+    id = serializers.IntegerField()
     quantity = serializers.IntegerField()
 
     class Meta:
@@ -116,7 +116,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             print(f"Extra products data: {extra_products_data}")
 
             for extra_product_data in extra_products_data:
-                extra_product_id = extra_product_data['extra_product']['id']
+                extra_product_id = extra_product_data['id']
                 extra_product_quantity = extra_product_data['quantity']
 
                 print(f"Processing extra product ID: {extra_product_id} with quantity: {extra_product_quantity}")
