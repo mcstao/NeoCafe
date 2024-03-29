@@ -248,3 +248,19 @@ def return_to_storage(order_id):
         return "Returned successfully."
     except Exception as e:
         raise e
+
+
+@transaction.atomic
+def remove_extra_products(extra_product_id, extra_quantity=None):
+    extra_product = OrderItemExtraProduct.objects.get(id=extra_product_id)
+    order_item = extra_product.order_item
+
+
+
+    if extra_quantity is None or extra_quantity >= extra_product.quantity:
+
+        extra_product.delete()
+        order_item.save()
+    else:
+        extra_product.quantity -= extra_quantity
+        order_item.save()
