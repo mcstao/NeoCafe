@@ -27,7 +27,10 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = ExtraProductSerializer(many=True, required=False)
+    extra_product = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+    )
 
     class Meta:
         model = OrderItem
@@ -35,10 +38,8 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(ExtraProductSerializer(many=True))
     def get_extra_product(self, order_item):
-        extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
-        serializer = ExtraProductSerializer(extra_products, many=True)
-        serialized_data = serializer.data
-        return serialized_data
+        extra_products = order_item.extra_product.through.objects.filter(orderitem=order_item)
+        return ExtraProductSerializer(extra_products, many=True).data
 
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
@@ -121,19 +122,39 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             extra_products_data = item_data.pop('extra_product', [])
             print(f"Extra products data: {extra_products_data}")
 
-            for extra_product_dict in extra_products_data:
-                extra_product_id = extra_product_dict.get('id')
-                extra_product_quantity = extra_product_dict.get('quantity', 0)
+            for extra_product_data in extra_products_data:
+                extra_product_id = extra_product_data['id']
+                extra_product_quantity = extra_product_data['quantity']
 
-                extra_product_instance = ExtraItem.objects.get(id=extra_product_id)
-                extra_product_obj, created = OrderItemExtraProduct.objects.get_or_create(
+                print(f"Processing extra product ID: {extra_product_id} with quantity: {extra_product_quantity}")
+
+                extra = ExtraItem.objects.get(id=extra_product_id)
+                print(f"Retrieved ExtraItem: {extra}")
+
+                extra_product = OrderItemExtraProduct.objects.filter(
                     order_item=item,
-                    extra_product=extra_product_instance,
-                    defaults={'quantity': extra_product_quantity}
-                )
-                if not created:
-                    extra_product_obj.quantity += extra_product_quantity
-                    extra_product_obj.save()
+                    extra_product=extra
+                ).first()
+
+                if extra_product:
+                    print(
+                        f"Found existing OrderItemExtraProduct: {extra_product} with current quantity: {extra_product.quantity}. Updating quantity.")
+                    extra_product.quantity += extra_product_quantity
+                    extra_product.save()
+                    print(f"Updated quantity: {extra_product.quantity}")
+                else:
+                    print(
+                        f"Creating new OrderItemExtraProduct for ExtraItem ID: {extra_product_id} with quantity: {extra_product_quantity}")
+                    OrderItemExtraProduct.objects.create(
+                        order_item=item,
+                        extra_product=extra,
+                        quantity=extra_product_quantity
+                    )
+                    print("OrderItemExtraProduct created.")
+
+                if extra_product_quantity > 0:
+                    print(
+                        f"Calling update_extra_product_storage for ExtraItem ID: {extra_product_id} with quantity: {extra_product_quantity}")
                     update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
                     print("update_extra_product_storage called.")
 
