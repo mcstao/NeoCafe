@@ -263,4 +263,5 @@ def remove_extra_products(extra_product_id, extra_quantity=None):
         order_item.save()
     else:
         extra_product.quantity -= extra_quantity
+        extra_product.save()
         order_item.save()
