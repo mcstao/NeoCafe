@@ -125,41 +125,45 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
             extra_products_data = item_data.pop('extra_product', [])
-            for extra_product_data in extra_products_data:
+            print(f"Extra products data: {extra_products_data}")
 
+            for extra_product_data in extra_products_data:
                 extra_product_id = extra_product_data['id']
                 extra_product_quantity = extra_product_data['quantity']
 
-                extra = ExtraItem.objects.get(id=extra_product_id)
+                print(f"Processing extra product ID: {extra_product_id} with quantity: {extra_product_quantity}")
 
-                # Попытка получить существующий OrderItemExtraProduct
-                extra_product= OrderItemExtraProduct.objects.filter(
+                extra = ExtraItem.objects.get(id=extra_product_id)
+                print(f"Retrieved ExtraItem: {extra}")
+
+                extra_product = OrderItemExtraProduct.objects.filter(
                     order_item=item,
                     extra_product=extra
                 ).first()
 
-                # Если такой объект существует, увеличиваем количество
                 if extra_product:
+                    print(
+                        f"Found existing OrderItemExtraProduct: {extra_product} with current quantity: {extra_product.quantity}. Updating quantity.")
                     extra_product.quantity += extra_product_quantity
                     extra_product.save()
+                    print(f"Updated quantity: {extra_product.quantity}")
                 else:
-                    # Если объекта не существует, создаем новый с указанным количеством
+                    print(
+                        f"Creating new OrderItemExtraProduct for ExtraItem ID: {extra_product_id} with quantity: {extra_product_quantity}")
                     OrderItemExtraProduct.objects.create(
                         order_item=item,
-                        extra_product_id=extra,
+                        extra_product=extra,
                         quantity=extra_product_quantity
                     )
+                    print("OrderItemExtraProduct created.")
+
                 if extra_product_quantity > 0:
+                    print(
+                        f"Calling update_extra_product_storage for ExtraItem ID: {extra_product_id} with quantity: {extra_product_quantity}")
                     update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
+                    print("update_extra_product_storage called.")
 
-                logger.debug(f"Processing extra product {extra_product_id} with quantity {extra_product_quantity}")
 
-                if extra_product:
-                    logger.debug(
-                        f"Found existing extra product with ID {extra_product.id}, updating quantity from {extra_product.quantity} to {extra_product.quantity + extra_product_quantity}")
-                else:
-                    logger.debug(
-                        f"Creating new extra product with ID {extra_product_id} and quantity {extra_product_quantity}")
 
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
