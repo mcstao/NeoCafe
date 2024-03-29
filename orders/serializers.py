@@ -27,7 +27,7 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = ExtraProductSerializer(source='orderitemextraproduct_set', many=True)
+    extra_product = ExtraProductSerializer(many=True, required=False)
 
     class Meta:
         model = OrderItem
@@ -39,7 +39,10 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
         return MenuSerializer(obj.menu).data
 
 
-
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['extra_product'] = ExtraProductSerializer(instance.orderitemextraproduct_set.all(), many=True).data
+        return representation
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
