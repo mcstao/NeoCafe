@@ -27,19 +27,12 @@ class ExtraProductSerializer(serializers.ModelSerializer):
 class OrderStaffItemSerializer(serializers.ModelSerializer):
     menu_detail = serializers.SerializerMethodField(read_only=True)
     menu_id = serializers.IntegerField()
-    extra_product = serializers.ListField(
-        child=serializers.DictField(),
-        required=False,
-    )
+    extra_product = ExtraProductSerializer(many=True, read_only=True)
 
     class Meta:
         model = OrderItem
         fields = ['id', 'menu_id', 'menu_detail', 'quantity', 'extra_product']
 
-    @extend_schema_field(ExtraProductSerializer(many=True))
-    def get_extra_product(self, order_item):
-        extra_products = order_item.extra_product.all()
-        return [{'id': extra_product.id, 'quantity': 1} for extra_product in extra_products]
 
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
