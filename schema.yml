@@ -2566,16 +2566,6 @@ components:
       required:
       - id
       - name
-    ExtraProduct:
-      type: object
-      properties:
-        id:
-          type: integer
-        quantity:
-          type: integer
-      required:
-      - id
-      - quantity
     Ingredient:
       type: object
       properties:
@@ -3002,7 +2992,8 @@ components:
         extra_product:
           type: array
           items:
-            $ref: '#/components/schemas/ExtraProduct'
+            type: object
+            additionalProperties: {}
       required:
       - id
       - menu_detail
