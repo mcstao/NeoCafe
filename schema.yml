@@ -2831,16 +2831,12 @@ components:
           minimum: 0
           nullable: true
         order_type:
-          allOf:
-          - $ref: '#/components/schemas/OrderTypeEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/OrderTypeEnum'
         user:
           type: integer
           nullable: true
         status:
-          allOf:
-          - $ref: '#/components/schemas/StatusEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/StatusEnum'
         branch:
           type: integer
           nullable: true
@@ -2955,9 +2951,7 @@ components:
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
           readOnly: true
         order_type:
-          allOf:
-          - $ref: '#/components/schemas/OrderTypeEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/OrderTypeEnum'
         table:
           type: integer
           nullable: true
@@ -2965,9 +2959,7 @@ components:
           type: integer
           nullable: true
         status:
-          allOf:
-          - $ref: '#/components/schemas/StatusEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/StatusEnum'
         branch:
           type: integer
           nullable: true
@@ -3194,16 +3186,12 @@ components:
           minimum: 0
           nullable: true
         order_type:
-          allOf:
-          - $ref: '#/components/schemas/OrderTypeEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/OrderTypeEnum'
         user:
           type: integer
           nullable: true
         status:
-          allOf:
-          - $ref: '#/components/schemas/StatusEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/StatusEnum'
         branch:
           type: integer
           nullable: true
@@ -3234,9 +3222,7 @@ components:
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
           readOnly: true
         order_type:
-          allOf:
-          - $ref: '#/components/schemas/OrderTypeEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/OrderTypeEnum'
         table:
           type: integer
           nullable: true
@@ -3244,9 +3230,7 @@ components:
           type: integer
           nullable: true
         status:
-          allOf:
-          - $ref: '#/components/schemas/StatusEnum'
-          writeOnly: true
+          $ref: '#/components/schemas/StatusEnum'
         branch:
           type: integer
           nullable: true
