@@ -155,7 +155,7 @@ class RemoveOrderItemView(APIView):
                 extra_quantity = extra_product.quantity
 
             remove_extra_products(extra_product_id, extra_quantity)
-            return_extra_ingredients_to_storage(extra_product.extra_product_id, extra_product.order_item.order.branch_id, extra_quantity)
+            return_extra_ingredients_to_storage(extra_product.extra_product.id, extra_product.order_item.order.branch_id, extra_quantity)
 
         return Response({"message": "Requested items were removed/updated."}, status=status.HTTP_200_OK)
 
