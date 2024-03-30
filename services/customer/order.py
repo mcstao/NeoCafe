@@ -272,7 +272,7 @@ def return_extra_ingredients_to_storage(id, branch_id, extra_quantity):
     try:
         extra_product = ExtraItem.objects.get(id=id)
         inventory_item = InventoryItem.objects.get(name=extra_product.name, branch=branch_id)
-        inventory_item.quantity += 50 * extra_quantity
+        inventory_item.quantity += extra_product.use * extra_quantity
         inventory_item.save()
         return "Updated extra successfully."
     except Exception as e:
@@ -286,7 +286,7 @@ def return_extra_products_to_storage(order_id):
             extra_products = OrderItemExtraProduct.objects.filter(order_item=order_item)
             for extra_product in extra_products:
                 inventory_item = InventoryItem.objects.get(name=extra_product.extra_product.name, branch_id=order_item.order.branch.id)
-                inventory_item.quantity += 50 * extra_product.quantity
+                inventory_item.quantity += extra_product.extra_product.use * extra_product.quantity
                 inventory_item.save()
         return "Extra products returned successfully."
     except Exception as e:
