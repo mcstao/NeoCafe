@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
-    return_to_storage, return_item_ingredients_to_storage, remove_extra_products
+    return_to_storage, return_item_ingredients_to_storage, remove_extra_products, return_extra_ingredients_to_storage
 from .models import Table, Order, OrderItem, OrderItemExtraProduct
 
 from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDetailSerializer, TableSerializer, \
@@ -155,6 +155,7 @@ class RemoveOrderItemView(APIView):
                 extra_quantity = extra_product.quantity
 
             remove_extra_products(extra_product_id, extra_quantity)
+            return_extra_ingredients_to_storage(extra_product_id, extra_product.order_item.order.branch_id, extra_quantity)
 
         return Response({"message": "Requested items were removed/updated."}, status=status.HTTP_200_OK)
 

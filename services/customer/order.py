@@ -265,3 +265,16 @@ def remove_extra_products(extra_product_id, extra_quantity=None):
         extra_product.quantity -= extra_quantity
         extra_product.save()
         order_item.save()
+
+
+
+def return_extra_ingredients_to_storage(extra_product_id, branch_id, extra_quantity):
+    try:
+        extra_product = ExtraItem.objects.get(id=extra_product_id)
+        for ingredient in extra_product:
+            inventory_item = InventoryItem.objects.get(name=ingredient.name, branch=branch_id)
+            inventory_item.quantity += 50 * extra_quantity
+            inventory_item.save()
+        return "Updated extra successfully."
+    except Exception as e:
+        raise e
