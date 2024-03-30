@@ -268,9 +268,9 @@ def remove_extra_products(extra_product_id, extra_quantity=None):
 
 
 
-def return_extra_ingredients_to_storage(extra_product_id, branch_id, extra_quantity):
+def return_extra_ingredients_to_storage(id, branch_id, extra_quantity):
     try:
-        extra_product = ExtraItem.objects.get(id=extra_product_id)
+        extra_product = ExtraItem.objects.get(id=id)
         for ingredient in extra_product:
             inventory_item = InventoryItem.objects.get(name=ingredient.name, branch=branch_id)
             inventory_item.quantity += 50 * extra_quantity
