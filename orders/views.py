@@ -114,51 +114,49 @@ class ReorderInformationView(APIView):
 class RemoveOrderItemView(APIView):
     @extend_schema(
         responses={200: None},
-        description="Удаляет пункт из заказа.",
+        description="Удаляет пункт или обновляет количество в заказе.",
         request=inline_serializer(
             name='Removeorderitem',
             fields={
-                'order_item_id': serializers.IntegerField(),
+                'order_item_id': serializers.IntegerField(required=False),
                 'quantity': serializers.IntegerField(required=False),
+                'extra_product_id': serializers.IntegerField(required=False),
+                'extra_quantity': serializers.IntegerField(required=False),
             }
         ),
     )
     def delete(self, request):
         order_item_id = request.data.get("order_item_id")
-        quantity = request.data.get("quantity", None)
+        quantity = request.data.get("quantity")
         extra_product_id = request.data.get("extra_product_id")
         extra_quantity = request.data.get("extra_quantity")
 
-        # Получаем order_item и проверяем его существование
-        order_item = OrderItem.objects.filter(id=order_item_id).first()
-        if not order_item:
-            return Response({"error": "Order item not found."}, status=status.HTTP_404_NOT_FOUND)
+        if order_item_id:
+            order_item = OrderItem.objects.filter(id=order_item_id).first()
+            if not order_item:
+                return Response({"error": "Order item not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        extra_product = OrderItemExtraProduct.objects.filter(id=extra_product_id).first()
-        if not extra_product:
-            return Response({"error": "Extra productnot found."}, status=status.HTTP_404_NOT_FOUND)
+            if quantity is not None:
+                quantity = int(quantity)
+            else:
+                quantity = order_item.quantity
 
-        if quantity is not None:
-            quantity = int(quantity)
-        else:
-            quantity = order_item.quantity
+            remove_order_item(order_item_id, quantity)
+            return_item_ingredients_to_storage(order_item.menu_id, order_item.order.branch_id, quantity)
 
-        if extra_quantity is not None:
-            extra_quantity = int(extra_quantity)
-        else:
-            extra_quantity = extra_product.quantity
+        if extra_product_id:
+            extra_product = OrderItemExtraProduct.objects.filter(id=extra_product_id).first()
+            if not extra_product:
+                return Response({"error": "Extra product not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        remove_order_item(order_item_id, quantity)
-        return_item_ingredients_to_storage(order_item.menu_id, order_item.order.branch_id, quantity)
-        remove_extra_products(extra_product_id, extra_quantity)
+            if extra_quantity is not None:
+                extra_quantity = int(extra_quantity)
+            else:
+                extra_quantity = extra_product.quantity
 
-        return Response(
-            {
-                "message": "Order item removed.",
-            },
-            status=status.HTTP_200_OK,
-        )
+            remove_extra_products(extra_product_id, extra_quantity)
 
+        return Response({"message": "Requested items were removed/updated."}, status=status.HTTP_200_OK)
 
 class CreateCustomerOrderView(APIView):
     @extend_schema(

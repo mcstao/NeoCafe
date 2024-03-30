@@ -1530,7 +1530,7 @@ paths:
   /orders/remove-order-item/:
     delete:
       operationId: orders_remove_order_item_destroy
-      description: Удаляет пункт из заказа.
+      description: Удаляет пункт или обновляет количество в заказе.
       tags:
       - orders
       security:
