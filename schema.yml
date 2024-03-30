@@ -2563,6 +2563,8 @@ components:
         choice_category:
           type: integer
           nullable: true
+        use:
+          type: integer
       required:
       - id
       - name
@@ -3083,6 +3085,8 @@ components:
         choice_category:
           type: integer
           nullable: true
+        use:
+          type: integer
     PatchedIngredient:
       type: object
       properties:
