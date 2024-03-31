@@ -1,5 +1,4 @@
 from django.db.models import Q
-from django.shortcuts import render
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
 from rest_framework import permissions, generics, status, serializers
@@ -45,8 +44,6 @@ class CustomerEditProfileView(generics.GenericAPIView):
         return Response(
             {"detail": "Профиль успешно изменен"}, status=status.HTTP_200_OK
         )
-
-
 
 
 class MenuItemDetailView(APIView):
@@ -274,6 +271,7 @@ class MenuSearchView(generics.ListAPIView):
         print(f"Available menu items: {len(available_menu_items)}")
 
         return available_menu_items
+
     def menu_item_has_enough_ingredients(self, menu_item, branch):
         for ingredient in menu_item.ingredients.all():
             try:
