@@ -56,7 +56,7 @@ class MenuItemDetailView(APIView):
         description="Используйте этот эндпоинт для получения детальной информации о пункте меню по ID.",
         responses={200: MenuItemDetailSerializer},
     )
-    def get(self, request, item_id, format=None):
+    def get(self, request, item_id):
 
         try:
             item = Menu.objects.get(id=item_id)
@@ -75,9 +75,9 @@ class PopularItemsView(APIView):
         description="Самое популярное",
         responses={200: MenuItemDetailSerializer(many=True)},
     )
-    def get(self, request, format=None):
+    def get(self, request):
         user = request.user
-        items = get_popular_items(user.branch_id)  # Убедитесь, что функция get_popular_items ожидает id филиала
+        items = get_popular_items(user.branch_id)
         serializer = MenuItemDetailSerializer(items, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -116,7 +116,7 @@ class ItemSearchView(APIView):
             ),
         },
     )
-    def get(self, request, format=None):
+    def get(self, request):
         user = request.user
         query = request.GET.get("query")
         items = item_search(query, user.branch.id)
@@ -151,9 +151,9 @@ class CheckIfItemCanBeMadeView(APIView):
             return Response({"message": "Menu item does not exist."}, status=status.HTTP_404_NOT_FOUND)
 
         if check_if_items_can_be_made(menu_item.id, request.user.branch.id, quantity):
-            return Response({"message": "Item can be made."}, status=status.HTTP_200_OK)
+            return Response({"message": "Возможно изготовить."}, status=status.HTTP_200_OK)
 
-        return Response({"message": "Item can't be made."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "Невозможно изготовить."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangeBranchView(APIView):
@@ -174,7 +174,7 @@ class ChangeBranchView(APIView):
             ),
         },
     )
-    def post(self, request, format=None):
+    def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -205,7 +205,7 @@ class MyIdView(APIView):
             ),
         },
     )
-    def get(self, request, format=None):
+    def get(self, request):
         user = request.user
         return Response({"id": user.id}, status=status.HTTP_200_OK)
 
@@ -218,7 +218,7 @@ class MyOrdersView(APIView):
         description="Заказы пользователя",
         responses={200: UserOrdersSerializer},
     )
-    def get(self, request, format=None):
+    def get(self, request):
         user = request.user
         serializer = UserOrdersSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -248,31 +248,30 @@ class MenuSearchView(generics.ListAPIView):
         user = self.request.user
         branch = user.branch
 
-        print(f"Search query: {search}")  # Для отладки
+        print(f"Search query: {search}")
 
         if search:
             category = Category.objects.filter(name__iexact=search).first()
             if category:
-                # Фильтрация пунктов меню по категории
+
                 menu_items = Menu.objects.filter(category=category)
             else:
-                # Фильтрация пунктов меню по имени или описанию
+
                 menu_items = Menu.objects.filter(
                     Q(name__icontains=search) |
                     Q(description__icontains=search)
                 )
         else:
-            # Получение всех пунктов меню, если поисковый запрос не указан
+
             menu_items = Menu.objects.all()
 
-        print(f"Menu items found: {menu_items.count()}")  # Для отладки
+        print(f"Menu items found: {menu_items.count()}")
 
-        # Отбор доступных пунктов меню на основе проверки ингредиентов в филиале пользователя
         available_menu_items = [
             menu_item for menu_item in menu_items if self.menu_item_has_enough_ingredients(menu_item, branch)
         ]
 
-        print(f"Available menu items: {len(available_menu_items)}")  # Для отладки
+        print(f"Available menu items: {len(available_menu_items)}")
 
         return available_menu_items
     def menu_item_has_enough_ingredients(self, menu_item, branch):

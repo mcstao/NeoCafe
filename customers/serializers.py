@@ -7,7 +7,6 @@ from menu.models import Menu
 from menu.serializers import CategorySerializer
 from orders.models import OrderItem, Order
 
-
 User = get_user_model()
 
 
@@ -30,20 +29,19 @@ class CustomerMenuSerializer(serializers.ModelSerializer):
 
 
 class MenuItemDetailSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
     ingredients = serializers.SerializerMethodField()
     total_quantity = serializers.IntegerField(read_only=True)  # Добавлено поле для количества
 
     class Meta:
         model = Menu
-        fields = ['id', 'name', 'description', 'price', 'image', 'ingredients', 'available', 'category', 'total_quantity']
+        fields = ['id', 'name', 'description', 'price', 'image', 'ingredients', 'available', 'category',
+                  'total_quantity']
 
     @extend_schema_field(serializers.ListField(child=serializers.DictField()))
     def get_ingredients(self, obj):
         ingredients = obj.ingredients.all()
         return [{'id': ingredient.id, 'name': ingredient.name, 'quantity': ingredient.quantity,
                  'measurement_unit': ingredient.measurement_unit} for ingredient in ingredients]
-
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

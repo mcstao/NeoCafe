@@ -2753,12 +2753,13 @@ components:
           type: boolean
           title: В наличии
         category:
-          $ref: '#/components/schemas/Category'
+          type: integer
+          nullable: true
+          title: Категория
         total_quantity:
           type: integer
           readOnly: true
       required:
-      - category
       - description
       - id
       - ingredients

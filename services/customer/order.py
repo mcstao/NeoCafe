@@ -22,7 +22,7 @@ def get_my_orders_data(user, statuses):
     orders = Order.objects.filter(
         user=user,
         status__in=statuses,
-    ).only("id", "branch__name", "branch__image", "created", "is_dine_in", "table")
+    ).only("id", "branch__name", "branch__image", "created", "order_type", "table")
     return orders
 
 
@@ -229,7 +229,7 @@ def return_item_ingredients_to_storage(menu_id, branch_id, quantity):
             inventory_item = InventoryItem.objects.get(name=ingredient.name, branch=branch_id)
             inventory_item.quantity += ingredient.quantity * quantity
             inventory_item.save()
-        return "Updated successfully."
+        return "Ингридиент возвращен на склад."
     except Exception as e:
         raise e
 
@@ -239,13 +239,13 @@ def return_ingredients_to_storage(order_id):
     try:
         order_items = OrderItem.objects.filter(order_id=order_id)
         for order_item in order_items:
-            # Для каждого элемента заказа возвращаем его ингредиенты на склад
+
             for ingredient in order_item.menu.ingredients.all():
                 inventory_item = InventoryItem.objects.get(name=ingredient.name, branch_id=order_item.order.branch.id)
-                # Возвращаем количество использованных ингредиентов обратно на склад
+
                 inventory_item.quantity += ingredient.quantity * order_item.quantity
                 inventory_item.save()
-        return "Returned successfully."
+        return "Ингридиенты возвращены на склад"
     except Exception as e:
         raise e
 
@@ -274,7 +274,7 @@ def return_extra_ingredients_to_storage(id, branch_id, extra_quantity):
         inventory_item = InventoryItem.objects.get(name=extra_product.name, branch=branch_id)
         inventory_item.quantity += extra_product.use * extra_quantity
         inventory_item.save()
-        return "Updated extra successfully."
+        return "Доп. продукт возвращены на склад"
     except Exception as e:
         raise e
 
@@ -288,7 +288,7 @@ def return_extra_products_to_storage(order_id):
                 inventory_item = InventoryItem.objects.get(name=extra_product.extra_product.name, branch_id=order_item.order.branch.id)
                 inventory_item.quantity += extra_product.extra_product.use * extra_product.quantity
                 inventory_item.save()
-        return "Extra products returned successfully."
+        return "Все доп. продукты возварщены на склад"
     except Exception as e:
         raise e
 
@@ -296,6 +296,6 @@ def return_to_storage(order_id):
     try:
         return_ingredients_to_storage(order_id)
         return_extra_products_to_storage(order_id)
-        return "Returned successfully."
+        return "Возвращение успешно."
     except Exception as e:
         raise e
