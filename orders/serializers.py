@@ -59,9 +59,9 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     table = serializers.PrimaryKeyRelatedField(queryset=Table.objects.all(), required=False, allow_null=True)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False)
-    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
-    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
-    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M")
+    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
 
     class Meta:
         model = Order
@@ -194,9 +194,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
     status = serializers.ChoiceField(choices=Order.STATUS_CHOICES, allow_blank=False)
     order_type = serializers.ChoiceField(choices=Order.TYPE_CHOICES, allow_blank=False)
-    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
-    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M")
-    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M")
+    created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
 
     class Meta:
         model = Order

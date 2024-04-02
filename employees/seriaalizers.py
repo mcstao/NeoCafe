@@ -62,7 +62,7 @@ class StaffCreateSerializer(serializers.ModelSerializer):
 
         for attr, value in validated_data.items():
             if attr == 'password':
-                instance.set_password(value)
+                instance.password = value
             else:
                 setattr(instance, attr, value)
         instance.save()

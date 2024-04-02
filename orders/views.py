@@ -235,7 +235,7 @@ class OrderDetailedListView(generics.ListAPIView):
         status = self.request.query_params.get('status')
         if status:
             queryset = queryset.filter(status=status)
-        elif self.request.query_params.get('status__in'):  # Допустим, status__in=Завершен,Ожидает
+        elif self.request.query_params.get('status__in'):
             statuses = self.request.query_params.get('status__in').split(',')
             queryset = queryset.filter(status__in=statuses)
 

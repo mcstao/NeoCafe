@@ -2845,18 +2845,24 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
         completed_at:
           type: string
           format: date-time
+          readOnly: true
           nullable: true
       required:
+      - completed_at
+      - created
       - id
       - order_type
       - status
       - total_price
+      - updated_at
     OrderDetailedList:
       type: object
       properties:
@@ -2968,18 +2974,24 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
         completed_at:
           type: string
           format: date-time
+          readOnly: true
           nullable: true
       required:
+      - completed_at
+      - created
       - id
       - order_type
       - status
       - total_price
+      - updated_at
     OrderStaffItem:
       type: object
       properties:
@@ -3202,12 +3214,15 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
         completed_at:
           type: string
           format: date-time
+          readOnly: true
           nullable: true
     PatchedOrderStaff:
       type: object
@@ -3241,12 +3256,15 @@ components:
         created:
           type: string
           format: date-time
+          readOnly: true
         updated_at:
           type: string
           format: date-time
+          readOnly: true
         completed_at:
           type: string
           format: date-time
+          readOnly: true
           nullable: true
     PatchedStaffCreate:
       type: object
