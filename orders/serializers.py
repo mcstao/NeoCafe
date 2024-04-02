@@ -70,9 +70,22 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
-        table_id = validated_data.pop('table', None)  # Используйте table_id
+        table_id = validated_data.pop('table', None)
         user = self.context['request'].user
         order_type = validated_data.get('order_type')
+
+        if hasattr(user, 'position'):
+            if user.position == "Официант":
+                waiter = user
+                user = None
+            elif user.position == "Клиент":
+                waiter = None
+            else:
+                waiter = None
+                user = None
+        else:
+            waiter = None
+            user = None
 
         table = Table.objects.get(id=table_id) if table_id else None
 
@@ -83,7 +96,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             table.is_available = False
             table.save()
 
-        order = Order.objects.create(**validated_data, waiter=user, table=table)
+        order = Order.objects.create(**validated_data, user=user, waiter=waiter, table=table)
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
@@ -117,7 +130,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
-            extra_products_data = item_data.pop('extra_product', [])
+            extra_products_data = item_data.pop('orderitemextraproduct_set', [])
             print(f"Extra products data: {extra_products_data}")
 
             for extra_product_data in extra_products_data:
@@ -236,7 +249,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
             else:
                 OrderItem.objects.create(order=instance, menu=menu_item, quantity=new_quantity)
 
-            extra_products_data = item_data.pop('extra_product', [])
+            extra_products_data = item_data.pop('orderitemextraproduct_set', [])
             print(f"Extra products data: {extra_products_data}")
 
             for extra_product_data in extra_products_data:

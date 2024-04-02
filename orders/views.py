@@ -1,5 +1,6 @@
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import generics, status, serializers
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -197,7 +198,7 @@ class UpdateCustomerOrderView(APIView):
             updated_order = serializer.save()
 
             if updated_order.status == "Отменено" and order.table:
-                return_to_storage(updated_order.id)  # Возврат ингредиентов на склад
+                return_to_storage(updated_order.id)
 
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -226,12 +227,16 @@ class TableListByBranchView(generics.ListAPIView):
 class OrderDetailedListView(generics.ListAPIView):
     serializer_class = OrderDetailedListSerializer
     queryset = Order.objects.all().order_by('-created')
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        branch_id = self.request.query_params.get('branch_id')
-
-        if branch_id is not None:
-            queryset = queryset.filter(branch__id=branch_id)
+        user_branch = self.request.user.branch
+        queryset = super().get_queryset().filter(branch=user_branch)
+        status = self.request.query_params.get('status')
+        if status:
+            queryset = queryset.filter(status=status)
+        elif self.request.query_params.get('status__in'):  # Допустим, status__in=Завершен,Ожидает
+            statuses = self.request.query_params.get('status__in').split(',')
+            queryset = queryset.filter(status__in=statuses)
 
         return queryset

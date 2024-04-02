@@ -100,17 +100,20 @@ class MyOrdersListSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
     branch_image = serializers.ImageField(source="branch.image")
     completed_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M")
+    items = OrderItemSerializer(many=True)
 
     class Meta:
         model = Order
         fields = [
             "id",
+            "status",
             "branch_name",
             "total_price",
             "bonuses_used",
             "branch_image",
             "created",
-            'completed_at'
+            'completed_at',
+            "items"
         ]
 
 
