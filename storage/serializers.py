@@ -4,7 +4,7 @@ from .models import InventoryItem
 
 class InventoryItemSerializer(serializers.ModelSerializer):
     category = serializers.ChoiceField(choices=InventoryItem.CATEGORY_CHOICES)
-    arrival_date = serializers.DateField(format="%d.%m.%Y")
+    arrival_date = serializers.DateField(format="%d.%m.%Y", input_formats=['%d.%m.%Y', 'iso-8601'])
 
     class Meta:
         model = InventoryItem
