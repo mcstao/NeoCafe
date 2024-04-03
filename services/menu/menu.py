@@ -46,11 +46,11 @@ def get_popular_items(branch_id):
                   .annotate(total_quantity=Sum('quantity'))
                   .order_by('-total_quantity'))
 
-    menu_ids = [item['menu'] for item in item_sales[:10]]
+    menu_ids = [item['menu'] for item in item_sales[:3]]
     menus = Menu.objects.filter(id__in=menu_ids)
 
 
-    menu_quantities = {item['menu']: item['total_quantity'] for item in item_sales[:10]}
+    menu_quantities = {item['menu']: item['total_quantity'] for item in item_sales[:3]}
 
 
     for menu in menus:

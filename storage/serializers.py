@@ -4,18 +4,7 @@ from .models import InventoryItem
 
 class InventoryItemSerializer(serializers.ModelSerializer):
     category = serializers.ChoiceField(choices=InventoryItem.CATEGORY_CHOICES)
-    arrival_date = serializers.DateField(input_formats=[
-        '%d-%m-%Y',  # DD-MM-YYYY
-        '%d.%m.%Y',  # DD.MM.YYYY
-        '%Y-%m-%d',  # YYYY-MM-DD
-        '%d/%m/%Y',  # DD/MM/YYYY
-        '%m/%d/%Y',  # MM/DD/YYYY
-        '%Y/%m/%d',  # YYYY/MM/DD
-        '%b %d, %Y',  # Mar 22, 2024
-        '%B %d, %Y',  # March 22, 2024
-        '%d %b, %Y',  # 22 Mar, 2024
-        '%d %B, %Y',  # 22 March, 2024
-    ])
+    arrival_date = serializers.DateField(format="%d.%m.%Y")
 
     class Meta:
         model = InventoryItem
