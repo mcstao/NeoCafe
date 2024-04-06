@@ -80,9 +80,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                 user = CustomUser.objects.get(email=user_email)
             except CustomUser.DoesNotExist:
                 raise serializers.ValidationError({"user": "Пользователь с таким email не найден."})
-        bonuses_used = validated_data.get('bonuses_used', 0)
-        if bonuses_used > user.bonus:
-            raise serializers.ValidationError("Недостаточно бонусов.")
+
         waiter = self.context['request'].user
         order_type = validated_data.get('order_type')
 
@@ -178,6 +176,8 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
         instance.save()
+        if instance.bonuses_used > instance.user.bonus:
+            raise serializers.ValidationError("Недостаточно бонусов.")
 
         if instance.status == "Завершено":
             instance.user.bonus -= instance.bonuses_used
@@ -298,6 +298,9 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
         instance.save()
+
+        if instance.bonuses_used > instance.user.bonus:
+            raise serializers.ValidationError("Недостаточно бонусов.")
 
         if instance.status == "Завершено":
             instance.user.bonus -= instance.bonuses_used
