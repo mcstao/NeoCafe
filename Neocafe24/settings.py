@@ -103,34 +103,34 @@ ASGI_APPLICATION = 'Neocafe24.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# if DEBUG:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#             'NAME': config('DB_NAME'),
-#             'USER': config('DB_USER'),
-#             'PASSWORD': config('DB_PASSWORD'),
-#             'HOST': config('DB_HOST'),
-#             'PORT': config('DB_PORT'),
-#         }
-#     }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-
-DATABASES = {
-    "default": {
-        "ENGINE": config("NAME_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": config("DB_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": config("DB_USER", "user"),
-        "PASSWORD": config("DB_PASSWORD", "password"),
-        "HOST": config("DB_HOST", "localhost"),
-        "PORT": config("DB_PORT", "5432"),
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT'),
+        }
     }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# DATABASES = {
+#     "default": {
+#         "ENGINE": config("NAME_ENGINE", "django.db.backends.sqlite3"),
+#         "NAME": config("DB_NAME", os.path.join(BASE_DIR, "db.sqlite3")),
+#         "USER": config("DB_USER", "user"),
+#         "PASSWORD": config("DB_PASSWORD", "password"),
+#         "HOST": config("DB_HOST", "localhost"),
+#         "PORT": config("DB_PORT", "5432"),
+#     }
 }
 # DATABASES = {
 #     'default': {
