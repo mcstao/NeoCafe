@@ -11,3 +11,5 @@ myenv
 .gitignore
 static
 **__pycehe__
+client.html
+test.html

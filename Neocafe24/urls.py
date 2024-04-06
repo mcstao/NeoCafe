@@ -17,5 +17,6 @@ urlpatterns = [
     path('waiters/', include('waiters.urls')),
     path('customers/', include('customers.urls')),
     path('barista/', include('barista.urls')),
+    path('notifications/',include('notifications.urls'))
 
 ]
