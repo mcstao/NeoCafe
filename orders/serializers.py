@@ -10,6 +10,7 @@ from branches.models import Branch
 from menu.models import Menu, ExtraItem
 from menu.serializers import MenuSerializer
 from services.menu.menu import update_ingredient_storage_on_cooking, update_extra_product_storage
+from users.models import CustomUser
 from .models import Order, OrderItem, Table, OrderItemExtraProduct
 
 logger = logging.getLogger(__name__)
@@ -62,16 +63,27 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
 
     class Meta:
         model = Order
         fields = ['id', 'items', 'total_price', 'order_type', 'table', 'waiter', 'status', 'branch', 'created',
-                  'updated_at', 'completed_at']
+                  'updated_at', 'completed_at', 'user', 'bonuses_used']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])
         table_id = validated_data.pop('table', None)
-        waiter = self.context['request'].waiter
+        user_email = validated_data.pop('user_email', None)
+        user = None
+        if user_email:
+            try:
+                user = CustomUser.objects.get(email=user_email)
+            except CustomUser.DoesNotExist:
+                raise serializers.ValidationError({"user": "Пользователь с таким email не найден."})
+        bonuses_used = validated_data.get('bonuses_used', 0)
+        if bonuses_used > user.bonus:
+            raise serializers.ValidationError("Недостаточно бонусов.")
+        waiter = self.context['request'].user
         order_type = validated_data.get('order_type')
 
 
@@ -85,7 +97,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             table.is_available = False
             table.save()
 
-        order = Order.objects.create(**validated_data, waiter=waiter, table=table)
+        order = Order.objects.create(**validated_data, user=user, waiter=waiter, table=table)
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
@@ -164,10 +176,13 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
-        instance.total_price = max(total_price, Decimal(0))
+        instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
         instance.save()
 
         if instance.status == "Завершено":
+            instance.user.bonus -= instance.bonuses_used
+            instance.user.bonus += instance.total_price
+            instance.user.save()
             instance.completed_at = timezone.now()
         instance.save()
 
@@ -286,7 +301,7 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         if instance.status == "Завершено":
             instance.user.bonus -= instance.bonuses_used
-            instance.user.bonus += instance.total_price  # Начисляем бонусы за заказ
+            instance.user.bonus += instance.total_price
             instance.user.save()
             instance.completed_at = timezone.now()
         instance.save()
