@@ -75,13 +75,13 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         table_id = validated_data.pop('table', None)
         print(f"Current user: {self.context['request'].user}")
         waiter = self.context['request'].user
-        user_email = validated_data.pop('user_email', None)
-        user = None
-        if user_email:
-            try:
-                user = CustomUser.objects.get(email=user_email)
-            except CustomUser.DoesNotExist:
-                raise serializers.ValidationError({"user": "Пользователь с таким email не найден."})
+        # user_email = validated_data.pop('user_email', None)
+        # user = None
+        # if user_email:
+        #     try:
+        #         user = CustomUser.objects.get(email=user_email)
+        #     except CustomUser.DoesNotExist:
+        #         raise serializers.ValidationError({"user": "Пользователь с таким email не найден."})
 
         order_type = validated_data.get('order_type')
 
