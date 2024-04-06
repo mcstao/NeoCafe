@@ -131,7 +131,7 @@ else:
 #         "HOST": config("DB_HOST", "localhost"),
 #         "PORT": config("DB_PORT", "5432"),
 #     }
-}
+# }
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
