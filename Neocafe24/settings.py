@@ -266,14 +266,17 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = ['https://helsinki-backender.org.kg', 'https://www.helsinki-backender.org.kg']
 
+
+REDIS_HOST = config("REDIS_HOST", default="redis")
+REDIS_PORT = config("REDIS_PORT", default="6379")
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
 
 # Celery settings.
-CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/0"
