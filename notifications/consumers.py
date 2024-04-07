@@ -5,7 +5,7 @@ from .models import Notification
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-
+from django.utils import timezone
 
 class ClientNotificationConsumer(AsyncWebsocketConsumer):
     """
@@ -41,6 +41,7 @@ class ClientNotificationConsumer(AsyncWebsocketConsumer):
         )
         notifications_list = []
         for notification in notifications:
+            notification.timestamp = timezone.localtime(notification.timestamp)
             notifications_list.append(
                 {
                     "id": notification.id,
@@ -72,25 +73,32 @@ class WaiterNotificationConsumer(AsyncWebsocketConsumer):
     """
 
     async def connect(self):
-        self.user = self.scope["user"]
-        if self.user.role == 'Официант':
-            self.room_group_name = f"waiter-{self.user.id}"
+        self.waiter_id = self.scope["url_route"]["kwargs"]["user_id"]
+        self.waiter = await self.get_user(self.waiter_id)
+        print(self.waiter)
+        if self.waiter.position == 'Официант':
+            self.user_group_name = f"waiter-{self.waiter.id}"
 
             # Connect to user-specific group
-            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.channel_layer.group_add(self.user_group_name, self.channel_name)
 
         await self.accept()
         await self.get_notifications()
 
+    @database_sync_to_async
+    def get_user(self, waiter_id):
+        return get_user_model().objects.get(id=waiter_id)
+
+
     async def disconnect(self, close_code):
         # Disconnect from group
         await self.channel_layer.group_discard(
-            self.room_group_name, self.channel_name
+            self.user_group_name, self.channel_name
         )
 
     async def get_notifications(self, event=None):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.user, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.waiter, read=False).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:
@@ -125,25 +133,32 @@ class AdminNotificationConsumer(AsyncWebsocketConsumer):
     """
 
     async def connect(self):
-        self.user = self.scope["user"]
-        if self.user.is_authenticated and self.user.role == 'Админ':
-            self.room_group_name = f"admin-{self.user.id}"
+        self.admin_id = self.scope["url_route"]["kwargs"]["user_id"]
+        self.admin = await self.get_user(self.admin_id)
+        print(self.admin)
+        if self.admin.position == 'Админ':
+            self.user_group_name = f"admin-{self.admin.id}"
 
             # Connect to user-specific group
-            await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+            await self.channel_layer.group_add(self.user_group_name, self.channel_name)
 
         await self.accept()
         await self.get_notifications()
 
+    @database_sync_to_async
+    def get_user(self, admin_id):
+        return get_user_model().objects.get(id=admin_id)
+
+
     async def disconnect(self, close_code):
         # Disconnect from group
         await self.channel_layer.group_discard(
-            self.room_group_name, self.channel_name
+            self.user_group_name, self.channel_name
         )
 
     async def get_notifications(self, event=None):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.user, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.admin, read=False).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:

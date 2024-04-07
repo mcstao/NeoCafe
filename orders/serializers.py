@@ -74,7 +74,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         items_data = validated_data.pop('items', [])
         table_id = validated_data.pop('table', None)
         print(f"Current user: {self.context['request'].user}")
-        user = self.context['request'].user
+        waiter = self.context['request'].user
         order_type = validated_data.get('order_type')
 
 
@@ -88,12 +88,12 @@ class OrderStaffSerializer(serializers.ModelSerializer):
             table.is_available = False
             table.save()
 
-        order = Order.objects.create(**validated_data, waiter=user, table=table)
+        order = Order.objects.create(**validated_data, waiter=waiter, table=table)
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
 
-        order.save()
+
         return order
 
     def update(self, instance, validated_data):
@@ -105,7 +105,7 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         instance.table = validated_data.get('table', instance.table)
         instance.waiter = validated_data.get('waiter', instance.waiter)
         instance.status = validated_data.get('status', instance.status)
-        instance.save()
+
 
         for item_data in items_data:
             menu_id = item_data['menu_id']
@@ -168,15 +168,10 @@ class OrderStaffSerializer(serializers.ModelSerializer):
 
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
-        instance.save()
-        if instance.bonuses_used > instance.user.bonus:
-            raise serializers.ValidationError("Недостаточно бонусов.")
 
         if instance.status == "Завершено":
-            instance.user.bonus -= instance.bonuses_used
-            instance.user.bonus += instance.total_price
-            instance.user.save()
             instance.completed_at = timezone.now()
+
         instance.save()
 
         return instance
@@ -216,7 +211,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
 
-        order.save()
 
         return order
 
@@ -290,7 +284,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         total_price = sum(item.menu.price * item.quantity for item in instance.items.all())
         instance.total_price = max(total_price - instance.bonuses_used, Decimal(0))
-        instance.save()
 
         if instance.bonuses_used > instance.user.bonus:
             raise serializers.ValidationError("Недостаточно бонусов.")

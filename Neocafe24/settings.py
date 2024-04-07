@@ -267,7 +267,7 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = ['https://helsinki-backender.org.kg', 'https://www.helsinki-backender.org.kg']
 
 
-REDIS_HOST = config("REDIS_HOST", default="redis")
+REDIS_HOST = config("REDIS_HOST", default="localhost")
 REDIS_PORT = config("REDIS_PORT", default="6379")
 CHANNEL_LAYERS = {
     "default": {

@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
-    return_to_storage, return_item_ingredients_to_storage, remove_extra_products, return_extra_ingredients_to_storage
+    return_to_storage, return_item_ingredients_to_storage, remove_extra_products, return_extra_ingredients_to_storage, \
+    create_order_waiter
 from .models import Table, Order, OrderItem, OrderItemExtraProduct
 
 from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDetailSerializer, TableSerializer, \
@@ -15,7 +16,7 @@ from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDet
 class CreateOrderView(APIView):
     @extend_schema(request=OrderStaffSerializer, responses={201: OrderStaffSerializer}, description="Создает заказ")
     def post(self, request):
-        user = request.user
+        waiter = request.user
         table = request.data.get("table")
         order_type = request.data.get("order_type")
         items = request.data.get("items", [])
@@ -23,14 +24,14 @@ class CreateOrderView(APIView):
 
         table_id = None
         if table is not None:
-            table = Table.objects.filter(table_number=table, branch=user.branch).first()
+            table = Table.objects.filter(table_number=table, branch=waiter.branch).first()
             if order_type == "В заведении" and (not table or not table.is_available):
                 return Response({"message": "Table is not available or does not exist."},
                                 status=status.HTTP_400_BAD_REQUEST)
             table_id = table.id if table else None
 
         try:
-            order = create_order(user.id, items, order_type, bonuses_used, table_id)
+            order = create_order_waiter(waiter.id, items, order_type, bonuses_used, table_id)
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -190,8 +191,6 @@ class UpdateCustomerOrderView(APIView):
 
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
-        if order.user != request.user:
-            return Response({"message": "You can only update your orders."}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = OrderCustomerSerializer(order, data=request.data, partial=True)
         if serializer.is_valid():

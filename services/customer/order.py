@@ -121,6 +121,62 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
 
     return order
 
+
+@transaction.atomic
+def create_order_waiter(waiter_id, items, order_type, bonuses_used=0, table_id=None):
+    waiter = CustomUser.objects.get(id=waiter_id)
+    total_price = 0
+
+    table_instance = None
+    if order_type == "В заведении" and table_id:
+        table_instance = Table.objects.get(id=table_id)
+        if not table_instance.is_available:
+            raise ValueError("Стол не доступен.")
+
+        table_instance.is_available = False
+        table_instance.save()
+
+
+    order = Order.objects.create(
+        waiter=waiter,
+        total_price=0,  # временное значение
+        bonuses_used=bonuses_used,
+        order_type=order_type,
+        branch=waiter.branch,
+        table=table_instance,
+    )
+
+
+    for item in items:
+        menu_item = Menu.objects.get(id=item['menu_id'])
+        if check_if_items_can_be_made(menu_item.id, order.branch.id, item['quantity']):
+            order_item =OrderItem.objects.create(
+                order=order,
+                menu=menu_item,
+                quantity=item['quantity'],
+            )
+            total_price += menu_item.price * item['quantity']
+            for extra_product_data in item.get('extra_product', []):
+                extra_product_id = extra_product_data['id']
+                extra_product_quantity = extra_product_data.get('quantity', 1)
+                extra_product = ExtraItem.objects.get(id=extra_product_id)
+
+                OrderItemExtraProduct.objects.create(
+                    order_item=order_item,
+                    extra_product=extra_product,
+                    quantity=extra_product_quantity
+                )
+
+                update_extra_product_storage(extra_product_id, order.branch.id, extra_product_quantity)
+
+            update_ingredient_storage_on_cooking(menu_item.id, order.branch.id, item['quantity'])
+
+
+    order.total_price = total_price
+    order.save()
+
+    return order
+
 def reorder(order_id):
     original_order = Order.objects.get(id=order_id)
     new_order = Order.objects.create(

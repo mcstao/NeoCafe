@@ -30,7 +30,7 @@ class CustomerMenuSerializer(serializers.ModelSerializer):
 
 class MenuItemDetailSerializer(serializers.ModelSerializer):
     ingredients = serializers.SerializerMethodField()
-    total_quantity = serializers.IntegerField(read_only=True)  # Добавлено поле для количества
+    total_quantity = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Menu
