@@ -4,5 +4,5 @@ from .views import NotificationCreateView, NotificationDeleteView
 
 urlpatterns = [
     path('create/', NotificationCreateView.as_view(), name='create'),
-    path('delete/<int:id>/', NotificationDeleteView.as_view(), name='delete'),
+    path('delete/<int:pk>/', NotificationDeleteView.as_view(), name='delete'),
 ]
