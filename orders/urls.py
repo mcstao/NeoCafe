@@ -7,6 +7,7 @@ from .views import (
     RemoveOrderItemView,
     CreateCustomerOrderView,
     UpdateCustomerOrderView, TableDetailView, TableListByBranchView, TableListCreateView, OrderDetailedListView,
+    OrderDetailView
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path('tables/branch/<int:branch_id>/', TableListByBranchView.as_view(), name='table-list-by-branch'),
     path('tables/', TableListCreateView.as_view(), name='table-list-create'),
     path('order-list/', OrderDetailedListView.as_view(), name='order-list'),
+    path('<int:id>/', OrderDetailView.as_view(), name='api-order-detail'),
 ]

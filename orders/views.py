@@ -10,7 +10,7 @@ from services.customer.order import create_order, reorder, get_reorder_informati
 from .models import Table, Order, OrderItem, OrderItemExtraProduct
 
 from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDetailSerializer, TableSerializer, \
-    OrderDetailedListSerializer
+    OrderDetailedListSerializer, OrderOneSerializer
 
 
 class CreateOrderView(APIView):
@@ -231,11 +231,27 @@ class OrderDetailedListView(generics.ListAPIView):
     def get_queryset(self):
         user_branch = self.request.user.branch
         queryset = super().get_queryset().filter(branch=user_branch)
+
         status = self.request.query_params.get('status')
+        order_type = self.request.query_params.get('order_type')
+
         if status:
             queryset = queryset.filter(status=status)
-        elif self.request.query_params.get('status__in'):
-            statuses = self.request.query_params.get('status__in').split(',')
-            queryset = queryset.filter(status__in=statuses)
+
+        if order_type:
+            queryset = queryset.filter(order_type=order_type)
+
+        if 'status__in' in self.request.query_params:
+            status_in = self.request.query_params.get('status__in').split(',')
+            queryset = queryset.filter(status__in=status_in)
+
+        if 'order_type__in' in self.request.query_params:
+            order_type_in = self.request.query_params.get('order_type__in').split(',')
+            queryset = queryset.filter(order_type__in=order_type_in)
 
         return queryset
+
+class OrderDetailView(generics.RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderOneSerializer
+    lookup_field = 'id'

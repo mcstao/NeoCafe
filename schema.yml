@@ -1465,6 +1465,30 @@ paths:
       responses:
         '204':
           description: No response body
+  /orders/{id}/:
+    get:
+      operationId: orders_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - orders
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderOne'
+          description: ''
   /orders/create-customer-order/:
     post:
       operationId: orders_create_customer_order_create
@@ -2896,6 +2920,15 @@ components:
         user:
           type: integer
           nullable: true
+        waiter:
+          type: integer
+          nullable: true
+        user_name:
+          type: string
+          readOnly: true
+        waiter_name:
+          type: string
+          readOnly: true
         total_price:
           type: string
           format: decimal
@@ -2907,10 +2940,15 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
-        waiter:
-          type: integer
-          nullable: true
         created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
           type: string
           format: date-time
           readOnly: true
@@ -2927,10 +2965,14 @@ components:
           - $ref: '#/components/schemas/Table'
           readOnly: true
       required:
+      - completed_at
       - created
       - id
       - items
       - table_detail
+      - updated_at
+      - user_name
+      - waiter_name
     OrderItem:
       type: object
       properties:
@@ -2962,6 +3004,72 @@ components:
       - item_id
       - item_name
       - item_price
+    OrderOne:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        order_type:
+          $ref: '#/components/schemas/OrderTypeEnum'
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        user:
+          type: integer
+          nullable: true
+        waiter:
+          type: integer
+          nullable: true
+        user_name:
+          type: string
+          readOnly: true
+        waiter_name:
+          type: string
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        branch:
+          type: integer
+          nullable: true
+        bonuses_used:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        created:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        table:
+          type: integer
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderStaffItem'
+          readOnly: true
+        table_detail:
+          allOf:
+          - $ref: '#/components/schemas/Table'
+          readOnly: true
+      required:
+      - completed_at
+      - created
+      - id
+      - items
+      - table_detail
+      - updated_at
+      - user_name
+      - waiter_name
     OrderStaff:
       type: object
       description: Serializer for Order model.

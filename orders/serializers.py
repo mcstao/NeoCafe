@@ -34,16 +34,16 @@ class OrderStaffItemSerializer(serializers.ModelSerializer):
         model = OrderItem
         fields = ['id', 'menu_id', 'menu_detail', 'quantity', 'extra_product']
 
-
     @extend_schema_field(serializers.CharField())
     def get_menu_detail(self, obj):
         return MenuSerializer(obj.menu).data
 
-
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        representation['extra_product'] = ExtraProductSerializer(instance.orderitemextraproduct_set.all(), many=True).data
+        representation['extra_product'] = ExtraProductSerializer(instance.orderitemextraproduct_set.all(),
+                                                                 many=True).data
         return representation
+
 
 class TableSerializer(serializers.ModelSerializer):
     class Meta:
@@ -77,8 +77,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         waiter = self.context['request'].user
         order_type = validated_data.get('order_type')
 
-
-
         table = Table.objects.get(id=table_id) if table_id else None
 
         if table and not table.is_available:
@@ -93,7 +91,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
 
-
         return order
 
     def update(self, instance, validated_data):
@@ -105,7 +102,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
         instance.table = validated_data.get('table', instance.table)
         instance.waiter = validated_data.get('waiter', instance.waiter)
         instance.status = validated_data.get('status', instance.status)
-
 
         for item_data in items_data:
             menu_id = item_data['menu_id']
@@ -161,8 +157,6 @@ class OrderStaffSerializer(serializers.ModelSerializer):
                     update_extra_product_storage(extra_product_id, instance.branch.id, extra_product_quantity)
                     print("update_extra_product_storage called.")
 
-
-
             if new_quantity > 0:
                 update_ingredient_storage_on_cooking(menu_id, instance.branch.id, new_quantity)
 
@@ -210,7 +204,6 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
 
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
-
 
         return order
 
@@ -315,8 +308,43 @@ class TableDetailSerializer(serializers.ModelSerializer):
 class OrderDetailedListSerializer(serializers.ModelSerializer):
     items = OrderStaffItemSerializer(many=True, read_only=True)
     table_detail = TableSerializer(source='table', read_only=True)
+    created = serializers.DateTimeField(format="%d.%m.%Y %H:%M", read_only=True)
+    updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M", read_only=True)
+    completed_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    waiter_name = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'order_type', 'status', 'user', 'total_price', 'branch',
-                  'bonuses_used', 'waiter', 'created', 'table', 'items', 'table_detail']
+        fields = ['id', 'order_type', 'status', 'user', 'waiter',  'user_name', 'waiter_name', 'total_price', 'branch',
+                  'bonuses_used', 'waiter', 'created', 'updated_at', 'completed_at', 'table', 'items', 'table_detail']
+
+    @extend_schema_field(serializers.CharField())
+    def get_waiter_name(self, obj):
+        return obj.waiter.first_name if obj.waiter else None
+
+    @extend_schema_field(serializers.CharField())
+    def get_user_name(self, obj):
+        return obj.user.first_name if obj.user else None
+
+
+class OrderOneSerializer(serializers.ModelSerializer):
+    items = OrderStaffItemSerializer(many=True, read_only=True)
+    table_detail = TableSerializer(source='table', read_only=True)
+    waiter_name = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(format="%d.%m.%Y %H:%M", read_only=True)
+    updated_at = serializers.DateTimeField(format="%d.%m.%Y %H:%M", read_only=True)
+    completed_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    class Meta:
+        model = Order
+        fields = ['id', 'order_type', 'status','user', 'waiter', 'user_name', 'waiter_name', 'total_price', 'branch',
+                  'bonuses_used', 'created', 'updated_at', 'completed_at', 'table', 'items', 'table_detail']
+
+    @extend_schema_field(serializers.CharField())
+    def get_waiter_name(self, obj):
+        return obj.waiter.first_name if obj.waiter else None
+
+    @extend_schema_field(serializers.CharField())
+    def get_user_name(self, obj):
+        return obj.user.first_name if obj.user else None
