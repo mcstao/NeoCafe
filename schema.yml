@@ -1445,6 +1445,26 @@ paths:
       responses:
         '204':
           description: No response body
+  /notifications/delete/{id}/:
+    delete:
+      operationId: notifications_delete_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - notifications
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
   /orders/create-customer-order/:
     post:
       operationId: orders_create_customer_order_create
@@ -2984,6 +3004,13 @@ components:
           format: date-time
           readOnly: true
           nullable: true
+        user:
+          type: integer
+          nullable: true
+        bonuses_used:
+          type: integer
+          minimum: 0
+          nullable: true
       required:
       - completed_at
       - created
@@ -3265,6 +3292,13 @@ components:
           type: string
           format: date-time
           readOnly: true
+          nullable: true
+        user:
+          type: integer
+          nullable: true
+        bonuses_used:
+          type: integer
+          minimum: 0
           nullable: true
     PatchedStaffCreate:
       type: object

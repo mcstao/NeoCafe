@@ -3,20 +3,12 @@ from loguru import logger
 from .models import Notification
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, serializers
 
-class NotificationCreateView(APIView):
-    def post(self, request):
-        title = request.data.get('title')
-        description = request.data.get('description')
-        notification = Notification.objects.create(
-            title=title,
-            description=description,
-            recipient=request.user
-        )
-        return Response({"id": notification.id}, status=status.HTTP_201_CREATED)
+
 
 class NotificationDeleteView(APIView):
+    serializer_class = serializers.Serializer
     def delete(self, request, pk, format=None):
         try:
             notification = Notification.objects.get(pk=pk, recipient=request.user)
