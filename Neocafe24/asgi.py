@@ -18,7 +18,7 @@ from channels.auth import AuthMiddlewareStack
 
 application = ProtocolTypeRouter(
     {
-        "https": get_asgi_application(),
+        "http": get_asgi_application(),
         "websocket": AuthMiddlewareStack(
             URLRouter(
                 notifications.routing.websocket_urlpatterns
