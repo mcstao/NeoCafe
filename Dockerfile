@@ -7,4 +7,8 @@ WORKDIR $APP_HOME
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
+
+RUN pip install 'uvicorn[standard]'
+
+
 COPY . .
