@@ -188,6 +188,7 @@ class CreateCustomerOrderView(APIView):
 
 class UpdateCustomerOrderView(APIView):
     serializer_class = OrderCustomerSerializer
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
@@ -206,6 +207,7 @@ class UpdateCustomerOrderView(APIView):
 class TableDetailView(generics.RetrieveAPIView):
     queryset = Table.objects.all()
     serializer_class = TableDetailSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return super().get_object()
@@ -213,6 +215,7 @@ class TableDetailView(generics.RetrieveAPIView):
 class TableListCreateView(generics.ListCreateAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class TableListByBranchView(generics.ListAPIView):
@@ -254,4 +257,5 @@ class OrderDetailedListView(generics.ListAPIView):
 class OrderDetailView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderOneSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
