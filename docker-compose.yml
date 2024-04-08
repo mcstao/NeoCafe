@@ -16,6 +16,9 @@ services:
       - .env
     depends_on:
       - redis
+    networks:
+      - my_custom_network
+
 
   channels:
     build: .
@@ -29,11 +32,15 @@ services:
       - .env
     depends_on:
       - redis
+    networks:
+      - my_custom_network
 
   redis:
     image: "redis:latest"
     ports:
       - "6379:6379"
+    networks:
+      - my_custom_network
 
 
 networks:
