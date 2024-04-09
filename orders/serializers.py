@@ -64,10 +64,11 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
     bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
+    order_name = serializers.CharField()
 
     class Meta:
         model = Order
-        fields = ['id', 'items', 'total_price', 'order_type', 'table', 'waiter', 'status', 'branch', 'created',
+        fields = ['id', 'order_name', 'items', 'total_price', 'order_type', 'table', 'waiter', 'status', 'branch', 'created',
                   'updated_at', 'completed_at', 'user', 'bonuses_used']
 
     def create(self, validated_data):
@@ -183,10 +184,11 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
+    order_name = serializers.CharField(required=False)
 
     class Meta:
         model = Order
-        fields = ['id', 'items', 'total_price', 'bonuses_used', 'order_type', 'user', 'status', 'branch',
+        fields = ['id', 'order_name', 'items', 'total_price', 'bonuses_used', 'order_type', 'user', 'status', 'branch',
                   'created',
                   'updated_at', 'completed_at']
 
@@ -316,7 +318,7 @@ class OrderDetailedListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'order_type', 'status', 'user', 'waiter',  'user_name', 'waiter_name', 'total_price', 'branch',
+        fields = ['id', "order_name", 'order_type', 'status', 'user', 'waiter',  'user_name', 'waiter_name', 'total_price', 'branch',
                   'bonuses_used', 'waiter', 'created', 'updated_at', 'completed_at', 'table', 'items', 'table_detail']
 
     @extend_schema_field(serializers.CharField())
@@ -338,7 +340,7 @@ class OrderOneSerializer(serializers.ModelSerializer):
     completed_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     class Meta:
         model = Order
-        fields = ['id', 'order_type', 'status','user', 'waiter', 'user_name', 'waiter_name', 'total_price', 'branch',
+        fields = ['id', 'order_name', 'order_type', 'status','user', 'waiter', 'user_name', 'waiter_name', 'total_price', 'branch',
                   'bonuses_used', 'created', 'updated_at', 'completed_at', 'table', 'items', 'table_detail']
 
     @extend_schema_field(serializers.CharField())

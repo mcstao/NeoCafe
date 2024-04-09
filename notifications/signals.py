@@ -170,6 +170,8 @@ def branch_notification(sender, instance, created, **kwargs):
                     "type": "get_notifications_handler",
                 }
             )
+
+
 @receiver(post_delete, sender=Branch, dispatch_uid="branch_deleted")
 def branch_deleted_notification(sender, instance, **kwargs):
     for admin in admins:
@@ -185,6 +187,7 @@ def branch_deleted_notification(sender, instance, **kwargs):
                 "type": "get_notifications_handler",
             }
         )
+
 
 @receiver(post_save, sender=InventoryItem, dispatch_uid="storage_created")
 def storage_item_created(sender, instance, created, **kwargs):
@@ -205,6 +208,7 @@ def storage_item_created(sender, instance, created, **kwargs):
                 }
             )
 
+
 @receiver(post_delete, sender=InventoryItem, dispatch_uid="storage_deleted")
 def storage_item_deleted(sender, instance, **kwargs):
     if instance.category == "Сырье":
@@ -222,6 +226,7 @@ def storage_item_deleted(sender, instance, **kwargs):
                     "type": "get_notifications_handler",
                 }
             )
+
 
 @receiver(post_save, sender=Menu, dispatch_uid="menu_created")
 def menu_item_created(sender, instance, created, **kwargs):
@@ -241,9 +246,9 @@ def menu_item_created(sender, instance, created, **kwargs):
                 }
             )
 
+
 @receiver(post_delete, sender=Menu, dispatch_uid="menu_deleted")
 def menu_item_deleted(sender, instance, **kwargs):
-
     for admin in admins:
         Notification.objects.create(
             title=f"Удалили позицию\"{instance.name}\" ",
@@ -257,6 +262,7 @@ def menu_item_deleted(sender, instance, **kwargs):
                 "type": "get_notifications_handler",
             }
         )
+
 
 @receiver(post_save, sender=InventoryItem, dispatch_uid="storage_ready_created")
 def storage_ready_created(sender, instance, created, **kwargs):
@@ -276,6 +282,7 @@ def storage_ready_created(sender, instance, created, **kwargs):
                     "type": "get_notifications_handler",
                 }
             )
+
 
 @receiver(post_delete, sender=InventoryItem, dispatch_uid="storage_ready_deleted")
 def storage_ready_deleted(sender, instance, **kwargs):
@@ -314,6 +321,7 @@ def staff_created(sender, instance, created, **kwargs):
                 }
             )
 
+
 @receiver(post_delete, sender=CustomUser, dispatch_uid="staff_deleted")
 def staff_deleted(sender, instance, **kwargs):
     if instance.position == "Официант" or "Бармен":
@@ -327,6 +335,48 @@ def staff_deleted(sender, instance, **kwargs):
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 f"admin-{admin.id}",
+                {
+                    "type": "get_notifications_handler",
+                }
+            )
+
+
+baristas = User.objects.filter(position="Бармен")
+
+
+@receiver(post_save, sender=Order, dispatch_uid="order_barista_status_accept")
+def barista_status_accept(sender, instance, created, **kwargs):
+    logger.info(f"Signal received for order with id {instance.id}. Created: {created}")
+
+    item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
+    items_detail = ", ".join(item_descriptions)
+
+    title = ""
+    description = ""
+
+    if instance.status == 'Новый':
+        for barista in baristas:
+            if barista.branch == instance.branch:
+                if instance.order_type == 'На вынос':
+                    title = f"{instance.order_type}"
+                    description = f"{items_detail}"
+                elif instance.order_type == 'В заведении':
+                    title = f"{instance.order_name}"
+                    description = f"{items_detail}"
+
+            if title and description and instance.waiter:
+                Notification.objects.create(
+                    title=title,
+                    description=description,
+                    recipient=barista,
+                    status=instance.status
+                )
+
+            barista_name = f"barista-{barista.id}"
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                barista_name,
                 {
                     "type": "get_notifications_handler",
                 }

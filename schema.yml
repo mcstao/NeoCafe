@@ -1481,7 +1481,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1629,7 +1628,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1660,7 +1658,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '201':
           content:
@@ -1684,7 +1681,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -1745,7 +1741,6 @@ paths:
       - jwtAuth: []
       - basicAuth: []
       - cookieAuth: []
-      - {}
       responses:
         '200':
           content:
@@ -2863,6 +2858,8 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
         items:
           type: array
           items:
@@ -2913,6 +2910,9 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
+          maxLength: 10
         order_type:
           $ref: '#/components/schemas/OrderTypeEnum'
         status:
@@ -3010,6 +3010,9 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
+          maxLength: 10
         order_type:
           $ref: '#/components/schemas/OrderTypeEnum'
         status:
@@ -3077,6 +3080,8 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
         items:
           type: array
           items:
@@ -3123,6 +3128,7 @@ components:
       - completed_at
       - created
       - id
+      - order_name
       - order_type
       - status
       - total_price
@@ -3323,6 +3329,8 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
         items:
           type: array
           items:
@@ -3366,6 +3374,8 @@ components:
         id:
           type: integer
           readOnly: true
+        order_name:
+          type: string
         items:
           type: array
           items:

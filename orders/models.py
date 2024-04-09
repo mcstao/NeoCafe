@@ -53,10 +53,11 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     table = models.ForeignKey(Table, on_delete=models.SET_NULL, null=True)
+    order_name = models.CharField(max_length=10, blank=True)
 
 
     def __str__(self):
-        return f"Order #{self.pk} - {self.order_type} - {self.status}"
+        return f"Order #{self.pk}-{self.order_name} - {self.order_type} - {self.status}"
 
 
 class OrderItem(models.Model):

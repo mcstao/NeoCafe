@@ -123,10 +123,9 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
 
 
 @transaction.atomic
-def create_order_waiter(waiter_id, items, order_type, bonuses_used=0, table_id=None):
+def create_order_waiter(waiter_id, items, order_name, order_type, bonuses_used=0, table_id=None):
     waiter = CustomUser.objects.get(id=waiter_id)
     total_price = 0
-
     table_instance = None
     if order_type == "В заведении" and table_id:
         table_instance = Table.objects.get(id=table_id)
@@ -144,6 +143,7 @@ def create_order_waiter(waiter_id, items, order_type, bonuses_used=0, table_id=N
         order_type=order_type,
         branch=waiter.branch,
         table=table_instance,
+        order_name=order_name
     )
 
 
