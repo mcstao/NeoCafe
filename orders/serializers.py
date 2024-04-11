@@ -184,11 +184,10 @@ class OrderCustomerSerializer(serializers.ModelSerializer):
     created = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
-    order_name = serializers.CharField(required=False)
 
     class Meta:
         model = Order
-        fields = ['id', 'order_name', 'items', 'total_price', 'bonuses_used', 'order_type', 'user', 'status', 'branch',
+        fields = ['id', 'items', 'total_price', 'bonuses_used', 'order_type', 'user', 'status', 'branch',
                   'created',
                   'updated_at', 'completed_at']
 
