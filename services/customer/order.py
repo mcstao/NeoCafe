@@ -123,7 +123,7 @@ def create_order(user_id, items, order_type, bonuses_used=0, table_id=None):
 
 
 @transaction.atomic
-def create_order_waiter(waiter_id, items, order_name, order_type, bonuses_used=0, table_id=None):
+def create_order_waiter(waiter_id, items, order_type, bonuses_used=0, table_id=None):
     waiter = CustomUser.objects.get(id=waiter_id)
     total_price = 0
     table_instance = None
@@ -143,7 +143,7 @@ def create_order_waiter(waiter_id, items, order_name, order_type, bonuses_used=0
         order_type=order_type,
         branch=waiter.branch,
         table=table_instance,
-        order_name=order_name
+
     )
 
 

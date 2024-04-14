@@ -37,7 +37,7 @@ class ClientNotificationConsumer(AsyncWebsocketConsumer):
 
     async def get_notifications(self):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.user.id, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.user.id).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:
@@ -98,7 +98,7 @@ class WaiterNotificationConsumer(AsyncWebsocketConsumer):
 
     async def get_notifications(self, event=None):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.waiter, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.waiter).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:
@@ -158,7 +158,7 @@ class AdminNotificationConsumer(AsyncWebsocketConsumer):
 
     async def get_notifications(self, event=None):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.admin, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.admin).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:
@@ -218,7 +218,7 @@ class AdminNotificationConsumer(AsyncWebsocketConsumer):
 
     async def get_notifications(self, event=None):
         notifications = await sync_to_async(list, thread_sensitive=True)(
-            Notification.objects.filter(recipient=self.barista, read=False).order_by('-timestamp')
+            Notification.objects.filter(recipient=self.barista).order_by('-timestamp')
         )
         notifications_list = []
         for notification in notifications:

@@ -2858,8 +2858,6 @@ components:
         id:
           type: integer
           readOnly: true
-        order_name:
-          type: string
         items:
           type: array
           items:
@@ -3080,8 +3078,6 @@ components:
         id:
           type: integer
           readOnly: true
-        order_name:
-          type: string
         items:
           type: array
           items:
@@ -3128,7 +3124,6 @@ components:
       - completed_at
       - created
       - id
-      - order_name
       - order_type
       - status
       - total_price
@@ -3329,8 +3324,6 @@ components:
         id:
           type: integer
           readOnly: true
-        order_name:
-          type: string
         items:
           type: array
           items:
@@ -3374,8 +3367,6 @@ components:
         id:
           type: integer
           readOnly: true
-        order_name:
-          type: string
         items:
           type: array
           items:

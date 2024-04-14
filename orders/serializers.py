@@ -64,11 +64,10 @@ class OrderStaffSerializer(serializers.ModelSerializer):
     updated_at = serializers.DateTimeField(required=False, format="%d.%m.%Y %H:%M", read_only=True)
     completed_at = serializers.DateTimeField(allow_null=True, required=False, format="%d.%m.%Y %H:%M", read_only=True)
     bonuses_used = serializers.IntegerField(required=False, allow_null=True, min_value=0)
-    order_name = serializers.CharField()
 
     class Meta:
         model = Order
-        fields = ['id', 'order_name', 'items', 'total_price', 'order_type', 'table', 'waiter', 'status', 'branch', 'created',
+        fields = ['id', 'items', 'total_price', 'order_type', 'table', 'waiter', 'status', 'branch', 'created',
                   'updated_at', 'completed_at', 'user', 'bonuses_used']
 
     def create(self, validated_data):

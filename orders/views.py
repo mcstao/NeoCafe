@@ -18,7 +18,6 @@ class CreateOrderView(APIView):
     def post(self, request):
         waiter = request.user
         table = request.data.get("table")
-        order_name = request.data.get('order_name')
         order_type = request.data.get("order_type")
         items = request.data.get("items", [])
         bonuses_used = request.data.get("bonuses_used", 0)
@@ -32,7 +31,7 @@ class CreateOrderView(APIView):
             table_id = table.id if table else None
 
         try:
-            order = create_order_waiter(waiter.id, items, order_name, order_type, bonuses_used, table_id)
+            order = create_order_waiter(waiter.id, items, order_type, bonuses_used, table_id)
             return Response(OrderStaffSerializer(order).data, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
