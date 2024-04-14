@@ -358,10 +358,10 @@ def barista_status_accept(sender, instance, created, **kwargs):
         for barista in baristas:
             if barista.branch == instance.branch:
                 if instance.order_type == 'На вынос':
-                    title = f"{instance.order_type}"
+                    title = f"{instance.order_type}{instance.id}"
                     description = f"{items_detail}"
                 elif instance.order_type == 'В заведении':
-                    title = f"{instance.order_name}"
+                    title = f"{instance.order_type}{instance.id}"
                     description = f"{items_detail}"
 
             if title and description and instance.waiter:
