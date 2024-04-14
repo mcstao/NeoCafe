@@ -1465,6 +1465,20 @@ paths:
       responses:
         '204':
           description: No response body
+  /notifications/delete/all/:
+    delete:
+      operationId: notifications_delete_all_destroy
+      tags:
+      - notifications
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
   /orders/{id}/:
     get:
       operationId: orders_retrieve

@@ -16,3 +16,15 @@ class NotificationDeleteView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Notification.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class NotificationAllDeleteView(APIView):
+    serializer_class = serializers.Serializer
+
+    def delete(self, request, format=None):
+        try:
+            notifications = Notification.objects.filter(recipient=request.user)
+            notifications.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Notification.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
