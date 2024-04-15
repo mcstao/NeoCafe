@@ -1479,6 +1479,24 @@ paths:
       responses:
         '204':
           description: No response body
+  /notifications/notifications/:
+    get:
+      operationId: notifications_notifications_retrieve
+      tags:
+      - notifications
+      security:
+      - tokenAuth: []
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserNotification'
+          description: ''
   /orders/{id}/:
     get:
       operationId: orders_retrieve
@@ -3663,6 +3681,38 @@ components:
           type: integer
       required:
       - id
+    UserNotification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          type: string
+          maxLength: 50
+        read:
+          type: boolean
+        position:
+          type: string
+          maxLength: 20
+        recipient:
+          type: integer
+      required:
+      - description
+      - id
+      - recipient
+      - status
+      - timestamp
+      - title
     UserOrders:
       type: object
       properties:
