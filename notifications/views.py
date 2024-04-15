@@ -4,6 +4,7 @@ from .models import Notification
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, serializers
+from .serializers import UserNotificationSerializer
 
 
 
@@ -28,3 +29,12 @@ class NotificationAllDeleteView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Notification.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class UserNotificationListView(APIView):
+    serializer_class = UserNotificationSerializer
+
+    def get(self, request, format=None):
+        notifications = Notification.objects.filter(recipient=request.user)
+        serializer = self.serializer_class(notifications, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
