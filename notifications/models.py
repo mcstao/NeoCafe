@@ -14,7 +14,6 @@ class Notification(models.Model):
     read = models.BooleanField(default=False)
 
     recipient = models.ForeignKey(CustomUser, related_name='notifications', on_delete=models.CASCADE)
-    position = models.CharField(max_length=20,blank=True)
 
 
     def __str__(self):

@@ -3687,23 +3687,20 @@ components:
         id:
           type: integer
           readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
         title:
           type: string
           maxLength: 255
         description:
           type: string
-        timestamp:
-          type: string
-          format: date-time
-          readOnly: true
         status:
           type: string
           maxLength: 50
         read:
           type: boolean
-        position:
-          type: string
-          maxLength: 20
         recipient:
           type: integer
       required:
