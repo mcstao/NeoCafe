@@ -12,7 +12,7 @@ class Notification(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=50)
     read = models.BooleanField(default=False)
-    table = models.CharField(blank=True, null=True, max_length=20)
+    table = models.CharField(blank=True, null=True, max_length=100)
 
     recipient = models.ForeignKey(CustomUser, related_name='notifications', on_delete=models.CASCADE)
 
