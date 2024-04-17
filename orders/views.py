@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from services.customer.order import create_order, reorder, get_reorder_information, remove_order_item, \
     return_to_storage, return_item_ingredients_to_storage, remove_extra_products, return_extra_ingredients_to_storage, \
     create_order_waiter
+from services.users.permissions import IsBarista, IsWaiter
 from .models import Table, Order, OrderItem, OrderItemExtraProduct
 
 from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDetailSerializer, TableSerializer, \
@@ -14,6 +15,7 @@ from .serializers import OrderStaffSerializer, OrderCustomerSerializer, TableDet
 
 
 class CreateOrderView(APIView):
+    permission_classes = [IsBarista | IsWaiter]
     @extend_schema(request=OrderStaffSerializer, responses={201: OrderStaffSerializer}, description="Создает заказ")
     def post(self, request):
         waiter = request.user
@@ -39,6 +41,7 @@ class CreateOrderView(APIView):
 
 class UpdateOrderView(APIView):
     serializer_class = OrderStaffSerializer
+    permission_classes = [IsBarista | IsWaiter]
 
     def patch(self, request, order_id):
         try:
@@ -64,6 +67,7 @@ class UpdateOrderView(APIView):
 
 
 class ReorderView(APIView):
+    permission_classes = [IsBarista | IsWaiter]
     @extend_schema(
         responses={201: OrderStaffSerializer},
         description="Повторно создает заказ по его идентификатору.",
@@ -83,6 +87,7 @@ class ReorderView(APIView):
 
 
 class ReorderInformationView(APIView):
+    permission_classes = [IsBarista | IsWaiter]
     @extend_schema(
         responses={200: None},
         description="Предоставляет информацию для повторного заказа."
@@ -114,6 +119,7 @@ class ReorderInformationView(APIView):
 
 
 class RemoveOrderItemView(APIView):
+    permission_classes = [IsBarista | IsWaiter]
     @extend_schema(
         responses={200: None},
         description="Удаляет пункт или обновляет количество в заказе.",
@@ -162,6 +168,7 @@ class RemoveOrderItemView(APIView):
         return Response({"message": "Requested items were removed/updated."}, status=status.HTTP_200_OK)
 
 class CreateCustomerOrderView(APIView):
+    permission_classes = [IsAuthenticated]
     @extend_schema(
         request=OrderCustomerSerializer,
         responses={201: OrderCustomerSerializer},
@@ -188,7 +195,7 @@ class CreateCustomerOrderView(APIView):
 
 class UpdateCustomerOrderView(APIView):
     serializer_class = OrderCustomerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBarista | IsWaiter]
 
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
@@ -207,7 +214,7 @@ class UpdateCustomerOrderView(APIView):
 class TableDetailView(generics.RetrieveAPIView):
     queryset = Table.objects.all()
     serializer_class = TableDetailSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBarista | IsWaiter]
 
     def get_object(self):
         return super().get_object()
@@ -215,11 +222,11 @@ class TableDetailView(generics.RetrieveAPIView):
 class TableListCreateView(generics.ListCreateAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [IsBarista | IsWaiter]
 
 class TableListByBranchView(generics.ListAPIView):
     serializer_class = TableSerializer
+    permission_classes = [IsBarista | IsWaiter]
 
     def get_queryset(self):
         branch_id = self.kwargs['branch_id']
@@ -229,7 +236,7 @@ class TableListByBranchView(generics.ListAPIView):
 class OrderDetailedListView(generics.ListAPIView):
     serializer_class = OrderDetailedListSerializer
     queryset = Order.objects.all().order_by('-created')
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBarista]
 
     def get_queryset(self):
         user_branch = self.request.user.branch
@@ -257,5 +264,5 @@ class OrderDetailedListView(generics.ListAPIView):
 class OrderDetailView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderOneSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBarista | IsWaiter]
     lookup_field = 'id'

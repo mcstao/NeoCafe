@@ -1,9 +1,10 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, permissions
 
 from branches.serializers import BranchSerializer
 from menu.serializers import MenuSerializer
 from branches.models import Branch
 from menu.models import Menu
+from services.users.permissions import IsAdminUser
 from storage.models import InventoryItem
 from drf_spectacular.utils import extend_schema
 
@@ -11,6 +12,8 @@ from drf_spectacular.utils import extend_schema
 class BranchViewSet(viewsets.ModelViewSet):
     queryset = Branch.objects.all()
     serializer_class = BranchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
 
 
 class BranchMenuView(generics.ListAPIView):
