@@ -95,31 +95,31 @@ def waiter_status_changed(sender, instance, created, **kwargs):
 
     item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
     items_detail = ", ".join(item_descriptions)
-    table = ""
+    table_number = ""
     title = ""
     description = ""
 
     if instance.status == 'Новый':
         title = f"Ваш заказ оформлен"
-        description = f"{items_detail}"
-        table = f"Стол №{instance.table.table_number}"
+        description = f"{items_detail} {instance.table}"
+        table_number = f"{instance.table}"
     elif instance.status == 'Готово':
         title = f"Заказ готов"
         description = f"{items_detail}"
-        table = f"Стол №{instance.table.table_number}"
+        table_number = f"{instance.table}"
     elif instance.status == 'В процессе':
         title = f"Бариста принял заказ"
         description = f"{items_detail}"
     elif instance.status == 'Завершено':
         title = f"Закрытие счета"
         description = f"{items_detail}"
-        table = f"Стол №{instance.table.table_number}"
+        table_number = f"{instance.table}"
 
-    if title and description and table and instance.waiter:
+    if title and description and table_number and instance.waiter:
         Notification.objects.create(
             title=title,
             description=description,
-            table=table,
+            table=table_number,
             recipient=instance.waiter,
             status=instance.status,
         )
@@ -354,7 +354,7 @@ def barista_status_accept(sender, instance, created, **kwargs):
 
     item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
     items_detail = ", ".join(item_descriptions)
-    table = ""
+    table_number = ""
     title = ""
     description = ""
 
@@ -367,7 +367,7 @@ def barista_status_accept(sender, instance, created, **kwargs):
                 elif instance.order_type == 'В заведении':
                     title = f"{instance.order_type} {instance.id}"
                     description = f"{items_detail}"
-                    table = f"Стол №{instance.table.table_number}"
+                    table_number = f"{instance.table}"
 
             if title and description and instance.waiter:
                 Notification.objects.create(
@@ -375,7 +375,7 @@ def barista_status_accept(sender, instance, created, **kwargs):
                     description=description,
                     recipient=barista,
                     status=instance.status,
-                    table=table
+                    table=table_number
                 )
 
             barista_name = f"barista-{barista.id}"
