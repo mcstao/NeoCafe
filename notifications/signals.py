@@ -95,29 +95,33 @@ def waiter_status_changed(sender, instance, created, **kwargs):
 
     item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
     items_detail = ", ".join(item_descriptions)
-
+    table = ""
     title = ""
     description = ""
 
     if instance.status == 'Новый':
         title = f"Ваш заказ оформлен"
         description = f"{items_detail}"
+        table = f"Стол №{instance.table.table_number}"
     elif instance.status == 'Готово':
         title = f"Заказ готов"
         description = f"{items_detail}"
+        table = f"Стол №{instance.table.table_number}"
     elif instance.status == 'В процессе':
         title = f"Бариста принял заказ"
         description = f"{items_detail}"
     elif instance.status == 'Завершено':
         title = f"Закрытие счета"
         description = f"{items_detail}"
+        table = f"Стол №{instance.table.table_number}"
 
-    if title and description and instance.waiter:
+    if title and description and table and instance.waiter:
         Notification.objects.create(
             title=title,
             description=description,
+            table=table,
             recipient=instance.waiter,
-            status=instance.status
+            status=instance.status,
         )
 
         waiter_name = f"waiter-{instance.waiter.id}"
@@ -350,7 +354,7 @@ def barista_status_accept(sender, instance, created, **kwargs):
 
     item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
     items_detail = ", ".join(item_descriptions)
-
+    table = ""
     title = ""
     description = ""
 
@@ -363,13 +367,15 @@ def barista_status_accept(sender, instance, created, **kwargs):
                 elif instance.order_type == 'В заведении':
                     title = f"{instance.order_type} {instance.id}"
                     description = f"{items_detail}"
+                    table = f"Стол №{instance.table.table_number}"
 
             if title and description and instance.waiter:
                 Notification.objects.create(
                     title=title,
                     description=description,
                     recipient=barista,
-                    status=instance.status
+                    status=instance.status,
+                    table=table
                 )
 
             barista_name = f"barista-{barista.id}"
