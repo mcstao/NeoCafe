@@ -263,5 +263,5 @@ class OrderDetailedListView(generics.ListAPIView):
 class OrderDetailView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderOneSerializer
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
