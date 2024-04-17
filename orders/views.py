@@ -119,7 +119,7 @@ class ReorderInformationView(APIView):
 
 
 class RemoveOrderItemView(APIView):
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
     @extend_schema(
         responses={200: None},
         description="Удаляет пункт или обновляет количество в заказе.",
@@ -195,7 +195,7 @@ class CreateCustomerOrderView(APIView):
 
 class UpdateCustomerOrderView(APIView):
     serializer_class = OrderCustomerSerializer
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
 
     def patch(self, request, order_id):
         order = Order.objects.get(id=order_id)
@@ -236,8 +236,7 @@ class TableListByBranchView(generics.ListAPIView):
 class OrderDetailedListView(generics.ListAPIView):
     serializer_class = OrderDetailedListSerializer
     queryset = Order.objects.all().order_by('-created')
-    permission_classes = [IsBarista]
-
+    permission_classes = [IsBarista | IsWaiter]
     def get_queryset(self):
         user_branch = self.request.user.branch
         queryset = super().get_queryset().filter(branch=user_branch)
