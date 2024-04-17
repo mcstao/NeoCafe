@@ -108,6 +108,7 @@ class WaiterNotificationConsumer(AsyncWebsocketConsumer):
                     "title": notification.title,
                     "description": notification.description,
                     "timestamp": notification.timestamp.strftime("%H:%M"),
+                    "table": notification.table
                 }
             )
             notification.read = True
@@ -187,7 +188,7 @@ class AdminNotificationConsumer(AsyncWebsocketConsumer):
         await self.get_notifications()
 
 
-class AdminNotificationConsumer(AsyncWebsocketConsumer):
+class BaristaNotificationConsumer(AsyncWebsocketConsumer):
     """
     Consumer for sending notifications to barista.
     """
@@ -228,6 +229,7 @@ class AdminNotificationConsumer(AsyncWebsocketConsumer):
                     "title": notification.title,
                     "description": notification.description,
                     "timestamp": notification.timestamp.strftime("%H:%M"),
+                    "table": notification.table
                 }
             )
             notification.read = True
