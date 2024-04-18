@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from rest_framework.permissions import IsAdminUser
 
 from employees.seriaalizers import StaffCreateSerializer
@@ -33,7 +33,7 @@ class StaffDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StaffCreateSerializer
     queryset = CustomUser.objects.filter(position__in=["Бармен", "Официант"])
     lookup_field = "id"
-    permission_classes = [IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 
