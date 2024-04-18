@@ -214,7 +214,7 @@ class UpdateCustomerOrderView(APIView):
 class TableDetailView(generics.RetrieveAPIView):
     queryset = Table.objects.all()
     serializer_class = TableDetailSerializer
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return super().get_object()
@@ -222,11 +222,11 @@ class TableDetailView(generics.RetrieveAPIView):
 class TableListCreateView(generics.ListCreateAPIView):
     queryset = Table.objects.all()
     serializer_class = TableSerializer
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
 
 class TableListByBranchView(generics.ListAPIView):
     serializer_class = TableSerializer
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         branch_id = self.kwargs['branch_id']
@@ -236,7 +236,7 @@ class TableListByBranchView(generics.ListAPIView):
 class OrderDetailedListView(generics.ListAPIView):
     serializer_class = OrderDetailedListSerializer
     queryset = Order.objects.all().order_by('-created')
-    permission_classes = [IsBarista | IsWaiter]
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user_branch = self.request.user.branch
         queryset = super().get_queryset().filter(branch=user_branch)
