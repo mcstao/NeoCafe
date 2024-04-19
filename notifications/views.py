@@ -15,7 +15,7 @@ class NotificationDeleteView(APIView):
         try:
             notification = Notification.objects.get(pk=pk, recipient=request.user)
             notification.delete()
-            return Response({"message": "Уведомление успешно удалено."}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "Уведомление успешно удалено."}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({"message": "Уведомление не найдено."}, status=status.HTTP_404_NOT_FOUND)
 
@@ -27,7 +27,7 @@ class NotificationAllDeleteView(APIView):
         try:
             notifications = Notification.objects.filter(recipient=request.user)
             notifications.delete()
-            return Response({"message": "Все уведомления успешно удалены."}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "Все уведомления успешно удалены."}, status=status.HTTP_200_OK)
         except Notification.DoesNotExist:
             return Response({"message": "Ни одно уведомление не найдено."}, status=status.HTTP_404_NOT_FOUND)
 
