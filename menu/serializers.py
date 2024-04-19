@@ -32,6 +32,14 @@ class MenuSerializer(serializers.ModelSerializer):
 
         return menu
 
+    def update(self, instance, validated_data):
+        ingredients_data = validated_data.pop('ingredients', None)
+        instance = super().update(instance, validated_data)
+        if ingredients_data is not None:
+            instance.ingredients.all().delete()
+            for ingredient_data in ingredients_data:
+                Ingredient.objects.create(menu_item=instance, **ingredient_data)
+        return instance
 
 class ExtraItemSerializer(serializers.ModelSerializer):
     class Meta:
