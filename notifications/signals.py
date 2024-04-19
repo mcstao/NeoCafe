@@ -60,7 +60,7 @@ def client_status_changed(sender, instance, created, **kwargs):
     if instance.status == 'Новый':
         title = f"Ваш заказ оформлен"
         description = f"{items_detail}"
-    if instance.status == 'Готово':
+    elif instance.status == 'Готово':
         title = f"Ваш заказ готов"
         description = f"{items_detail}"
     elif instance.status == 'Завершено':
