@@ -16,8 +16,10 @@ class InventoryItemSerializer(serializers.ModelSerializer):
         quantity_unit = data.get('quantity_unit')
 
         if quantity_unit == 'кг':
-            data['quantity'] = float(quantity) * 1000  # Конвертируем килограммы в граммы
+            data['quantity'] = float(quantity) * 1000
+            data['quantity_unit'] = 'гр'
         elif quantity_unit == 'л':
-            data['quantity'] = float(quantity) * 1000  # Конвертируем литры в миллилитры
+            data['quantity'] = float(quantity) * 1000
+            data['quantity_unit'] = 'мл'
 
         return super().to_internal_value(data)

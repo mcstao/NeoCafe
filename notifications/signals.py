@@ -15,7 +15,7 @@ from users.models import CustomUser
 from .models import Notification
 import loguru
 
-SLEEP_TIME = 3
+
 
 User = get_user_model()
 
@@ -26,7 +26,6 @@ def notify_clients(sender, instance, **kwargs):
     Updates notifications on barista side.
     """
     logger.info("Updating notifications")
-    time.sleep(SLEEP_TIME)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         "branch",
@@ -40,7 +39,6 @@ def notify_clients(sender, instance, **kwargs):
 @receiver(post_delete, sender=Notification)
 def notify_clients_on_delete(sender, instance, **kwargs):
     logger.info("Updating notifications")
-    time.sleep(SLEEP_TIME)
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(
         "branch",
@@ -52,7 +50,6 @@ def notify_clients_on_delete(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Order, dispatch_uid="order_client_status_changed")
 def client_status_changed(sender, instance, created, **kwargs):
-    logger.info(f"Signal received for order with id {instance.id}. Created: {created}")
 
     item_descriptions = [f"{item.menu.name} x {item.quantity}" for item in instance.items.all()]
     items_detail = ", ".join(item_descriptions)
