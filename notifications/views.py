@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import Http404
 from loguru import logger
 from .models import Notification
@@ -14,8 +15,10 @@ class NotificationDeleteView(APIView):
         try:
             notification = Notification.objects.get(pk=pk, recipient=request.user)
             notification.delete()
+            messages.success(request, "Уведомление успешно удалено.")
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Notification.DoesNotExist:
+            messages.error(request, "Уведомление не найдено.")
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -26,8 +29,10 @@ class NotificationAllDeleteView(APIView):
         try:
             notifications = Notification.objects.filter(recipient=request.user)
             notifications.delete()
+            messages.success(request, "Все уведомления успешно удалены.")
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Notification.DoesNotExist:
+            messages.error(request, "Ни одно уведомление не найдено.")
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
