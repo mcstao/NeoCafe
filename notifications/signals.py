@@ -57,10 +57,10 @@ def client_status_changed(sender, instance, created, **kwargs):
     title = ""
     description = ""
 
-    if created:
+    if instance.status == 'Новый':
         title = f"Ваш заказ оформлен"
         description = f"{items_detail}"
-    elif instance.status == 'Готово':
+    if instance.status == 'Готово':
         title = f"Ваш заказ готов"
         description = f"{items_detail}"
     elif instance.status == 'Завершено':
@@ -96,7 +96,7 @@ def waiter_status_changed(sender, instance, created, **kwargs):
     title = ""
     description = ""
 
-    if created:
+    if instance.status == 'Новый':
         title = f"Ваш заказ оформлен"
         description = f"{items_detail} {instance.table}"
         table_number = f"{instance.table}"
