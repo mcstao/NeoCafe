@@ -66,4 +66,5 @@ The API allows for actions like creating orders and updating profiles. It is RES
 ### Authentication
 API keys are used for authentication. Keep them secure and do not share publicly.
 
+### Author
 Adilet Anarbaev
